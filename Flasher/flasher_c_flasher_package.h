@@ -1,0 +1,10 @@
+#ifndef FLASHER_C_FLASHER_PACKAGE
+#define FLASHER_C_FLASHER_PACKAGE
+
+class C_FlasherPackage
+{
+
+};
+
+#endif // FLASHER_C_FLASHER_PACKAGE
+
