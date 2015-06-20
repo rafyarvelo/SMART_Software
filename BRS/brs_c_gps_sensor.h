@@ -5,6 +5,10 @@
 
 class C_GPS_Sensor : public C_AbstractSensor
 {
+public:
+    virtual void           turnOn();
+    virtual void           turnOff();
+    virtual sensorData_t*  GetData();
 
 };
 
