@@ -1,16 +1,11 @@
 #ifndef BCI_C_EEG_IO
 #define BCI_C_EEG_IO
 
+#include "../smart_config.h"
+
 typedef unsigned char  byteType;
 typedef unsigned short wordType;
 typedef unsigned int   dWordType;
-
-typedef enum
-{
-	EEG_TYPE_EMOTIV=0,
-	EEG_TYPE_NAUTILUS,
-	EEG_TYPE_DEBUG
-} EEG_TYPE;
 
 typedef struct EEG_Data
 {
@@ -39,11 +34,11 @@ typedef struct EEG_Data
 class C_EEG_IO
 {
 public:
-	C_EEG_IO();
+	         C_EEG_IO();
 	virtual ~C_EEG_IO();
-
-	virtual EEG_Data* getData() = 0;
-	virtual EEG_TYPE  getType() = 0;
+	
+	virtual EEG_Data*    getData() = 0;
+	virtual eegTypeEnum  getType() = 0;
 
 private:
 	EEG_Data*    pData;

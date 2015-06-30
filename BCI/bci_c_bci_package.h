@@ -20,8 +20,6 @@ using namespace std;
 class C_BCI_Package
 {
 public:
-     C_BCI_Package();
-    ~C_BCI_Package();
 
     //Factory Constructor
     static C_BCI_Package* Instance();
@@ -31,6 +29,9 @@ public:
     void sendPCC_Commands();
 
 private:
+	 C_BCI_Package();
+    ~C_BCI_Package();
+
     void initialize();
     bool checkFlasherComm();
     bool checkBRSHComm();
@@ -40,6 +41,8 @@ private:
 private:
     C_SignalProcessing*  pSignalProcessing;
     C_JudgmentAlgorithm* pJA;
+    C_JA2BRS* 			 pJA2BRS;
+	C_JA2PCC* 			 pJA2PCC;
     C_EEG_IO*            pEEG_IO;
     C_Flasher_IO*        pFlasherIO;
     C_RVS*               pRVS;

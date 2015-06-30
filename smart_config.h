@@ -13,13 +13,25 @@
 typedef bool ConnectionStatusType;
 typedef unsigned char PCC_Command_Type;
 
+typedef enum
+{
+	EEG_TYPE_EMOTIV=0,
+	EEG_TYPE_NAUTILUS,
+	EEG_TYPE_DEBUG
+} eegTypeEnum;
+
+typedef enum
+{
+	ANDROID=0,
+	IOS=1,
+	WINDOWS_PHONE=2
+} MobileDeviceTypeEnum;
+
 //EEG Type (only select one)
-#define EEG_DEBUG
-//#define EEG_EMOTIV
-//#define EEG_NAUTILUS
+#define EEG_DEVICE_TYPE EEG_TYPE_DEBUG
 
 //Device Type (only select one)
-#define ANDROID
+#define MOBILE_DEVICE_TYPE ANDROID
 //#define IOS
 //#define WINDOWS_PHONE
 

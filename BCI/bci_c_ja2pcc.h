@@ -14,8 +14,8 @@ public:
 	void SetCommand(PCC_Command_Type cmd);
 	void SendCommand();
 	
-	void connect();
-	bool connectionStatus();
+	void Connect();
+	bool ConnectionStatus();
 	
 private:
 	PCC_Command_Type currentCommand;

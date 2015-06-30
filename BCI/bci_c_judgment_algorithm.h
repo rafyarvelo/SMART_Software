@@ -15,8 +15,6 @@ public:
 
 private:
 	C_SignalProcessing* mSignalProcessingPtr;
-	C_JA2BRS* 			pJA2BRS;
-	C_JA2PCC* 			pJA2PCC;
 };
 
 #endif // BCI_C_JUDGMENT_ALGORITHM_H

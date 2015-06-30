@@ -16,7 +16,6 @@ typedef enum
 #define	LED_RIGHT_FREQ_DEFAULT    30
 #define	LED_LEFT_FREQ_DEFAULT     40
 
-
 class LED_Group
 {
 public:
@@ -29,33 +28,38 @@ public:
 	//Factory Constructors
 	static LED_Group* Forward()
 	{
-		return new LED_Group(LED_FORWARD, LED_FORWARD_FREQ_DEFAULT);
+		return createLED_Group(LED_FORWARD, LED_FORWARD_FREQ_DEFAULT);
 	}
 	
 	static LED_Group* Backward()
 	{
-		return new LED_Group(LED_BACKWARD, LED_BACKWARD_FREQ_DEFAULT);
+		return createLED_Group(LED_BACKWARD, LED_BACKWARD_FREQ_DEFAULT);
 	}
 	
 	static LED_Group* Right()
 	{
-		return new LED_Group(LED_RIGHT, LED_RIGHT_FREQ_DEFAULT);
+		return createLED_Group(LED_RIGHT, LED_RIGHT_FREQ_DEFAULT);
 	}
 	
 	static LED_Group* Left()
 	{
-		return new LED_Group(LED_LEFT, LED_LEFT_FREQ_DEFAULT);
+		return createLED_Group(LED_LEFT, LED_LEFT_FREQ_DEFAULT);
+	}
+	
+	static LED_Group* createLED_Group(LED_Group_ID id, float freq)
+	{
+		return new LED_Group(id, freq);
 	}
 
 	static LED_Group** DefaultGroups()
 	{
-		LED_Group* defaultGroups[] = 
-		{
-			Forward(),
-			Backward(),
-			Right(),
-			Left()
-		};
+		int i = 0;
+		LED_Group** defaultGroups = new LED_Group*[NUM_LED_GROUPS];
+		
+		defaultGroups[i++] = Forward();
+		defaultGroups[i++] = Backward();
+		defaultGroups[i++] = Right();
+		defaultGroups[i++] = Left();
 		
 		return defaultGroups;
 	}
@@ -75,7 +79,7 @@ public:
     void SetFrequency(LED_Group_ID id, float frequency);
 
 private:
-    LED_Group* ledGroups[NUM_LED_GROUPS];
+    LED_Group** ledGroups;
 
 };
 

@@ -11,7 +11,7 @@ typedef struct C_TM
     sensorData_t US_Data;
     unsigned int size;
 
-    C_TM(EEG_Data eegData, sensorData_t gpsData, sensorData_t usData)
+    C_TM(EEG_Data& eegData, sensorData_t& gpsData, sensorData_t& usData)
     {
     	this->eegData  = eegData;
     	this->GPS_Data = gpsData;
@@ -19,6 +19,11 @@ typedef struct C_TM
     	this->size     = eegData.size + gpsData.size + usData.size;
     }
 
+	static C_TM* createTMPacket(EEG_Data& eegData, sensorData_t& gpsData, sensorData_t& usData)
+	{
+		return new C_TM(eegData, gpsData, usData);
+	}
+	
 } C_TM;
 
 #endif // BCI_C_TM
