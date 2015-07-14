@@ -1,0 +1,1 @@
+"./pcc_cmd_control.obj" "./pcc_gpio.obj" "./pcc_main.obj" "./pcc_uart_comm.obj" "../lnk_msp430g2553.cmd" -l"libc.a" 
