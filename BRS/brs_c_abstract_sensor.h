@@ -4,19 +4,25 @@
 typedef float         SensorDataType;
 typedef unsigned char byteType;
 
-typedef struct sensorData_t
+class sensorData_t
 {
-    int size;
-    byteType*       rawData;
-    SensorDataType* data;
-
+public:
     sensorData_t(char* byteData, int size)
     {
         this->rawData = (byteType*) byteData;
         this->data    = (float*)    byteData;
         this->size    = size;
     }
-}sensorData_t;
+    sensorData_t()
+    {
+        this->rawData = 0;
+        this->data    = 0;
+        this->size    = 0;
+    }
+    int size;
+    byteType*       rawData;
+    SensorDataType* data;
+};
 
 class C_AbstractSensor
 {

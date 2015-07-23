@@ -22,18 +22,37 @@ void initCmdControl()
 	sendGPIO(PORT1_REF, SERVO_X, LOGIC_LOW);
 	sendGPIO(PORT1_REF, SERVO_Y, LOGIC_LOW);
 
+	//Initialize Status Bad
+	setLED(RED_LED, ON);
+	setLED(GREEN_LED, OFF);
+
 	pcc_cntrl_initialized = TRUE;
 }
 
-void sendServoCmd(unsigned char servo, ServoDirection direction)//direction is
+void sendServoCmd(unsigned char servo, ServoDirection direction)//direction
 {
 	//Status good
 	setLED(RED_LED, OFF);
 	setLED(GREEN_LED, ON);
 
-	sendGPIO(PORT1_REF, servo, LOGIC_HIGH);
-	sleep(PULSE_DURATION);
-	sendGPIO(PORT1_REF, servo, LOGIC_LOW);
+#ifdef SERVO_OUTPUT_PWM //defined in smart_config.h
+	if (direction == CLOCKWISE)
+	{
+		sendGPIO(PORT1_REF, servo, LOGIC_TOGGLE);
+	}
+	else//Counter Clockwise
+	{
+		sendGPIO(PORT1_REF, servo, LOGIC_TOGGLE);
+	}
+#else
+	printStr("Undefined Servo API!!!!");
+	println();
+
+	//Status Bad
+	setLED(RED_LED, ON);
+	setLED(GREEN_LED, OFF);
+#endif
+
 }
 
 void Forward()
@@ -105,12 +124,6 @@ void processCommand(unsigned char cmd)
 	if (!pcc_cntrl_initialized)
 		initCmdControl();
 
-	unsigned long i = 0;
-	for (i = 0; i < 500; i++)
-	{
-		printInteger(i);
-	}
-
 	printNewLine();
 	switch (cmd)
 	{
@@ -143,8 +156,11 @@ void processCommand(unsigned char cmd)
 			if (++invalidCmdCount >= maxInvalidCmdCount)
 			{
 				println("Maximum amount of Invalid Commands Processed, Stopping PCC Commands...");
+
+				//Status Bad
 				setLED(RED_LED, ON);
 				setLED(GREEN_LED, OFF);
+
 				pLastProcessedCmd = NULL;
 			}
 			else//Keep sending the last successfully processed command until the retry count is reached

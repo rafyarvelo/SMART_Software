@@ -8,11 +8,15 @@
 //Define all PCC Movement Commands Here
 //Movement commands will be sent as UNSIGNED CHARs
 
+#include "../smart_config.h"
+
 #ifndef POWER_CHAIR_COMMAND_CONSTANTS_H_
 #define POWER_CHAIR_COMMAND_CONSTANTS_H_
 
-#define TRUE         1
-#define FALSE        0
+#define TRUE          1
+#define CONNECTED     true
+#define FALSE         0
+#define NOT_CONNECTED false
 
 #define PCC_STOP     0x73 //ASCII 's'
 
@@ -31,7 +35,7 @@
 #define SERVO_Y      BIT4 //Forward/Back
 #define SERVO_X      BIT5 //Left/Right
 
-#define CMD_DURATION 50 //ms
+#define CMD_DURATION   50 //ms
 #define PULSE_DURATION 10 //ms
 
 //LEDS
