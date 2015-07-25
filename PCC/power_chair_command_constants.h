@@ -13,11 +13,6 @@
 #ifndef POWER_CHAIR_COMMAND_CONSTANTS_H_
 #define POWER_CHAIR_COMMAND_CONSTANTS_H_
 
-#define TRUE          1
-#define CONNECTED     true
-#define FALSE         0
-#define NOT_CONNECTED false
-
 #define PCC_STOP     0x73 //ASCII 's'
 
 #define PCC_FORWARD  0x66 //ASCII 'f'

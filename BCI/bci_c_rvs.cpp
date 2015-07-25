@@ -17,14 +17,27 @@ C_RVS::~C_RVS()
 	}
 }
 
-void C_RVS::emitRVS(LED_Group_ID id)
+const LED_Group*  C_RVS::GetLEDGroup(LED_Group_ID id)
 {
-	
+	if (id < 0 || id > NUM_LED_GROUPS)
+	{
+		id = LED_FORWARD;//return forward group by default
+	}
+	return ledGroups[id];
 }
 
-void C_RVS::SetFrequency(LED_Group_ID id, float frequency)
+const LED_Group** GetAllLEDGroups();
+
+void C_RVS::SetFrequency(LED_Group_ID id, unsigned short frequency)
 {
-	
+	if (id < 0 || id > NUM_LED_GROUPS)
+	{
+		;//invalid id, do nothing
+	}	
+	else
+	{
+		ledGroups[id]->frequency = frequency;
+	}
 }
 
 

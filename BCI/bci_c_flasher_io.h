@@ -3,17 +3,23 @@
 
 #include "bci_c_rvs.h"
 #include "../smart_config.h"
+#include "../smart_debug_log.h"
 
 class C_Flasher_IO
 {
 public:
-     C_Flasher_IO();
+     C_Flasher_IO(C_RVS* pRVS);
     ~C_Flasher_IO();
 
+	static C_Flasher_IO* Instance(C_RVS* pRVS)
+	{
+		return new C_Flasher_IO(pRVS);
+	}
+	
     ConnectionStatusType GetConnectionStatus() {return connectionStatus;}
-    C_RVS&               GetRVSRef()           {return rvs;}
+    
 private:
-    C_RVS rvs;
+	C_RVS* mRVS_Ptr;
     ConnectionStatusType connectionStatus;
 };
 

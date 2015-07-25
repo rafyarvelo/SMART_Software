@@ -1,6 +1,9 @@
 #ifndef BCI_C_JA2BRS
 #define BCI_C_JA2BRS
 
+#include "../smart_config.h"
+#include "../smart_debug_log.h"
+
 class C_JA2BRS
 {
 public:		

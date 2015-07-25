@@ -10,8 +10,24 @@
 #ifndef SMART_CONFIG_H_
 #define SMART_CONFIG_H_
 
-typedef bool ConnectionStatusType;
-typedef unsigned char PCC_Command_Type;
+//Basic Common Declarations
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+using namespace std;
+
+typedef bool               ConnectionStatusType;
+typedef unsigned char      PCC_Command_Type;
+typedef unsigned char      byteType;
+typedef unsigned short     shortType;
+typedef unsigned int       wordType;
+typedef unsigned int       sizeType;
+typedef unsigned long long longType;
+
+#define TRUE          1
+#define FALSE         0
+#define CONNECTED     true
+#define NOT_CONNECTED false
 
 typedef enum
 {
@@ -28,14 +44,16 @@ typedef enum
 } MobileDeviceTypeEnum;
 
 //EEG Type (only select one)
-#define EEG_DEVICE_TYPE EEG_TYPE_DEBUG
-
+#define DEFAULT_EEG_TYPE EEG_TYPE_DEBUG //Supported Options:
+                                        //EEG_TYPE_DEBUG
+                                        //EEG_TYPE_NAUTILUS
+                                        //EEG_TYPE_EMOTIV
 //Device Type (only select one)
-#define MOBILE_DEVICE_TYPE ANDROID
-//#define IOS
-//#define WINDOWS_PHONE
+#define DEFAULT_MOBILE_DEVICE ANDROID
+                            //IOS
+                            //WINDOWS_PHONE
 
-//Servo Type
+//Servo Output Type
 #define SERVO_OUTPUT_PWM
 
 //PCC Serial Port

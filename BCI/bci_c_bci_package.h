@@ -5,6 +5,9 @@
 #include "bci_c_tm.h"
 #include "bci_c_flasher_io.h"
 #include "bci_c_eeg_io.h"
+#include "bci_c_eeg_io_debug.h"
+#include "bci_c_eeg_io_emotiv.h"
+#include "bci_c_eeg_io_nautilus.h"
 #include "bci_c_judgment_algorithm.h"
 #include "bci_c_ja2brs.h"
 #include "bci_c_ja2pcc.h"
@@ -15,6 +18,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string>
+#include <ctime>
 using namespace std;
 
 class C_BCI_Package
@@ -39,6 +43,9 @@ private:
     bool checkEEGComm();
 
 private:
+	C_EEG_IO* createEEG_IO(eegTypeEnum type=DEFAULT_EEG_TYPE);//factory EEG Construction
+	
+	SMART_DEBUG_LOG*     debugLog;
     C_SignalProcessing*  pSignalProcessing;
     C_JudgmentAlgorithm* pJA;
     C_JA2BRS* 			 pJA2BRS;

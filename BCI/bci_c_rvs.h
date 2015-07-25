@@ -2,6 +2,9 @@
 #ifndef BCI_C_RVS
 #define BCI_C_RVS
 
+#include "../smart_config.h"
+#include "../smart_debug_log.h"
+
 typedef enum
 {
     LED_FORWARD=0,
@@ -75,11 +78,14 @@ public:
       C_RVS();
      ~C_RVS();
 
-    void emitRVS(LED_Group_ID id);
-    void SetFrequency(LED_Group_ID id, float frequency);
+	static C_RVS* Instance(){ return new C_RVS; }
+    const LED_Group*  GetLEDGroup(LED_Group_ID id);
+    const LED_Group** GetAllLEDGroups();
+    void SetFrequency(LED_Group_ID id, unsigned short frequency);
 
 private:
-    LED_Group** ledGroups;
+	SMART_DEBUG_LOG* debugLog;
+    LED_Group**      ledGroups;
 
 };
 

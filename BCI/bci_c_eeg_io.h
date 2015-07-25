@@ -2,17 +2,26 @@
 #define BCI_C_EEG_IO
 
 #include "../smart_config.h"
-
-typedef unsigned char  byteType;
-typedef unsigned short wordType;
-typedef unsigned int   dWordType;
+#include "../smart_debug_log.h"
 
 typedef struct EEG_Data
 {
 	byteType* rawData;
-	unsigned int size;
+	sizeType size;
 
-	EEG_Data(byteType* data, unsigned int size)
+	static EEG_Data* create(byteType* pData, sizeType size)
+	{
+		if (!pData || size < 0)
+		{
+			return new EEG_Data();
+		}
+		else
+		{
+			return new EEG_Data(pData, size);
+		}
+	}
+	
+	EEG_Data(byteType* data, sizeType size)
 	{
 		this->rawData = data;
 		this->size = size;
@@ -34,14 +43,14 @@ typedef struct EEG_Data
 class C_EEG_IO
 {
 public:
-	         C_EEG_IO();
-	virtual ~C_EEG_IO();
+	         C_EEG_IO(){}
+	virtual ~C_EEG_IO(){}
 	
 	virtual EEG_Data*    getData() = 0;
 	virtual eegTypeEnum  getType() = 0;
+	ConnectionStatusType GetConnectionStatus() {return connectionStatus;}
 
-private:
-	EEG_Data*    pData;
+protected:
 	bool         connectionStatus;
 };
 
