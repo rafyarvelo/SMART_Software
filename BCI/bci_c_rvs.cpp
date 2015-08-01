@@ -40,5 +40,10 @@ void C_RVS::SetFrequency(LED_Group_ID id, unsigned short frequency)
 	}
 }
 
+void C_RVS::Generate()
+{
+    //Do Nothing for now..
+}
+
 
 	

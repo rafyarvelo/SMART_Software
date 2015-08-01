@@ -4,6 +4,7 @@ C_EEG_IO_DEBUG::C_EEG_IO_DEBUG()
 	: mDebugData(0)
 {
 	srand(static_cast<unsigned int>(time(0))); //seed value to system clock
+    connectionStatus = CONNECTED;//Just debugging here...
 }
 
 C_EEG_IO_DEBUG::~C_EEG_IO_DEBUG()
@@ -50,7 +51,7 @@ EEG_Data* C_EEG_IO_DEBUG::createRandomData()
 	byteType* pData = new byteType[size];
 	
 	//create Random Data
-	for (int i = 0; i < size; i++)
+    for (sizeType i = 0; i < size; i++)
 	{
 		pData[i] = (char) (rand() % 256);//255 is max size for 8 bits
 	} 

@@ -1,10 +1,21 @@
 #ifndef BCI_C_JUDGMENT_ALGORITHM_H
 #define BCI_C_JUDGMENT_ALGORITHM_H
 
-#include "bci_c_signal_processing.h"
 #include "../PCC/power_chair_command_constants.h"
-#include "../smart_config.h"
 #include "../smart_debug_log.h"
+#include "../smart_config.h"
+#include "bci_c_signal_processing.h"
+#include "bci_c_rvs.h"
+#include "bci_c_tm.h"
+
+//Use to see how sure we are that the command is correct
+typedef enum Confidence_Type
+{
+    UNSURE=0,
+    MODERATE,
+    LIKELY,
+    ABSOLUTE
+}Confidence_Type;
 
 class C_JudgmentAlgorithm
 {
@@ -18,8 +29,20 @@ public:
 		return new C_JudgmentAlgorithm(signalProcessing);
 	}
 
+    void SetRVS(C_RVS* pRVS);
+    void SetTM (C_TM*  pTM);
+    PCC_Command_Type GetFinalCommand();
+
+    //To be effective, make sure the RVS and TM are set before calling this
+    Confidence_Type computeCommand();
+
 private:
 	C_SignalProcessing* mSignalProcessingPtr;
+    C_RVS*              mRVS_Ptr;
+    C_TM*               mTM_Ptr;
+    PCC_Command_Type    finalCommand;
+    PCC_Command_Type    prevCommand;
+    bool commandSafe; //Just in case user forgets to call computeCommand()
 };
 
 #endif // BCI_C_JUDGMENT_ALGORITHM_H

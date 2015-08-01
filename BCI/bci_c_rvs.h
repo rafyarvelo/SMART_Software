@@ -49,7 +49,7 @@ public:
 		return createLED_Group(LED_LEFT, LED_LEFT_FREQ_DEFAULT);
 	}
 	
-	static LED_Group* createLED_Group(LED_Group_ID id, float freq)
+    static LED_Group* createLED_Group(LED_Group_ID id, unsigned short freq)
 	{
 		return new LED_Group(id, freq);
 	}
@@ -69,7 +69,6 @@ public:
 	
     unsigned short frequency;
     LED_Group_ID   id;
-
 };
 
 class C_RVS
@@ -83,6 +82,7 @@ public:
     const LED_Group** GetAllLEDGroups();
     void SetFrequency(LED_Group_ID id, unsigned short frequency);
 
+    void Generate(); //Creates RVS frequencies
 private:
 	SMART_DEBUG_LOG* debugLog;
     LED_Group**      ledGroups;

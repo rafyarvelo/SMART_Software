@@ -3,51 +3,49 @@
 
 #include "../smart_config.h"
 #include "../smart_debug_log.h"
+#include <QFile>
+#include <QTextStream>
+#include <QDataStream>
 
-//Serial Comm Implementation using boost::asio
-#include <boost/asio.hpp>
-using namespace boost::asio;
+//Serial Comm Implementation using qextserialport
+#include "qextserialport.h"
 
-//Default Serial Configuration
-#define DEFAULT_BAUD_RATE 9600
-#define DEFAULT_PARITY    serial_port_base::parity::none
-#define DEFAULT_STOP_BITS serial_port_base::stop_bits::one
-
-typedef boost::system::system_error SerialCommError;
 #define SUCCESS true
 #define FAILURE false
+#define DEFAULT_TIMEOUT_MS 500
 
+#define READ_DATA_FILENAME ""
 //Wrapper class for serial communications
-class C_Serial_Comm
+class C_Serial_Comm : public QObject
 {
-public://constructor with defaults
-	 C_Serial_Comm(const char*                 portName,
-	               serial_port_base::baud_rate baudRate =DEFAULT_BAUD_RATE,
-	               serial_port_base::parity    parity   =DEFAULT_PARITY,
-	               serial_port_base::stop_bits stopBits =DEFAULT_STOP_BITS);
+    Q_OBJECT//Required QT Macro
+public:
+     C_Serial_Comm(const QString&  portName, const PortSettings& settings);
 	~C_Serial_Comm();
 	
-	//return true on successful Open/Write
+    static PortSettings DefaultPortSettings();
+    static C_Serial_Comm* Instance(const QString& portName, PortSettings& settings = DefaultPortSettings());
+
+    //return true on successful Open/Send
 	bool open();
-	bool send(const char* pData, sizeType size);
-	bool send(std::string data);
+    bool sendRawData(const char* pData, sizeType size);
+    bool send       (QByteArray& bytes);
 	
 	//Receive Data
-	void readRawData(char* pData, sizeType size);
-	void readString (std::string& readBuffer);
-	void readUntil  (std::string& readBuffer, char delim);
-	void readLine   (std::string& readBuffer);
-				
+    void       readRawData(char* pData, sizeType size);
+    QByteArray read       (int numBytes=-1);//numBytes < 0 to read all
+
+private slots:
+    void onDsrChanged(bool status);
+    void onReadyRead();
+
 private:
+    void printPortSettings(ostream& stream);
 	SMART_DEBUG_LOG* debugLog;
-	
-	const char*                 mPortName;
-	serial_port_base::baud_rate mBaudRate;
-	serial_port_base::parity    mParity;
-	serial_port_base::stop_bits mStopBits;
-	
-	io_service  io;
-	serial_port mSerialPort;
+
+    QString         mPortName;
+    PortSettings    mPortSettings;
+    QextSerialPort* mSerialPort;
 };
 
 #endif

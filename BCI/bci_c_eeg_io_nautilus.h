@@ -12,6 +12,7 @@ public:
 	
 	virtual EEG_Data*    getData(){return 0; }
 	virtual eegTypeEnum  getType(){ return EEG_TYPE_NAUTILUS; }
+    virtual ConnectionStatusType connect(){return NOT_CONNECTED;}
 };
 
 #endif

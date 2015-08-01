@@ -1,78 +1,144 @@
 #include "bci_c_serial_comm.h"
 
-C_Serial_Comm::C_Serial_Comm(const char*                 portName,
-                             serial_port_base::baud_rate baudRate,
-                             serial_port_base::parity    parity,
-                             serial_port_base::stop_bits stopBits)
+C_Serial_Comm::C_Serial_Comm(const QString&      portName,
+                             const PortSettings& settings)
     : mPortName(portName),
-      mBaudRate(baudRate),
-      mParity  (parity),
-      mStopBits(stopBits),
-      mSerialPort(io)
+      mPortSettings(settings)
 {
-	debugLog = SMART_DEBUG_LOG::Instance();//Get a pointer to the debug log
+    debugLog    = SMART_DEBUG_LOG::Instance();//Get a pointer to the debug log
+    mSerialPort = new QextSerialPort(mPortName, mPortSettings);
+
+    connect(mSerialPort, SIGNAL(dsrChanged(bool)), this, SLOT(onDsrChanged(bool)));
+    connect(mSerialPort, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
 }
 
 C_Serial_Comm::~C_Serial_Comm()
 {
-	mSerialPort.close();
+    if (mSerialPort)
+    {
+        mSerialPort->close();
+        delete mSerialPort;
+    }
+}
+
+PortSettings C_Serial_Comm::DefaultPortSettings()
+{
+    PortSettings settings;
+    settings.BaudRate    = BAUD9600;
+    settings.FlowControl = FLOW_OFF;
+    settings.Parity      = PAR_NONE;
+    settings.DataBits    = DATA_8;
+    settings.StopBits    = STOP_1;
+    settings.Timeout_Millisec = DEFAULT_TIMEOUT_MS;
+
+    return settings;
+}
+
+void C_Serial_Comm::printPortSettings(ostream &stream)
+{
+    stream << "Port Settings for " << mPortName.toStdString() << ":" << endl;
+    stream << "BAUD Rate:    " << (unsigned int) mPortSettings.BaudRate << endl;
+    stream << "Flow Control: " << (unsigned int) mPortSettings.FlowControl << endl;
+    stream << "Parity:       " << (unsigned int) mPortSettings.Parity << endl;
+    stream << "Data Bits:    " << (unsigned int) mPortSettings.DataBits << endl;
+    stream << "Stop Bits:    " << (unsigned int) mPortSettings.StopBits << endl;
+    stream << "Timeout (ms): " << (unsigned int) mPortSettings.Timeout_Millisec << endl;
 }
 
 bool C_Serial_Comm::open()
 {
-	try
-	{   //Attempt to open and configure serial port
-		mSerialPort.open(mPortName);
-		mSerialPort.set_option(mBaudRate);
-		mSerialPort.set_option(mParity);
-		mSerialPort.set_option(mStopBits);
-	}
-	catch (SerialCommError e)
-	{
-		debugLog->BCI_Log() << "Could not open serial port: " << mPortName << endl;
-		return FAILURE;
-	}
+    if (mSerialPort->open(QIODevice::ReadWrite))
+    {
+        cout                << "Successfully Opened Port: " << mPortName.toStdString() << endl;
+        debugLog->BCI_Log() << "Successfully Opened Port: " << mPortName.toStdString() << endl;
+
+        printPortSettings(debugLog->SerialComm_Log());
+    }
+    else
+    {
+        cout                << "Could Not Open Port: " << mPortName.toStdString() << endl;
+        debugLog->BCI_Log() << "Could Not Open Port: " << mPortName.toStdString() << endl;
+        printPortSettings(debugLog->BCI_Log());
+        return FAILURE;
+    }
 	
 	return SUCCESS;
 }
 
-bool C_Serial_Comm::send(const char* pData, sizeType size)
+C_Serial_Comm* C_Serial_Comm::Instance(const QString& portName, PortSettings& settings)
 {
-	try
-	{   //Attempt to open and configure serial port
-		write(mSerialPort, buffer(pData, size));
-	}
-	catch (SerialCommError e)
-	{
-		debugLog->BCI_Log() << "Could not write to serial port: " << mPortName << endl;
-		return FAILURE;
-	}
-	
-	return SUCCESS;
+    return new C_Serial_Comm(portName, settings);
 }
 
-bool C_Serial_Comm::send(std::string data)
+bool C_Serial_Comm::sendRawData(const char* pData, sizeType size)
 {
-	return send(data.c_str(), data.size());
+    int bytesWritten = -1;
+
+    debugLog->BCI_Log() << "Attempting to Write Data of size: " << size << endl;
+    bytesWritten = mSerialPort->writeData(pData, size);
+    debugLog->BCI_Log() << "Bytes Written: " << bytesWritten + 1 << endl;
+
+    read();//Hack for now...
+
+    return (bytesWritten > -1) ? SUCCESS : FAILURE;
+}
+
+bool C_Serial_Comm::send(QByteArray& bytes)
+{
+    return sendRawData(bytes.data(), bytes.size());
 }
 
 //Receive Data
 void C_Serial_Comm::readRawData(char* pData, sizeType size)
 {
-	
+    int bytesAvailable = mSerialPort->bytesAvailable();
+
+    if (!pData)//Seriously bro...allocate your shit..
+    {
+        debugLog->BCI_Log() << "Unallocated Buffer Passed to Read! Nothing will be read." << endl;
+        return;
+    }
+
+    //Read Data
+    debugLog->BCI_Log() << "Bytes Available: " << bytesAvailable << endl;
+    mSerialPort->read(pData, size);
+    debugLog->BCI_Log() << "Bytes Read: " << size << endl;
+
+    //See what we read
+    std::string s = QString(QByteArray(pData, size)).toStdString();
+    debugLog->SerialComm_Log() << s << endl;
 }
 
-void C_Serial_Comm::readString(std::string& readBuffer)
+QByteArray C_Serial_Comm::read(int numBytes)
 {
-	
+    QByteArray bytes;
+    int numToRead;
+
+    if (numBytes < 0 || numBytes > mSerialPort->bytesAvailable())
+    {
+        numToRead = mSerialPort->bytesAvailable();
+    }
+    else
+    {
+        numToRead = numBytes;
+    }
+
+    bytes.resize(numToRead);
+    readRawData(bytes.data(), bytes.size());
+
+    return bytes;
 }
 
-void C_Serial_Comm::readUntil(std::string& readBuffer, char delim)
+//SLOTS
+void C_Serial_Comm::onDsrChanged(bool status)
 {
-	
+    if (status)
+        debugLog->SerialComm_Log() << "Serial Device was turned on" << endl;
+    else
+        debugLog->SerialComm_Log() << "Serial Device was turned off" << endl;
 }
 
-void C_Serial_Comm::readLine(std::string& readBuffer)
+void C_Serial_Comm::onReadyRead()
 {
-	return readUntil(readBuffer, '\n');
+    this->read();//Read all available data when it's ready
 }

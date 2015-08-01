@@ -8,72 +8,60 @@
 #include "bci_c_bci_package.h"
 
 C_BCI_Package::C_BCI_Package()
+    : bciState(BCI_OFF)
 {
-	initialize();
-	ofstream& bciLog = debugLog->BCI_Log();
-		
-	//Check EEG Connection Status...
-	if (checkEEGComm())
-	{
-		bciLog << "EEG Communications Connected" << endl;
-	}
-	else
-	{
-		bciLog << "EEG Connection not created! Stopping BCI..." << endl;
-		exit(1);
-	}
+    debugLog = SMART_DEBUG_LOG::Instance();
+    debugLog->BCI_Log() << "Instantiating BCI Package..." << endl;
 
-	//Check PCC Connection Status...
-	if (checkPCCComm())
-	{
-		bciLog << "PCC Communications Connected" << endl;
-	}
-	else
-	{
-		bciLog << "PCC Connection not created! Stopping BCI..." << endl;
-		exit(1);
-	}
+    //Create Container Classes
+    pRVS              = C_RVS::Instance();
+    pFlasherIO        = C_Flasher_IO::Instance(pRVS);
 
+    pEEG_IO           = createEEG_IO();
+    pSignalProcessing = C_SignalProcessing::Instance(pEEG_IO);
+    pJA               = C_JudgmentAlgorithm::Instance(pSignalProcessing);
 
-	//Check BRSH Connection Status...
-	if (checkBRSHComm())
-	{
-		bciLog << "BRSH Communications Connected" << endl;
-	}
-	else
-	{
-		bciLog << "BRSH Connection not created! Stopping BCI..." << endl;
-		exit(1);
-	}
+    pBRS_IO           = C_BRSH_IO::Instance();
+    pPCC_IO           = C_PCC_IO::Instance();
 
+    eegConnectionStatus      = NOT_CONNECTED;
+    flasherConnectionStatus = NOT_CONNECTED;
+    pccConnectionStatus      = NOT_CONNECTED;
+    brshConnectionStatus     = NOT_CONNECTED;
 
-	//Check EEG Connection Status...
-	if (checkFlasherComm())
-	{
-		bciLog << "Flasher Communications Connected" << endl;
-	}
-	else
-	{
-		bciLog << "Flasher Connection not created! Stopping BCI..." << endl;
-		exit(1);
-	}
+    debugLog->BCI_Log() << "BCI Package Instantiated Successfully" << endl;
 }
 
 C_BCI_Package::~C_BCI_Package()
 {
-	
+    if (pEEG_IO)
+    {
+        delete pEEG_IO;
+    }
 	if (pSignalProcessing)
+    {
 		delete pSignalProcessing;
-	if (pJA)
-		delete pJA;
-	if (pEEG_IO)
-		delete pEEG_IO;
-	if (pFlasherIO);
+    }
+    if (pJA)
+    {
+        delete pJA;
+    }
+    if (pFlasherIO)
+    {
 		delete pFlasherIO;
-	if (pRVS);
+    }
+    if (pRVS)
+    {
 		delete pRVS;
-	if (pTM);
-		delete pTM;
+    }
+    if (tmDataBuffer)
+    {
+        delete tmDataBuffer;
+    }
+    if (eegDataBuffer)
+    {
+        delete eegDataBuffer;
+    }
 }
 
 C_BCI_Package* C_BCI_Package::Instance()
@@ -97,73 +85,44 @@ void C_BCI_Package::startEEG()
 	EEG_Data* eegData = 0;
 	char buffer[100];
 	
-	if (pEEG_IO->GetConnectionStatus())
+    if (!pEEG_IO->connect())
 	{
-		EEG_Data* eegData = pEEG_IO->getData();
-		
-		cout                << "READING DATA FROM EEG:" << endl;
-		debugLog->BCI_Log() << "READING DATA FROM EEG:" << endl;
-		for (int i = 0; i < eegData->size; i++)
-		{
-			sprintf(buffer, "Data[%d]: 0x%2x\n", i, eegData->rawData[i]);
-			debugLog->BCI_Log() << buffer;
-			cout                << buffer;
-		}	
-		cout                << "------------" << endl << endl;
-		debugLog->BCI_Log() << "------------" << endl << endl;
-	}
-}
+        debugLog->BCI_Log() << "Lost Connection to EEG!" << cout;
+        eegConnectionStatus = NOT_CONNECTED;
+        return;
+    }
+    else
+    {
+        eegConnectionStatus = CONNECTED;
+    }
 
-void C_BCI_Package::sendRVS_Commands()
-{
+    cout                << "READING DATA FROM EEG:" << endl;
+    debugLog->BCI_Log() << "READING DATA FROM EEG:" << endl;
+    eegData = pEEG_IO->getData();
 
-}
-
-void C_BCI_Package::sendPCC_Commands()
-{
-
+    for (sizeType i = 0; i < eegData->size; i++)
+    {
+        sprintf(buffer, "Data[%d]: 0x%2x\n", i, eegData->rawData[i]);
+        debugLog->BCI_Log() << buffer;
+        cout                << buffer;
+    }
+    cout                << "------------" << endl << endl;
+    debugLog->BCI_Log() << "------------" << endl << endl;
 }
 
 void C_BCI_Package::initialize()
 {
-	debugLog = SMART_DEBUG_LOG::Instance();
-	debugLog->BCI_Log() << "Initializing BCI Package..." << endl;
-	
-	//Create Container Classes
-	pRVS              = C_RVS::Instance();	
-	pFlasherIO        = C_Flasher_IO::Instance(pRVS);	
-	
-	pEEG_IO           = createEEG_IO();
-	pSignalProcessing = C_SignalProcessing::Instance(pEEG_IO); 
-	pJA               = C_JudgmentAlgorithm::Instance(pSignalProcessing);
-	
-	pJA2BRS           = C_JA2BRS::Instance();
-	pJA2PCC           = C_JA2PCC::Instance();
-	
-	pTM               = C_TM::Instance();
-	
-	debugLog->BCI_Log() << "TM Base Address at: " << pTM << endl;
-	debugLog->BCI_Log() << "BCI Package Initialized Successfully" << endl;
-}
+    debugLog->BCI_Log() << "Connecting to Flasher..." << endl;
+    flasherConnectionStatus = pFlasherIO->connect();
 
-bool C_BCI_Package::checkFlasherComm()
-{
-	return true;
-}
+    debugLog->BCI_Log() << "Connecting to EEG..." << endl;
+    eegConnectionStatus = pEEG_IO->connect();
 
-bool C_BCI_Package::checkBRSHComm()
-{
-	return true;
-}
+    debugLog->BCI_Log() << "Connecting to BRSH..." << endl;
+    brshConnectionStatus = pBRS_IO->connect();
 
-bool C_BCI_Package::checkPCCComm()
-{
-	return true;
-}
-
-bool C_BCI_Package::checkEEGComm()
-{
-	return true;
+    debugLog->BCI_Log() << "Connecting to PCC..." << endl;
+    pccConnectionStatus = pPCC_IO->connect();
 }
 
 C_EEG_IO* C_BCI_Package::createEEG_IO(eegTypeEnum type)
@@ -186,3 +145,109 @@ C_EEG_IO* C_BCI_Package::createEEG_IO(eegTypeEnum type)
 	return ptr;
 }
 
+bool C_BCI_Package::checkConnections()
+{
+    ConnectionStatusType status = CONNECTED;
+
+    if (bciState <= BCI_INITIALIZATION)
+    {
+        return CONNECTED;//We haven't initialized yet, so just return true.
+    }
+
+    //Check EEG Connection Status...
+    if (!eegConnectionStatus)
+    {
+        debugLog->BCI_Log() << "EEG Connection not created! Stopping BCI..." << endl;
+        cout   << "EEG Disconnected! Stopping BCI..." << endl;
+        status = NOT_CONNECTED;
+    }
+
+    //Check PCC Connection Status...
+    if (!pccConnectionStatus)
+    {
+        cout   << "PCC Disconnected! Stopping BCI..." << endl;
+        status = NOT_CONNECTED;
+    }
+
+
+    //Check BRSH Connection Status...
+    if (!brshConnectionStatus)
+    {
+        debugLog->BCI_Log() << "BRSH Disconnected! Stopping BCI..." << endl;
+        status = NOT_CONNECTED;
+    }
+
+    //Check EEG Connection Status...
+    if (!flasherConnectionStatus)
+    {
+        debugLog->BCI_Log() << "Flasher Disconnected! Stopping BCI..." << endl;
+        status = NOT_CONNECTED;
+    }
+
+    return status;
+}
+
+void C_BCI_Package::Run()
+{
+    while (checkConnections())
+    {
+        switch (bciState)
+        {
+        case BCI_OFF:
+            bciState = BCI_INITIALIZATION;//Start initializing!
+            break;
+        case BCI_INITIALIZATION:
+
+            //Make Connections
+            initialize();
+
+            //Configure Repetitive Visual Stimulus and send to Flasher
+            pRVS->Generate();
+            pJA->SetRVS(pRVS);
+            pFlasherIO->SendRVS();
+
+            startEEG();
+            debugLog->BCI_Log() << "Initialization Complete, Moving to STANBY..." << endl;
+
+            stopwatch.start(); //Check for a timeout
+            bciState = BCI_STANDBY;
+            break;
+        case BCI_STANDBY:
+            //Wait for an interrupt or a timeout
+            if (stopwatch.elapsed() > COMMAND_TIMEOUT)
+            {
+                debugLog->BCI_Log() << "Timed out waiting for EEG Data: Count = " << ++missCount << endl;
+                stopwatch.restart();
+            }
+
+            if (missCount < MAX_MISSES)
+            {
+                debugLog->BCI_Log() << "Resending last command due to timeout..." << endl;
+                pPCC_IO->SendCommand();
+            }
+            else
+            {
+                debugLog->BCI_Log() << "Maximum Miss Count Reached." << endl;
+                cout << "Connection to EEG Timed out" << endl;
+                exit(1);
+            }
+
+            break;
+        case BCI_PROCESSING:
+            pJA->SetTM(pBRS_IO->GetLatestTM());
+            pJA->computeCommand();
+
+            break;
+        case BCI_READY:
+            pPCC_IO->SetCommand(pJA->GetFinalCommand());
+            pPCC_IO->SendCommand();
+
+            pBRS_IO->SendTM();
+            bciState = BCI_STANDBY;
+            break;
+        }
+    }
+
+    //Should Never Get to this line
+    cout << "ERROR! BCI Lost Connection!" << endl;
+}
