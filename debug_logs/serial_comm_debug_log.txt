@@ -1,0 +1,7 @@
+Port Settings for COM5:
+BAUD Rate:    9600
+Flow Control: 0
+Parity:       0
+Data Bits:    8
+Stop Bits:    0
+Timeout (ms): 500

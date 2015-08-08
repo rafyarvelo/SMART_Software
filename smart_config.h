@@ -21,7 +21,7 @@ typedef unsigned char      PCC_Command_Type;
 typedef unsigned char      byteType;
 typedef unsigned short     shortType;
 typedef unsigned int       wordType;
-typedef unsigned int       sizeType;
+typedef unsigned long      sizeType;
 typedef unsigned long long longType;
 
 #define TRUE          1
@@ -63,5 +63,7 @@ typedef enum
 	#define PCC_PORT "/dev/ttyACMO"
 #endif
 
+//CHANGE THIS PATH FOR YOUR MACHINE
+#define BOOST_PATH "C:\Users\Rafy\SENIOR_DESIGN\SMART_Software\lib\boost_1_58_0"
 
 #endif /* SMART_CONFIG_H_ */
