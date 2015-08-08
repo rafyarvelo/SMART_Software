@@ -25,7 +25,7 @@ C_BCI_Package::C_BCI_Package()
     pPCC_IO           = C_PCC_IO::Instance();
 
     eegConnectionStatus      = NOT_CONNECTED;
-    flasherConnectionStatus = NOT_CONNECTED;
+    flasherConnectionStatus  = NOT_CONNECTED;
     pccConnectionStatus      = NOT_CONNECTED;
     brshConnectionStatus     = NOT_CONNECTED;
 
@@ -96,7 +96,7 @@ void C_BCI_Package::startEEG()
         eegConnectionStatus = CONNECTED;
     }
 
-    cout                << "READING DATA FROM EEG:" << endl;
+    //cout                << "READING DATA FROM EEG:" << endl;
     debugLog->BCI_Log() << "READING DATA FROM EEG:" << endl;
     eegData = pEEG_IO->getData();
 
@@ -104,9 +104,9 @@ void C_BCI_Package::startEEG()
     {
         sprintf(buffer, "Data[%d]: 0x%2x\n", i, eegData->rawData[i]);
         debugLog->BCI_Log() << buffer;
-        cout                << buffer;
+        //cout                << buffer;
     }
-    cout                << "------------" << endl << endl;
+   // cout                << "------------" << endl << endl;
     debugLog->BCI_Log() << "------------" << endl << endl;
 }
 
@@ -223,6 +223,8 @@ void C_BCI_Package::Run()
             if (missCount < MAX_MISSES)
             {
                 debugLog->BCI_Log() << "Resending last command due to timeout..." << endl;
+                //Hack for Now
+                pPCC_IO->SetCommand(PCC_FORWARD);
                 pPCC_IO->SendCommand();
             }
             else

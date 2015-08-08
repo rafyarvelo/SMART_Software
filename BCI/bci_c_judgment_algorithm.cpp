@@ -45,6 +45,7 @@ Confidence_Type C_JudgmentAlgorithm::computeCommand()
     Confidence_Type confidence = UNSURE;
 
 
+    //Let's not change the command unless we're sure
     if (confidence == UNSURE && prevCommand != PCC_CMD_NONE)
     {
         finalCommand = prevCommand;

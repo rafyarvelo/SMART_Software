@@ -75,8 +75,8 @@ bool C_Serial_Comm::sendRawData(const char* pData, sizeType size)
     int bytesWritten = -1;
 
     debugLog->BCI_Log() << "Attempting to Write Data of size: " << size << endl;
-    bytesWritten = mSerialPort->writeData(pData, size);
-    debugLog->BCI_Log() << "Bytes Written: " << bytesWritten + 1 << endl;
+    bytesWritten = mSerialPort->write(pData, (qint64) size);
+    debugLog->BCI_Log() << "Bytes Written: " << bytesWritten << endl;
 
     read();//Hack for now...
 
@@ -123,9 +123,10 @@ QByteArray C_Serial_Comm::read(int numBytes)
         numToRead = numBytes;
     }
 
-    bytes.resize(numToRead);
-    readRawData(bytes.data(), bytes.size());
+    //bytes.resize(numToRead);
+    //readRawData(bytes.data(), bytes.size());
 
+    bytes = mSerialPort->readAll();
     return bytes;
 }
 

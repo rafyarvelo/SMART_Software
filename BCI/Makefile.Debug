@@ -982,15 +982,10 @@ debug\qextserialenumerator_win.obj: api\qextserialport\src\qextserialenumerator_
 		C:\Qt\5.4\msvc2012_opengl\include\QtGui\qcursor.h
 
 debug\bci_c_bci_package.obj: bci_c_bci_package.cpp bci_c_bci_package.h \
-		bci_c_signal_processing.h \
-		..\smart_config.h \
-		..\smart_debug_log.h \
-		bci_c_eeg_io.h \
-		C:\Qt\5.4\msvc2012_opengl\include\QtCore\QThread \
-		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qthread.h \
-		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qobject.h \
-		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qobjectdefs.h \
-		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qnamespace.h \
+		C:\Qt\5.4\msvc2012_opengl\include\QtCore\QTime \
+		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qdatetime.h \
+		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qstring.h \
+		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qchar.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qglobal.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qconfig.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qfeatures.h \
@@ -1019,17 +1014,27 @@ debug\bci_c_bci_package.obj: bci_c_bci_package.cpp bci_c_bci_package.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qglobalstatic.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qmutex.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qnumeric.h \
-		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qobjectdefs_impl.h \
-		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qstring.h \
-		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qchar.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qbytearray.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qrefcount.h \
+		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qnamespace.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qarraydata.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qstringbuilder.h \
+		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qshareddata.h \
+		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qhash.h \
+		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qiterator.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qlist.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qalgorithms.h \
-		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qiterator.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qbytearraylist.h \
+		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qpair.h \
+		bci_c_signal_processing.h \
+		..\smart_config.h \
+		..\smart_debug_log.h \
+		bci_c_eeg_io.h \
+		C:\Qt\5.4\msvc2012_opengl\include\QtCore\QThread \
+		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qthread.h \
+		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qobject.h \
+		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qobjectdefs.h \
+		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qobjectdefs_impl.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qcoreevent.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qscopedpointer.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qmetatype.h \
@@ -1059,9 +1064,7 @@ debug\bci_c_bci_package.obj: bci_c_bci_package.cpp bci_c_bci_package.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qlocale.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qvariant.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qmap.h \
-		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qpair.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qdebug.h \
-		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qhash.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qvector.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qpoint.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qset.h \
@@ -1070,7 +1073,6 @@ debug\bci_c_bci_package.obj: bci_c_bci_package.cpp bci_c_bci_package.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qdatastream.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qregexp.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qstringmatcher.h \
-		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qshareddata.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\QDataStream \
 		api\qextserialport\src\qextserialport.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\QIODevice \
@@ -1343,15 +1345,10 @@ debug\bci_c_signal_processing.obj: bci_c_signal_processing.cpp bci_c_signal_proc
 		bci_c_connected_device.h
 
 debug\bci_main.obj: bci_main.cpp bci_c_bci_package.h \
-		bci_c_signal_processing.h \
-		..\smart_config.h \
-		..\smart_debug_log.h \
-		bci_c_eeg_io.h \
-		C:\Qt\5.4\msvc2012_opengl\include\QtCore\QThread \
-		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qthread.h \
-		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qobject.h \
-		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qobjectdefs.h \
-		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qnamespace.h \
+		C:\Qt\5.4\msvc2012_opengl\include\QtCore\QTime \
+		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qdatetime.h \
+		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qstring.h \
+		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qchar.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qglobal.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qconfig.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qfeatures.h \
@@ -1380,17 +1377,27 @@ debug\bci_main.obj: bci_main.cpp bci_c_bci_package.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qglobalstatic.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qmutex.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qnumeric.h \
-		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qobjectdefs_impl.h \
-		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qstring.h \
-		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qchar.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qbytearray.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qrefcount.h \
+		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qnamespace.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qarraydata.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qstringbuilder.h \
+		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qshareddata.h \
+		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qhash.h \
+		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qiterator.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qlist.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qalgorithms.h \
-		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qiterator.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qbytearraylist.h \
+		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qpair.h \
+		bci_c_signal_processing.h \
+		..\smart_config.h \
+		..\smart_debug_log.h \
+		bci_c_eeg_io.h \
+		C:\Qt\5.4\msvc2012_opengl\include\QtCore\QThread \
+		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qthread.h \
+		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qobject.h \
+		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qobjectdefs.h \
+		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qobjectdefs_impl.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qcoreevent.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qscopedpointer.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qmetatype.h \
@@ -1420,9 +1427,7 @@ debug\bci_main.obj: bci_main.cpp bci_c_bci_package.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qlocale.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qvariant.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qmap.h \
-		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qpair.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qdebug.h \
-		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qhash.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qvector.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qpoint.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qset.h \
@@ -1431,7 +1436,6 @@ debug\bci_main.obj: bci_main.cpp bci_c_bci_package.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qdatastream.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qregexp.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qstringmatcher.h \
-		C:\Qt\5.4\msvc2012_opengl\include\QtCore\qshareddata.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\QDataStream \
 		api\qextserialport\src\qextserialport.h \
 		C:\Qt\5.4\msvc2012_opengl\include\QtCore\QIODevice \

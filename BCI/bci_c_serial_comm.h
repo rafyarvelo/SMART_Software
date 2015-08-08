@@ -23,8 +23,8 @@ public:
      C_Serial_Comm(const QString&  portName, const PortSettings& settings);
 	~C_Serial_Comm();
 	
-    static PortSettings DefaultPortSettings();
-    static C_Serial_Comm* Instance(const QString& portName, PortSettings& settings = DefaultPortSettings());
+    static const PortSettings& DefaultPortSettings();
+    static C_Serial_Comm* Instance(const QString& portName, const PortSettings& settings = DefaultPortSettings());
 
     //return true on successful Open/Send
 	bool open();

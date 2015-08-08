@@ -4,6 +4,7 @@ C_PCC_IO::C_PCC_IO()
 {
     debugLog   = SMART_DEBUG_LOG::Instance();
     serialComm = C_Serial_Comm::Instance(PCC_PORT);
+    currentCommand = PCC_CMD_NONE;
 }
 
 C_PCC_IO::~C_PCC_IO()
