@@ -10,7 +10,7 @@
 int main(void)
 {
 
-	C_BCI_Package* pBCIPackage = C_BCI_Package::Instance();	
+    C_BCI_Package* pBCIPackage = C_BCI_Package::Instance();
     pBCIPackage->Run();
 
 	return 0;

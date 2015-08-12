@@ -1,12 +1,13 @@
 #include "bci_c_serial_comm.h"
 
-C_Serial_Comm::C_Serial_Comm(const QString&      portName,
-                             const PortSettings& settings)
-    : mPortName(portName),
-      mPortSettings(settings)
+C_Serial_Comm::C_Serial_Comm(const QString&      portName)
+    : mPortName(portName)
 {
     debugLog    = SMART_DEBUG_LOG::Instance();//Get a pointer to the debug log
-    mSerialPort = new QextSerialPort(mPortName, mPortSettings);
+    mSerialPort = new QextSerialPort(mPortName);
+
+    //Config Port Setup
+    SetDefaultPortSettings();
 
     connect(mSerialPort, SIGNAL(dsrChanged(bool)), this, SLOT(onDsrChanged(bool)));
     connect(mSerialPort, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
@@ -21,28 +22,26 @@ C_Serial_Comm::~C_Serial_Comm()
     }
 }
 
-PortSettings C_Serial_Comm::DefaultPortSettings()
+void C_Serial_Comm::SetDefaultPortSettings()
 {
-    PortSettings settings;
-    settings.BaudRate    = BAUD9600;
-    settings.FlowControl = FLOW_OFF;
-    settings.Parity      = PAR_NONE;
-    settings.DataBits    = DATA_8;
-    settings.StopBits    = STOP_1;
-    settings.Timeout_Millisec = DEFAULT_TIMEOUT_MS;
-
-    return settings;
+    //Config Port Setup
+    mSerialPort->setBaudRate(BAUD9600);
+    mSerialPort->setFlowControl(FLOW_OFF);
+    mSerialPort->setParity(PAR_NONE);
+    mSerialPort->setDataBits(DATA_8);
+    mSerialPort->setStopBits(STOP_1);
+    mSerialPort->setTimeout(DEFAULT_TIMEOUT_MS);
 }
 
 void C_Serial_Comm::printPortSettings(ostream &stream)
 {
     stream << "Port Settings for " << mPortName.toStdString() << ":" << endl;
-    stream << "BAUD Rate:    " << (unsigned int) mPortSettings.BaudRate << endl;
-    stream << "Flow Control: " << (unsigned int) mPortSettings.FlowControl << endl;
-    stream << "Parity:       " << (unsigned int) mPortSettings.Parity << endl;
-    stream << "Data Bits:    " << (unsigned int) mPortSettings.DataBits << endl;
-    stream << "Stop Bits:    " << (unsigned int) mPortSettings.StopBits << endl;
-    stream << "Timeout (ms): " << (unsigned int) mPortSettings.Timeout_Millisec << endl;
+    stream << "BAUD Rate:    " << mSerialPort->baudRate()            << endl;
+    stream << "Flow Control: " << mSerialPort->flowControl()         << endl;
+    stream << "Parity:       " << mSerialPort->parity()              << endl;
+    stream << "Data Bits:    " << mSerialPort->dataBits()            << endl;
+    stream << "Stop Bits:    " << mSerialPort->stopBits()            << endl;
+    stream << "Timeout (ms): " << DEFAULT_TIMEOUT_MS                 << endl;
 }
 
 bool C_Serial_Comm::open()
@@ -65,9 +64,9 @@ bool C_Serial_Comm::open()
 	return SUCCESS;
 }
 
-C_Serial_Comm* C_Serial_Comm::Instance(const QString& portName, PortSettings& settings)
+C_Serial_Comm* C_Serial_Comm::Instance(const QString& portName)
 {
-    return new C_Serial_Comm(portName, settings);
+    return new C_Serial_Comm(portName);
 }
 
 bool C_Serial_Comm::sendRawData(const char* pData, sizeType size)

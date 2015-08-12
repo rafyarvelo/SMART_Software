@@ -207,7 +207,7 @@ void C_BCI_Package::Run()
             pFlasherIO->SendRVS();
 
             startEEG();
-            debugLog->BCI_Log() << "Initialization Complete, Moving to STANBY..." << endl;
+            debugLog->BCI_Log() << "Initialization Complete, Moving to STANDBY..." << endl;
 
             stopwatch.start(); //Check for a timeout
             bciState = BCI_STANDBY;
@@ -218,22 +218,22 @@ void C_BCI_Package::Run()
             {
                 debugLog->BCI_Log() << "Timed out waiting for EEG Data: Count = " << ++missCount << endl;
                 stopwatch.restart();
-            }
 
-            if (missCount < MAX_MISSES)
-            {
-                debugLog->BCI_Log() << "Resending last command due to timeout..." << endl;
-                //Hack for Now
-                pPCC_IO->SetCommand(PCC_FORWARD);
-                pPCC_IO->SendCommand();
-            }
-            else
-            {
-                debugLog->BCI_Log() << "Maximum Miss Count Reached." << endl;
-                cout << "Connection to EEG Timed out" << endl;
-                exit(1);
-            }
+                if (missCount < MAX_MISSES)
+                {
+                    debugLog->BCI_Log() << "Resending last command due to timeout..." << endl;
 
+                    //Hack for Now
+                    pPCC_IO->SetCommand(PCC_FORWARD);
+                    pPCC_IO->SendCommand();
+                }
+                else
+                {
+                    debugLog->BCI_Log() << "Maximum Miss Count Reached." << endl;
+                    cout << "Connection to EEG Timed out" << endl;
+                    exit(1);
+                }
+            }
             break;
         case BCI_PROCESSING:
             pJA->SetTM(pBRS_IO->GetLatestTM());

@@ -14,7 +14,7 @@
 #include "bci_c_pcc_io.h"
 #include "bci_c_rvs.h"
 
-#define COMMAND_TIMEOUT 1000 //ms
+#define COMMAND_TIMEOUT 5000 //ms
 #define MAX_MISSES      5    //Max Time outs before quitting
 
 typedef enum BCIState

@@ -20,11 +20,10 @@ class C_Serial_Comm : public QObject
 {
     Q_OBJECT//Required QT Macro
 public:
-     C_Serial_Comm(const QString&  portName, const PortSettings& settings);
+     C_Serial_Comm(const QString&  portName);
 	~C_Serial_Comm();
-	
-    static const PortSettings& DefaultPortSettings();
-    static C_Serial_Comm* Instance(const QString& portName, const PortSettings& settings = DefaultPortSettings());
+
+    static C_Serial_Comm* Instance(const QString& portName);
 
     //return true on successful Open/Send
 	bool open();
@@ -35,6 +34,8 @@ public:
     void       readRawData(char* pData, sizeType size);
     QByteArray read       (int numBytes=-1);//numBytes < 0 to read all
 
+    void SetDefaultPortSettings();
+
 private slots:
     void onDsrChanged(bool status);
     void onReadyRead();
@@ -44,7 +45,6 @@ private:
 	SMART_DEBUG_LOG* debugLog;
 
     QString         mPortName;
-    PortSettings    mPortSettings;
     QextSerialPort* mSerialPort;
 };
 
