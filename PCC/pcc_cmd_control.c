@@ -1,32 +1,41 @@
 #include "pcc_cmd_control.h"
 
-//This Function Pointer references the last command that was successfully
-//sent to the Power chair.
-void  (*pLastProcessedCmd)() = PCC_CMD_NONE;
-
-//The number of Commands that have arrived that are not valid
-volatile unsigned short invalidCmdCount = 0;
-
-//The Maximum amount of commands missed before stopping power chair commands
-volatile const unsigned short maxInvalidCmdCount = 5;
-
-//initilization check
-volatile unsigned short pcc_cntrl_initialized = FALSE;
 
 void initCmdControl()
 {
-	pLastProcessedCmd = PCC_CMD_NONE;
-	invalidCmdCount   = 0;
-
 	//Initialize servos
-	sendGPIO(PORT1_REF, SERVO_X, LOGIC_LOW);
-	sendGPIO(PORT1_REF, SERVO_Y, LOGIC_LOW);
+	configureServos();
 
-	//Initialize Status Bad
-	setLED(RED_LED, ON);
+	//Initialize LEDS OFF
+	setLED(RED_LED, OFF);
 	setLED(GREEN_LED, OFF);
+}
 
-	pcc_cntrl_initialized = TRUE;
+void configureServos()
+{
+	unsigned int servo_stepval, servo_stepnow;
+	unsigned int i;
+
+	//Global Configuration
+	TACCTL1	= OUTMOD_7;            // TACCR1 reset/set
+	TACTL	= TASSEL_2 + MC_1;     // SMCLK, upmode
+	TACCR0	= PWM_PERIOD-1;        // PWM Period
+	TACCR1	= PWM_OFF;             // TACCR1 PWM Duty Cycle
+	P1DIR	|= BIT6;               // P1.6 = output
+	P1SEL	|= BIT6;               // P1.6 = TA1 output
+
+	// Calculate the step value and define the current step, defaults to minimum.
+	servo_stepval 	= ( (SERVO_MAX - SERVO_MIN) / SERVO_STEPS );
+	servo_stepnow	= SERVO_MIN;
+
+	// Fill up the LUT
+	for (i = 0; i < SERVO_STEPS; i++) {
+		servo_stepnow += servo_stepval;
+		servo_lut[i] = servo_stepnow;
+	}
+
+	//Center the Servos
+	CenterServos(PCC_CMD_NONE);
 }
 
 void sendServoCmd(unsigned char servo, ServoDirection direction)//direction
@@ -35,140 +44,150 @@ void sendServoCmd(unsigned char servo, ServoDirection direction)//direction
 	setLED(RED_LED, OFF);
 	setLED(GREEN_LED, ON);
 
-#ifdef SERVO_OUTPUT_PWM //defined in smart_config.h
-	if (direction == CLOCKWISE)
+	//Rotate servo in desired direction
+	switch (direction)
 	{
-		sendGPIO(PORT1_REF, servo, LOGIC_TOGGLE);
+		case CLOCKWISE:
+			rotateServo(servo, 180);//Move 90 degrees clockwise
+		break;
+		case COUNTER_CLOCKWISE:
+			rotateServo(servo, 0);//Move 90 degrees counter-clockwise
+		break;
 	}
-	else//Counter Clockwise
-	{
-		sendGPIO(PORT1_REF, servo, LOGIC_TOGGLE);
-	}
-#else
-	printStr("Undefined Servo API!!!!");
-	println();
-
-	//Status Bad
-	setLED(RED_LED, ON);
-	setLED(GREEN_LED, OFF);
-#endif
-
 }
 
-void Forward()
+void rotateServo(unsigned char servo, ServoAngle angle)
+{
+	//Max Rotation is 180 degrees - 1
+	if (angle >= 180)
+	{
+		angle = 180 - 1;
+	}
+
+	if (servo == SERVO_Y)
+	{
+		// Go to requested angle
+		TA0CCR1 = servo_lut[angle];
+	}
+	else
+	{
+		//Don't know how to do multiple servos yet:(
+	}
+
+	__delay_cycles(MCU_CLOCK);
+	TACCR1 = PWM_OFF;//stop Servo
+}
+
+//Container Function call for Forward Movement
+void Forward(PCC_Command_Type lastCmd)
 {
 	println("Sending Logic Forward...");
 
+	CenterServos(lastCmd);
+	sendServoCmd(SERVO_X, CENTER);
 	sendServoCmd(SERVO_Y, CLOCKWISE);
-	pLastProcessedCmd = Forward;
 }
 
-void Backward()
+//Container Function call for Backward Movement
+void Backward(PCC_Command_Type lastCmd)
 {
 	println("Sending Logic Backward...");
 
+	CenterServos(lastCmd);
+	sendServoCmd(SERVO_X, CENTER);
 	sendServoCmd(SERVO_Y, COUNTER_CLOCKWISE);
-	pLastProcessedCmd = Backward;
 }
 
-void Right()
+//Container Function call for Right Movement
+void Right(PCC_Command_Type lastCmd)
 {
 	println("Sending Logic Right...");
 
-	sendServoCmd(SERVO_Y, CLOCKWISE);
-	pLastProcessedCmd = Right;
+	CenterServos(lastCmd);
+	sendServoCmd(SERVO_Y, CENTER);
+	sendServoCmd(SERVO_X, CLOCKWISE);
 }
 
-void Left()
+//Container Function call for Left Movement
+void Left(PCC_Command_Type lastCmd)
 {
 	println("Sending Logic Left...");
 
-	sendServoCmd(SERVO_X, CLOCKWISE);
-	pLastProcessedCmd = Left;
+	CenterServos(lastCmd);
+	sendServoCmd(SERVO_Y, CENTER);
+	sendServoCmd(SERVO_X, COUNTER_CLOCKWISE);
 }
 
-void Stop()
+//Container Function call for Stop Command
+void Stop(PCC_Command_Type lastCmd)
 {
 	println("Sending Emergency Stop...");
-
-	sendServoCmd(SERVO_X, COUNTER_CLOCKWISE);
-	pLastProcessedCmd = Stop;
+	CenterServos(lastCmd);
 }
 
-void printInvalidCmdCount(void)
+//Reset the Servos in between sending commands
+void CenterServos(PCC_Command_Type lastCmd)
 {
-	char invalidCmdStr[50];
-	sprintf(invalidCmdStr,"Invalid Command, Count = %d", invalidCmdCount);
-	printStr(invalidCmdStr);
-}
-
-void SendLastCommand()
-{
-	if (pLastProcessedCmd != PCC_CMD_NONE)
-		pLastProcessedCmd();
-}
-
-void sleep(unsigned short time)
-{
-	volatile unsigned int i;
-	volatile unsigned const int SCALE_FACTOR = 100;
-
-	for (i = 0; i < time * SCALE_FACTOR; i++)
-		;//sleep
-}
-
-//The Main Processing function of the PCC
-void processCommand(unsigned char cmd)
-{
-	//initialize if necessary
-	if (!pcc_cntrl_initialized)
-		initCmdControl();
-
-	printNewLine();
-	switch (cmd)
+	switch (lastCmd)
 	{
 		case PCC_FORWARD:
-			Forward();
-			invalidCmdCount = 0;
+			sendServoCmd(SERVO_Y, COUNTER_CLOCKWISE);
+		break;
+		case PCC_BACKWARD:
+			sendServoCmd(SERVO_Y, CLOCKWISE);
+		break;
+		case PCC_RIGHT:
+			sendServoCmd(SERVO_X, COUNTER_CLOCKWISE);
+		break;
+		case PCC_LEFT:
+			sendServoCmd(SERVO_X, CLOCKWISE);
+		break;
+		default:
+			//Do Nothing
+		break;
+	}
+}
+
+//The Main Processing function of the PCC, Return the PCC Command that is being used
+PCC_Command_Type processCommand(PCC_Command_Type currentCmd, PCC_Command_Type lastCmd)
+{
+	printNewLine();
+
+	if (currentCmd == lastCmd)
+	{
+		return currentCmd;//We don't need to do anything here, keep the servos in the same position
+	}
+
+	switch (currentCmd)
+	{
+		case PCC_FORWARD:
+			Forward(lastCmd);
 		break;
 
 		case PCC_RIGHT:
-			Right();
-			invalidCmdCount = 0;
+			Right(lastCmd);
 		break;
 
 		case PCC_LEFT:
-			Left();
-			invalidCmdCount = 0;
+			Left(lastCmd);
 		break;
 
 		case PCC_BACKWARD:
-			Backward();
-			invalidCmdCount = 0;
+			Backward(lastCmd);
 		break;
 
 		case PCC_STOP:
-			Stop();
-			invalidCmdCount = 0;
+			Stop(lastCmd);
 		break;
 
+		case PCC_TEST:
+			blinkLEDs(5);//Blink LEDs for debugging
+		break;
 		default:
-			if (++invalidCmdCount >= maxInvalidCmdCount)
-			{
-				println("Maximum amount of Invalid Commands Processed, Stopping PCC Commands...");
-
-				//Status Bad
-				setLED(RED_LED, ON);
-				setLED(GREEN_LED, OFF);
-
-				pLastProcessedCmd = NULL;
-			}
-			else//Keep sending the last successfully processed command until the retry count is reached
-			{
-				SendLastCommand();
-				printInvalidCmdCount();
-			}
-
-			break;
+			println("Invalid Command");
+			currentCmd = PCC_CMD_NONE;
+		break;
 	}
+
+	return currentCmd;
 }

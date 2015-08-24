@@ -2,11 +2,10 @@
 
 void Init_GPIO()
 {
-	P1DIR |= ALL_BITS_MASK;
-	P2DIR |= ALL_BITS_MASK;
+	P1DIR |= RED_LED;
+	P1DIR |= GREEN_LED;
 
 	P1OUT = 0x00;
-	P2OUT = 0x00;
 }
 
 void sendGPIO(volatile unsigned char* portRef, unsigned char bit, unsigned short value)
@@ -30,39 +29,46 @@ void sendGPIO(volatile unsigned char* portRef, unsigned char bit, unsigned short
 
 }
 
-
-//LED FUNCTIONS
-void Init_LED()
-{
-	P1DIR |= 0x33;//Bit1 and Bit6 High
-	P1OUT = 0x00;
-}
 void toggleGreen()
 {
-	//P2OUT ^= 0x04;
-	sendGPIO(PORT2_REF, BIT3, LOGIC_TOGGLE);
-}
-
-void toggleYellow()
-{
-	//P1OUT ^= 0x32;
-	sendGPIO(PORT1_REF, BIT6, LOGIC_TOGGLE);
+	setLED(GREEN_LED, LOGIC_TOGGLE);
 }
 
 void toggleRed()
 {
 	//P1OUT ^= 0x01;
-	sendGPIO(PORT1_REF, BIT0, LOGIC_TOGGLE);
+	setLED(RED_LED, LOGIC_TOGGLE);
 }
 
 void toggleAll()
 {
 	toggleRed();
 	toggleGreen();
-	toggleYellow();
 }
 
 void setLED(unsigned char LED, unsigned char value)
 {
 	sendGPIO(PORT1_REF, LED, value);
+}
+
+void setLEDs(unsigned char value)
+{
+	setLED(RED_LED, value);
+	setLED(GREEN_LED, value);
+}
+
+//Blink LEDs for Debugging
+void blinkLEDs(unsigned int numTimes)
+{
+	volatile unsigned int i = 0;
+
+	if (numTimes > 5)
+		numTimes = 5; //We Don't have all day man
+
+	for (i = 0; i < numTimes; i++)
+	{
+		setLEDs(ON);
+		_delay_cycles(50000);
+		setLEDs(OFF);
+	}
 }

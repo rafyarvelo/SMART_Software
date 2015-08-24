@@ -21,15 +21,12 @@ void sendGPIO(volatile unsigned char* portRef, unsigned char bit, unsigned short
 void pulseOut(volatile unsigned char* portRef, unsigned char bit, unsigned short duration);
 
 //LED FUNCTIONS
-void Init_LED();
-
 void setLED(unsigned char LED, unsigned char value);
+void setLEDs(unsigned char value);
+
 void toggleGreen();
-
-void toggleYellow();
-
 void toggleRed();
-
 void toggleAll();
+void blinkLEDs(unsigned int numTimes);
 
 #endif /* PCC_GPIO_H_ */

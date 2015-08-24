@@ -17,31 +17,32 @@
 typedef enum
 {
 	CLOCKWISE=0,
-	COUNTER_CLOCKWISE
+	COUNTER_CLOCKWISE,
+	CENTER
 } ServoDirection;
 
-//This is the only function that should output Power Chair commands
+typedef unsigned int ServoAngle;
+
+//This holds the values for the Servos to Point to, use it to move the servos
+unsigned int servo_lut[ SERVO_STEPS+1 ];
+
+//These are the only functions that should output Power Chair commands
 void sendServoCmd(unsigned char servo, ServoDirection direction);
+void rotateServo(unsigned char servo, ServoAngle angle);
 
 //Encapsulation of the sendCmd function
-void Forward();
-void Backward();
-void Right();
-void Left();
-void Stop();
-
-//Keep sending the last successfully processed command until the retry count is reached
-void SendLastCommand();
+void Forward     (PCC_Command_Type lastCmd);
+void Backward    (PCC_Command_Type lastCmd);
+void Right       (PCC_Command_Type lastCmd);
+void Left        (PCC_Command_Type lastCmd);
+void Stop        (PCC_Command_Type lastCmd);
+void CenterServos(PCC_Command_Type lastCmd);
 
 //initialization
 void initCmdControl();
+void configureServos();
 
 //The Main Processing function of the PCC
-void processCommand(unsigned char cmd);
-
-//Prints the number of invalid commands seen so far
-void printInvalidCmdCount(void);
-
-void sleep(unsigned short time);
+PCC_Command_Type processCommand(PCC_Command_Type nextCmd, PCC_Command_Type lastCmd);
 
 #endif /* PCC_CMD_CONTROL_H_ */
