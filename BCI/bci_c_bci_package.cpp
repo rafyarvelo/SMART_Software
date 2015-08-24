@@ -230,6 +230,10 @@ void C_BCI_Package::Run()
                 else
                 {
                     debugLog->BCI_Log() << "Maximum Miss Count Reached." << endl;
+                    
+					//Hack for Now
+                    pPCC_IO->SetCommand(PCC_STOP);
+                    pPCC_IO->SendCommand();
                     cout << "Connection to EEG Timed out" << endl;
                     exit(1);
                 }

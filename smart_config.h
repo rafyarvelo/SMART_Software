@@ -14,13 +14,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifdef _cplusplus
+#ifdef __cplusplus
 	#include <iostream>
 	using namespace std;
 
-	typedef bool               ConnectionStatusType;
+	typedef bool ConnectionStatusType;
 #endif
 
+//Common Typedefs
 typedef unsigned char      PCC_Command_Type;
 typedef unsigned char      byteType;
 typedef unsigned short     shortType;
@@ -31,6 +32,7 @@ typedef unsigned long long longType;
 #define CONNECTED     true
 #define NOT_CONNECTED false
 
+//=====================EEG Declaration======================
 typedef enum
 {
 	EEG_TYPE_EMOTIV=0,
@@ -38,22 +40,38 @@ typedef enum
 	EEG_TYPE_DEBUG
 } eegTypeEnum;
 
-typedef enum
-{
-	ANDROID=0,
-	IOS=1,
-	WINDOWS_PHONE=2
-} MobileDeviceTypeEnum;
-
 //EEG Type (only select one)
 #define DEFAULT_EEG_TYPE EEG_TYPE_DEBUG //Supported Options:
                                         //EEG_TYPE_DEBUG
                                         //EEG_TYPE_NAUTILUS
                                         //EEG_TYPE_EMOTIV
-//Device Type (only select one)
+//==========================================================
+
+//==================Mobile Device Declaration================
+typedef enum
+{
+	ANDROID=0,
+	IOS,
+	WINDOWS_PHONE
+} MobileDeviceTypeEnum;
+
+//Mobile Device Type (only select one)
 #define DEFAULT_MOBILE_DEVICE ANDROID
                             //IOS
                             //WINDOWS_PHONE
+//============================================================
+
+//==================Servo Type Declaration====================
+typedef enum
+{
+	PARALLAX_SERVO=0,
+	TOWER_PRO_SERVO
+} ServoTypeEnum;
+
+//Mobile Device Type (only select one)
+#define DEFAULT_SERVO_TYPE  PARALLAX_SERVO
+                            //TOWER_PRO_SERVO
+//============================================================
 
 //PCC Serial Port
 #ifdef WIN32
