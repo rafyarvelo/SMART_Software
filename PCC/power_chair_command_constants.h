@@ -31,26 +31,21 @@
 //===================SERVO CONFIGURATION================
 //Servo Output Type
 #define SERVO_OUTPUT_PWM
-#define SERVO_X       BIT5 //Left/Right   (Port 1 Bit 5)
-#define SERVO_Y       BIT6 //Forward/Back (Port 1 Bit 6)
+#define SERVO_X BIT5 //Left/Right   (Port 1 Bit 5)
+#define SERVO_Y BIT6 //Forward/Back (Port 1 Bit 6)
 
 #define MCU_CLOCK	  1000000
 #define PWM_FREQUENCY 50		// In Hertz, ideally 50Hz.
 
-#define PWM_PERIOD    (MCU_CLOCK / PWM_FREQUENCY)	// PWM Period
-#define PWM_OFF	      0							// PWM Duty Cycle 0%
+#define PWM_PERIOD (MCU_CLOCK / PWM_FREQUENCY) // PWM Period
+#define PWM_OFF    0                           // PWM Duty Cycle 0%
 
-// SEROVS, Connect the servo PWM SIGNAL wire to P1.6 through a 1K resistor.
-#define SERVO_STEPS	180		// Maximum amount of steps in degrees (180 is common)
+// SERVOS, Connect the servo PWM SIGNAL wire to P1.6 through a 1K resistor.
+#define MAX_ROTATION 180          // Degrees
+#define SERVO_STEPS	 MAX_ROTATION // Maximum amount of steps in degrees (for the Look-Up-Table)
 
-//Servo Specific Min and Max Pulse Widths
-#ifdef TOWER_PRO_SERVO
-	#define SERVO_MIN			400				// The minimum duty cycle (~.4ms,  2% )
-	#define SERVO_MAX			2400			// The maximum duty cycle (~2.4ms, 12%)
-#else //SERVO_TYPE_PARALLAX
-	#define SERVO_MIN			PWM_PERIOD / 20	// The minimum duty cycle (~1ms, 5% )
-	#define SERVO_MAX			PWM_PERIOD / 10	// The maximum duty cycle (~2ms, 10%)
-#endif
+#define SERVO_MIN (PWM_PERIOD / 20) // The minimum duty cycle (~1ms, 5% )
+#define SERVO_MAX (PWM_PERIOD / 10) // The maximum duty cycle (~2ms, 10%)
 
 //Timer A Configurations for SMCLK (We will use UP mode)
 #define TIMERA_SMCLK_STOP    TASSEL_2 + MC_0
