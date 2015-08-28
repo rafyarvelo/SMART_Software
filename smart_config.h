@@ -68,9 +68,9 @@ typedef enum
 	TOWER_PRO_SERVO
 } ServoTypeEnum;
 
-//Mobile Device Type (only select one)
-#define DEFAULT_SERVO_TYPE  PARALLAX_SERVO
-                            //TOWER_PRO_SERVO
+//Servo Type
+#define TOWER_PRO_SERVO
+
 //============================================================
 
 //PCC Serial Port
