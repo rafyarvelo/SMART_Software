@@ -57,7 +57,7 @@ void Initialize_PCC()
 
 //-------------SOME DEBUG STUFF HERE LEAVE ME ALONE-------------
 //void main (void)
-//{
+// {
 //
 //	volatile unsigned int  i;
 //	volatile unsigned char c;
@@ -71,34 +71,47 @@ void Initialize_PCC()
 //		c = INCHAR_UART();
 //	    OUTCHAR_UART(c);
 //
-//		if (c == 'f')
+//		if (c >= '0' && c <= '9')
 //		{
+//			unsigned short index = (unsigned short) (c - 0x30) * 10;
+//
 //			// Go forward
-//			TA0CCR1 = servo_lut[179];
+//			TA0CCR1 = servo_lut[index];
 //			__delay_cycles(2000000);
+//			TACCR1 = PWM_OFF;//stop Servo
+//		}
+//		else if (c == 'a')
+//		{
+//			// Go backward
+//			TA0CCR1 = servo_lut[120];
+//			__delay_cycles(1000000);
 //			TACCR1 = PWM_OFF;//stop Servo
 //		}
 //		else if (c == 'b')
 //		{
 //			// Go backward
-//			TA0CCR1 = servo_lut[0];
+//			TA0CCR1 = servo_lut[140];
 //			__delay_cycles(1000000);
+//			TACCR1 = PWM_OFF;//stop Servo
 //		}
+//
 //		else if (c == 'c')
 //		{
 //			// Go backward
-//			TA0CCR1 = servo_lut[90];
+//			TA0CCR1 = servo_lut[160];
 //			__delay_cycles(1000000);
-//
+//			TACCR1 = PWM_OFF;//stop Servo
 //		}
-//
-//		else if (c == 's')
+//		else if (c == 'd')
 //		{
+//			// Go backward
+//			TA0CCR1 = servo_lut[179];
+//			__delay_cycles(1000000);
 //			TACCR1 = PWM_OFF;//stop Servo
 //		}
 //		else
 //		{
-//			//TACCR1 = PWM_OFF;//stop Servo
+//			TACCR1 = PWM_OFF;//stop Servo
 //		}
 //	}
 //}

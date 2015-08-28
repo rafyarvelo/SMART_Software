@@ -16,27 +16,29 @@
 
 typedef enum
 {
-	CLOCKWISE=0,
-	COUNTER_CLOCKWISE,
-	CENTER
+	SERVO_FORWARD=0,
+	SERVO_BACKWARD,
+	SERVO_CENTER
 } ServoDirection;
 
 typedef unsigned int ServoAngle;
 
-//This holds the values for the Servos to Point to, use it to move the servos
+//Servo LOOK UP TABLE that holds the values for the Servos to Point to, use it to move the servos
 unsigned int servo_lut[ SERVO_STEPS+1 ];
 
-//These are the only functions that should output Power Chair commands
+//This Encapsulates the Servo Commands to only Move in 3 Directions (Forward, Back, Center)
 void sendServoCmd(unsigned char servo, ServoDirection direction);
+
+//This Physically Rotates the Servo
 void rotateServo(unsigned char servo, ServoAngle angle);
 
-//Encapsulation of the sendCmd function
-void Forward     (PCC_Command_Type lastCmd);
-void Backward    (PCC_Command_Type lastCmd);
-void Right       (PCC_Command_Type lastCmd);
-void Left        (PCC_Command_Type lastCmd);
-void Stop        (PCC_Command_Type lastCmd);
-void CenterServos(PCC_Command_Type lastCmd);
+//Encapsulation of the endServoCmd function
+void Forward     ();
+void Backward    ();
+void Right       ();
+void Left        ();
+void Stop        ();
+void CenterServos();
 
 //initialization
 void initCmdControl();

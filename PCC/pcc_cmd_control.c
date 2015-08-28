@@ -1,6 +1,6 @@
 #include "pcc_cmd_control.h"
 
-
+//Initialize PCC Commands
 void initCmdControl()
 {
 	//Initialize servos
@@ -11,25 +11,27 @@ void initCmdControl()
 	setLED(GREEN_LED, OFF);
 }
 
+//This Sets up the Timers and PWM for the Servos
 void configureServos()
 {
 	unsigned int servo_stepval, servo_stepnow;
 	unsigned int i;
 
 	//Global Configuration
-	TACCTL1	= OUTMOD_7;            // TACCR1 reset/set
-	TACTL	= TASSEL_2 + MC_1;     // SMCLK, upmode
-	TACCR0	= PWM_PERIOD-1;        // PWM Period
-	TACCR1	= PWM_OFF;             // TACCR1 PWM Duty Cycle
-	P1DIR	|= BIT6;               // P1.6 = output
-	P1SEL	|= BIT6;               // P1.6 = TA1 output
+	TACCTL1 = PWM_RESET_SET;   // TACCR1 reset/set
+	TACTL   = TIMERA_SMCLK_UP; // SMCLK, upmode
+	TACCR0  = PWM_PERIOD-1;    // PWM Period
+	TACCR1  = PWM_OFF;         // TACCR1 PWM Duty Cycle
+	P1DIR  |= BIT6;            // P1.6 = output
+	P1SEL  |= BIT6;            // P1.6 = TA1 output
 
 	// Calculate the step value and define the current step, defaults to minimum.
-	servo_stepval 	= ( (SERVO_MAX - SERVO_MIN) / SERVO_STEPS );
-	servo_stepnow	= SERVO_MIN;
+	servo_stepval = ( (SERVO_MAX - SERVO_MIN) / SERVO_STEPS );
+	servo_stepnow = SERVO_MIN;
 
-	// Fill up the LUT
-	for (i = 0; i < SERVO_STEPS; i++) {
+	// Fill up the Look-Up-Table
+	for (i = 0; i < SERVO_STEPS; i++)
+	{
 		servo_stepnow += servo_stepval;
 		servo_lut[i] = servo_stepnow;
 	}
@@ -38,31 +40,30 @@ void configureServos()
 	CenterServos(PCC_CMD_NONE);
 }
 
+
+//Limit the Direction of the Serov to Forward, Back, and Center
 void sendServoCmd(unsigned char servo, ServoDirection direction)//direction
 {
-	//Status good
-	setLED(RED_LED, OFF);
-	setLED(GREEN_LED, ON);
-
 	//Rotate servo in desired direction
 	switch (direction)
 	{
-		case CLOCKWISE:
-			rotateServo(servo, 180);//Move 90 degrees clockwise
+		case SERVO_FORWARD:
+			rotateServo(servo, 179);//Move to +90 degrees
 		break;
-		case COUNTER_CLOCKWISE:
-			rotateServo(servo, 0);//Move 90 degrees counter-clockwise
+		case SERVO_BACKWARD:
+			rotateServo(servo, 0);  //Move to -90 degrees
+			break;
+		case SERVO_CENTER:
+			rotateServo(servo, 90); //Return to Center
 		break;
 	}
 }
 
+//Perform Actual Rotation of Servos
 void rotateServo(unsigned char servo, ServoAngle angle)
 {
-	//Max Rotation is 180 degrees - 1
-	if (angle >= 180)
-	{
-		angle = 180 - 1;
-	}
+	//Protect from invalid Rotation Commands
+	angle = angle % MAX_ROTATION;
 
 	if (servo == SERVO_Y)
 	{
@@ -74,78 +75,59 @@ void rotateServo(unsigned char servo, ServoAngle angle)
 		//Don't know how to do multiple servos yet:(
 	}
 
+	//Short Delay, Then turn PWM OFF
 	__delay_cycles(MCU_CLOCK);
-	TACCR1 = PWM_OFF;//stop Servo
+	TACCR1 = PWM_OFF;
 }
 
 //Container Function call for Forward Movement
-void Forward(PCC_Command_Type lastCmd)
+void Forward()
 {
 	println("Sending Logic Forward...");
 
-	CenterServos(lastCmd);
-	sendServoCmd(SERVO_X, CENTER);
-	sendServoCmd(SERVO_Y, CLOCKWISE);
+	sendServoCmd(SERVO_X, SERVO_CENTER);
+	sendServoCmd(SERVO_Y, SERVO_FORWARD);
 }
 
 //Container Function call for Backward Movement
-void Backward(PCC_Command_Type lastCmd)
+void Backward()
 {
 	println("Sending Logic Backward...");
 
-	CenterServos(lastCmd);
-	sendServoCmd(SERVO_X, CENTER);
-	sendServoCmd(SERVO_Y, COUNTER_CLOCKWISE);
+	sendServoCmd(SERVO_X, SERVO_CENTER);
+	sendServoCmd(SERVO_Y, SERVO_BACKWARD);
 }
 
 //Container Function call for Right Movement
-void Right(PCC_Command_Type lastCmd)
+void Right()
 {
 	println("Sending Logic Right...");
 
-	CenterServos(lastCmd);
-	sendServoCmd(SERVO_Y, CENTER);
-	sendServoCmd(SERVO_X, CLOCKWISE);
+	sendServoCmd(SERVO_Y, SERVO_CENTER);
+	sendServoCmd(SERVO_X, SERVO_FORWARD);
 }
 
 //Container Function call for Left Movement
-void Left(PCC_Command_Type lastCmd)
+void Left()
 {
 	println("Sending Logic Left...");
 
-	CenterServos(lastCmd);
-	sendServoCmd(SERVO_Y, CENTER);
-	sendServoCmd(SERVO_X, COUNTER_CLOCKWISE);
+	sendServoCmd(SERVO_Y, SERVO_CENTER);
+	sendServoCmd(SERVO_X, SERVO_BACKWARD);
 }
 
 //Container Function call for Stop Command
-void Stop(PCC_Command_Type lastCmd)
+void Stop()
 {
 	println("Sending Emergency Stop...");
-	CenterServos(lastCmd);
+	CenterServos();
 }
 
-//Reset the Servos in between sending commands
-void CenterServos(PCC_Command_Type lastCmd)
+//Set the Servo Positions to Centerered
+void CenterServos()
 {
-	switch (lastCmd)
-	{
-		case PCC_FORWARD:
-			sendServoCmd(SERVO_Y, COUNTER_CLOCKWISE);
-		break;
-		case PCC_BACKWARD:
-			sendServoCmd(SERVO_Y, CLOCKWISE);
-		break;
-		case PCC_RIGHT:
-			sendServoCmd(SERVO_X, COUNTER_CLOCKWISE);
-		break;
-		case PCC_LEFT:
-			sendServoCmd(SERVO_X, CLOCKWISE);
-		break;
-		default:
-			//Do Nothing
-		break;
-	}
+	sendServoCmd(SERVO_X, SERVO_CENTER);
+	sendServoCmd(SERVO_Y, SERVO_CENTER);
 }
 
 //The Main Processing function of the PCC, Return the PCC Command that is being used
@@ -161,23 +143,23 @@ PCC_Command_Type processCommand(PCC_Command_Type currentCmd, PCC_Command_Type la
 	switch (currentCmd)
 	{
 		case PCC_FORWARD:
-			Forward(lastCmd);
+			Forward();
 		break;
 
 		case PCC_RIGHT:
-			Right(lastCmd);
+			Right();
 		break;
 
 		case PCC_LEFT:
-			Left(lastCmd);
+			Left();
 		break;
 
 		case PCC_BACKWARD:
-			Backward(lastCmd);
+			Backward();
 		break;
 
 		case PCC_STOP:
-			Stop(lastCmd);
+			Stop();
 		break;
 
 		case PCC_TEST:
