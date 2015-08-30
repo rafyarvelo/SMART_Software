@@ -32,13 +32,17 @@ void sendServoCmd(unsigned char servo, ServoDirection direction);
 //This Physically Rotates the Servo
 void rotateServo(unsigned char servo, ServoAngle angle);
 
-//Encapsulation of the endServoCmd function
+//Encapsulation of the sendServoCmd function
 void Forward     ();
 void Backward    ();
 void Right       ();
 void Left        ();
 void Stop        ();
 void CenterServos();
+
+//For Debugging...
+void ServoTest();
+
 
 //initialization
 void initCmdControl();

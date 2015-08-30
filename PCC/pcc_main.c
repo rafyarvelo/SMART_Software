@@ -29,6 +29,9 @@ void main(int argc, char** argv)
 	lastCmd    = PCC_CMD_NONE;
 	currentCmd = PCC_CMD_NONE;
 
+	//Try Each Possible Servo Command
+	ServoTest();
+
 	//Listen and Process Commands
 	while(1)
 	{
@@ -57,19 +60,27 @@ void Initialize_PCC()
 
 //-------------SOME DEBUG STUFF HERE LEAVE ME ALONE-------------
 //void main (void)
-// {
+//{
 //
 //	volatile unsigned int  i;
-//	volatile unsigned char c;
+//	unsigned char c = 0x00;
+//
 //
 //	Initialize_PCC();
+//
 //
 //	// Main loop
 //	while (1)
 //	{
 //
-//		c = INCHAR_UART();
-//	    OUTCHAR_UART(c);
+//		//c = INCHAR_UART();
+//	    //OUTCHAR_UART(c);
+//
+//		if (1)
+//		{
+//			TACCR1 =servo_lut[0];
+//			_delay_cycles(MCU_CLOCK);
+//		}
 //
 //		if (c >= '0' && c <= '9')
 //		{
@@ -109,9 +120,34 @@ void Initialize_PCC()
 //			__delay_cycles(1000000);
 //			TACCR1 = PWM_OFF;//stop Servo
 //		}
+//		else if (c == 'f')
+//		{
+//			// Go backward
+//						TA0CCR1 = servo_lut[179];
+//						__delay_cycles(1000000);
+//		}
+//		else if (c == 'g')
+//		{
+//			// Go backward
+//						TA0CCR1 = servo_lut[0];
+//						__delay_cycles(1000000);
+//		}
 //		else
 //		{
 //			TACCR1 = PWM_OFF;//stop Servo
 //		}
 //	}
+//}
+
+
+//int main(void)
+//{
+//	Initialize_PCC();
+//	TACCR1 = servo_lut[179];
+//
+//	while (1)
+//	{
+//	}
+//
+//	return 0;
 //}

@@ -130,6 +130,16 @@ void CenterServos()
 	sendServoCmd(SERVO_Y, SERVO_CENTER);
 }
 
+//Test all Possible Servo Commands
+void ServoTest()
+{
+	processCommand(PCC_TEST    , PCC_CMD_NONE);
+	processCommand(PCC_FORWARD , PCC_CMD_NONE);
+	processCommand(PCC_BACKWARD, PCC_CMD_NONE);
+	processCommand(PCC_RIGHT   , PCC_CMD_NONE);
+	processCommand(PCC_LEFT    , PCC_CMD_NONE);
+}
+
 //The Main Processing function of the PCC, Return the PCC Command that is being used
 PCC_Command_Type processCommand(PCC_Command_Type currentCmd, PCC_Command_Type lastCmd)
 {
