@@ -17,13 +17,25 @@ void configureServos()
 	unsigned int servo_stepval, servo_stepnow;
 	unsigned int i;
 
-	//Global Configuration
-	TACCTL1 = PWM_RESET_SET;   // TACCR1 reset/set
-	TACTL   = TIMERA_SMCLK_UP; // SMCLK, upmode
-	TACCR0  = PWM_PERIOD-1;    // PWM Period
-	TACCR1  = PWM_OFF;         // TACCR1 PWM Duty Cycle
-	P1DIR  |= BIT6;            // P1.6 = output
-	P1SEL  |= BIT6;            // P1.6 = TA1 output
+	//Timer A1 Configuration
+	TA1CTL   = TIMERA_SMCLK_UP; // SMCLK, upmode
+	TA1CCR0  = PWM_PERIOD-1;    // PWM Period
+	BCSCTL1  = CALBC1_1MHZ;     // Set DCO range
+	DCOCTL   = CALDCO_1MHZ;     // Set DCO step and modulation
+
+	//Servo Y Configuration
+	TA1CCTL1 =  PWM_RESET_SET;   // TA1CCR1 reset/set
+	TA1CCR1  =  PWM_OFF;         // TA1CCR1 PWM Duty Cycle
+	P2DIR   |=  SERVO_Y;         // P2.1 = output
+	P2SEL   |=  SERVO_Y;         // P2.1 = TA1.1 output
+	P2SEL2  &= ~SERVO_Y;         // Clear Timer Bit (Just to be safe)
+
+	//Servo X Configuration
+	TA1CCTL2 =  PWM_RESET_SET;   // TA1CCR1 reset/set
+	TA1CCR2  =  PWM_OFF;         // TA1CCR1 PWM Duty Cycle
+	P2DIR   |=  SERVO_X;         // P2.4 = output
+	P2SEL   |=  SERVO_X;         // P2.4 = TA1.1 output
+	P2SEL2  &= ~SERVO_X;         // Clear Timer Bit (Just to be safe)
 
 	// Calculate the step value and define the current step, defaults to minimum.
 	servo_stepval = ( (SERVO_MAX - SERVO_MIN) / SERVO_STEPS );
@@ -40,7 +52,6 @@ void configureServos()
 	CenterServos(PCC_CMD_NONE);
 }
 
-
 //Limit the Direction of the Serov to Forward, Back, and Center
 void sendServoCmd(unsigned char servo, ServoDirection direction)//direction
 {
@@ -48,10 +59,10 @@ void sendServoCmd(unsigned char servo, ServoDirection direction)//direction
 	switch (direction)
 	{
 		case SERVO_FORWARD:
-			rotateServo(servo, 179);//Move to +90 degrees
+			rotateServo(servo, 0);//Move to +90 degrees
 		break;
 		case SERVO_BACKWARD:
-			rotateServo(servo, 0);  //Move to -90 degrees
+			rotateServo(servo, 179);  //Move to -90 degrees
 			break;
 		case SERVO_CENTER:
 			rotateServo(servo, 90); //Return to Center
@@ -65,19 +76,16 @@ void rotateServo(unsigned char servo, ServoAngle angle)
 	//Protect from invalid Rotation Commands
 	angle = angle % MAX_ROTATION;
 
+	//Change the Duty Cycle of the Correponding PWM Pin
 	if (servo == SERVO_Y)
 	{
 		// Go to requested angle
-		TA0CCR1 = servo_lut[angle];
+		TA1CCR1 = servo_lut[angle];
 	}
 	else
 	{
-		//Don't know how to do multiple servos yet:(
+		TA1CCR2 = servo_lut[angle];
 	}
-
-	//Short Delay, Then turn PWM OFF
-	__delay_cycles(MCU_CLOCK);
-	TACCR1 = PWM_OFF;
 }
 
 //Container Function call for Forward Movement
@@ -126,18 +134,40 @@ void Stop()
 //Set the Servo Positions to Centerered
 void CenterServos()
 {
+	println("Centering Servos...");
 	sendServoCmd(SERVO_X, SERVO_CENTER);
 	sendServoCmd(SERVO_Y, SERVO_CENTER);
+}
+
+//Disable PWM to Servos
+void DisablePWM()
+{
+	println("Disabling PWM Signal...");
+	TA1CCR1 = PWM_OFF;
+	TA1CCR2 = PWM_OFF;
 }
 
 //Test all Possible Servo Commands
 void ServoTest()
 {
+	println("Running Initial Servo Tests...");
 	processCommand(PCC_TEST    , PCC_CMD_NONE);
+	__delay_cycles(MCU_CLOCK);
+
 	processCommand(PCC_FORWARD , PCC_CMD_NONE);
+	__delay_cycles(MCU_CLOCK);
+
 	processCommand(PCC_BACKWARD, PCC_CMD_NONE);
+	__delay_cycles(MCU_CLOCK);
+
 	processCommand(PCC_RIGHT   , PCC_CMD_NONE);
+	__delay_cycles(MCU_CLOCK);
+
 	processCommand(PCC_LEFT    , PCC_CMD_NONE);
+	__delay_cycles(MCU_CLOCK);
+
+	//Return the Servos to the Center
+	CenterServos();
 }
 
 //The Main Processing function of the PCC, Return the PCC Command that is being used
@@ -172,9 +202,14 @@ PCC_Command_Type processCommand(PCC_Command_Type currentCmd, PCC_Command_Type la
 			Stop();
 		break;
 
-		case PCC_TEST:
-			blinkLEDs(5);//Blink LEDs for debugging
+		case PCC_TEST: //Debug the UART by blinking the LEDs
+			blinkLEDs(5);
 		break;
+
+		case PCC_OFF:
+			DisablePWM();
+		break;
+
 		default:
 			println("Invalid Command");
 			currentCmd = PCC_CMD_NONE;

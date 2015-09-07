@@ -43,6 +43,8 @@ void CenterServos();
 //For Debugging...
 void ServoTest();
 
+//Disable PWM signal to save power
+void DisablePWM();
 
 //initialization
 void initCmdControl();

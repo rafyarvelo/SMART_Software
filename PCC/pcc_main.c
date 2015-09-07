@@ -29,7 +29,7 @@ void main(int argc, char** argv)
 	lastCmd    = PCC_CMD_NONE;
 	currentCmd = PCC_CMD_NONE;
 
-	//Try Each Possible Servo Command
+	//Test Each Possible Servo Command
 	ServoTest();
 
 	//Listen and Process Commands
@@ -58,7 +58,7 @@ void Initialize_PCC()
 	println(initStatement);
 }
 
-//-------------SOME DEBUG STUFF HERE LEAVE ME ALONE-------------
+////-------------SOME DEBUG STUFF HERE LEAVE ME ALONE-------------
 //void main (void)
 //{
 //
@@ -68,18 +68,16 @@ void Initialize_PCC()
 //
 //	Initialize_PCC();
 //
-//
 //	// Main loop
 //	while (1)
 //	{
 //
-//		//c = INCHAR_UART();
-//	    //OUTCHAR_UART(c);
+//		c = INCHAR_UART();
+//	    OUTCHAR_UART(c);
 //
 //		if (1)
 //		{
 //			TACCR1 =servo_lut[0];
-//			_delay_cycles(MCU_CLOCK);
 //		}
 //
 //		if (c >= '0' && c <= '9')
@@ -88,66 +86,41 @@ void Initialize_PCC()
 //
 //			// Go forward
 //			TA0CCR1 = servo_lut[index];
-//			__delay_cycles(2000000);
-//			TACCR1 = PWM_OFF;//stop Servo
 //		}
 //		else if (c == 'a')
 //		{
 //			// Go backward
 //			TA0CCR1 = servo_lut[120];
-//			__delay_cycles(1000000);
-//			TACCR1 = PWM_OFF;//stop Servo
 //		}
 //		else if (c == 'b')
 //		{
 //			// Go backward
 //			TA0CCR1 = servo_lut[140];
-//			__delay_cycles(1000000);
-//			TACCR1 = PWM_OFF;//stop Servo
 //		}
 //
 //		else if (c == 'c')
 //		{
 //			// Go backward
 //			TA0CCR1 = servo_lut[160];
-//			__delay_cycles(1000000);
-//			TACCR1 = PWM_OFF;//stop Servo
 //		}
 //		else if (c == 'd')
 //		{
 //			// Go backward
-//			TA0CCR1 = servo_lut[179];
-//			__delay_cycles(1000000);
-//			TACCR1 = PWM_OFF;//stop Servo
+//			TA1CCR1 = servo_lut[179];
 //		}
 //		else if (c == 'f')
 //		{
 //			// Go backward
-//						TA0CCR1 = servo_lut[179];
-//						__delay_cycles(1000000);
+//			TA1CCR1 = servo_lut[179];
 //		}
 //		else if (c == 'g')
 //		{
 //			// Go backward
-//						TA0CCR1 = servo_lut[0];
-//						__delay_cycles(1000000);
+//			TA1CCR1 = servo_lut[0];
 //		}
-//		else
+//		else if (c == 's')
 //		{
-//			TACCR1 = PWM_OFF;//stop Servo
+//			TA1CCR1 = PWM_OFF;//stop Servo
 //		}
 //	}
-//}
-
-
-//int main(void)
-//{
-//	Initialize_PCC();
-//	TACCR1 = servo_lut[179];
-//
-//	while (1)
-//	{
-//	}
-//
-//	return 0;
 //}

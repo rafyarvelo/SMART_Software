@@ -25,14 +25,16 @@
 
 #define PCC_TEST     0x64 //ASCII 'd' , For Testing/Debugging UART Connection
 
+#define PCC_OFF      0x6B //ASCII 'k' , Kill PWM Signal to save power
+
 #define PCC_CMD_NONE NULL
 
 
 //===================SERVO CONFIGURATION================
 //Servo Output Type
 #define SERVO_OUTPUT_PWM
-#define SERVO_X BIT5 //Left/Right   (Port 1 Bit 5)
-#define SERVO_Y BIT6 //Forward/Back (Port 1 Bit 6)
+#define SERVO_X BIT4 //Left/Right   (Port 2 Bit 4)
+#define SERVO_Y BIT1 //Forward/Back (Port 2 Bit 1)
 
 #define MCU_CLOCK	  1000000
 #define PWM_FREQUENCY 50		// In Hertz, ideally 50Hz.
@@ -44,8 +46,8 @@
 #define MAX_ROTATION 180          // Degrees
 #define SERVO_STEPS	 MAX_ROTATION // Maximum amount of steps in degrees (for the Look-Up-Table)
 
-#define SERVO_MIN (PWM_PERIOD / 20) // The minimum duty cycle (~1ms, 5% )
-#define SERVO_MAX (PWM_PERIOD / 10) // The maximum duty cycle (~2ms, 10%)
+#define SERVO_MIN 600  // The minimum duty cycle
+#define SERVO_MAX 2370 // The maximum duty cycle
 
 //Timer A Configurations for SMCLK (We will use UP mode)
 #define TIMERA_SMCLK_STOP    TASSEL_2 + MC_0

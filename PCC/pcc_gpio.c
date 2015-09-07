@@ -65,10 +65,10 @@ void blinkLEDs(unsigned int numTimes)
 	if (numTimes > 5)
 		numTimes = 5; //We Don't have all day man
 
-	for (i = 0; i < numTimes; i++)
+	setLEDs(OFF);
+	for (i = 0; i < numTimes * 2; i++)
 	{
-		setLEDs(ON);
-		_delay_cycles(50000);
-		setLEDs(OFF);
+		setLEDs(LOGIC_TOGGLE);
+		_delay_cycles(MCU_CLOCK / 2); //half second delay
 	}
 }
