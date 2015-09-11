@@ -1,0 +1,3 @@
+/home/pi/SENIOR_DESIGN/SMART_Software/emokit/examples/contact/CMakeFiles/contact.dir
+/home/pi/SENIOR_DESIGN/SMART_Software/emokit/src/CMakeFiles/emokit.dir
+/home/pi/SENIOR_DESIGN/SMART_Software/emokit/examples/emokitd/CMakeFiles/emokitd.dir
