@@ -74,7 +74,7 @@ C_BCI_Package* C_BCI_Package::Instance()
 
 void C_BCI_Package::startEEG()
 {
-
+    pEEG_IO->start();
 }
 
 void C_BCI_Package::initialize()
