@@ -54,14 +54,6 @@ C_BCI_Package::~C_BCI_Package()
     {
 		delete pRVS;
     }
-    if (tmDataBuffer)
-    {
-        delete tmDataBuffer;
-    }
-    if (eegDataBuffer)
-    {
-        delete eegDataBuffer;
-    }
 }
 
 C_BCI_Package* C_BCI_Package::Instance()
@@ -82,32 +74,7 @@ C_BCI_Package* C_BCI_Package::Instance()
 
 void C_BCI_Package::startEEG()
 {
-	EEG_Data* eegData = 0;
-	char buffer[100];
-	
-    if (!pEEG_IO->connect())
-	{
-        debugLog->BCI_Log() << "Lost Connection to EEG!" << cout;
-        eegConnectionStatus = NOT_CONNECTED;
-        return;
-    }
-    else
-    {
-        eegConnectionStatus = CONNECTED;
-    }
 
-    //cout                << "READING DATA FROM EEG:" << endl;
-    debugLog->BCI_Log() << "READING DATA FROM EEG:" << endl;
-    eegData = pEEG_IO->getData();
-
-    for (sizeType i = 0; i < eegData->size; i++)
-    {
-        sprintf(buffer, "Data[%d]: 0x%2x\n", i, eegData->rawData[i]);
-        debugLog->BCI_Log() << buffer;
-        //cout                << buffer;
-    }
-   // cout                << "------------" << endl << endl;
-    debugLog->BCI_Log() << "------------" << endl << endl;
 }
 
 void C_BCI_Package::initialize()
@@ -131,15 +98,18 @@ C_EEG_IO* C_BCI_Package::createEEG_IO(eegTypeEnum type)
 	
 	switch (type)
 	{
-		case EEG_TYPE_EMOTIV:
-			ptr = C_EEG_IO_EMOTIV::Instance();
-			break;
 		case EEG_TYPE_NAUTILUS:
 			ptr = C_EEG_IO_NAUTILUS::Instance();
-			break;
-		default:
+        break;
+
+        case EEG_TYPE_DEBUG:
 			ptr = C_EEG_IO_DEBUG::Instance();
-			break;
+        break;
+
+        //Emotiv is the default
+        default:
+            ptr = C_EEG_IO_EMOTIV::Instance();
+        break;
 	}
 	
 	return ptr;
@@ -158,14 +128,14 @@ bool C_BCI_Package::checkConnections()
     if (!eegConnectionStatus)
     {
         debugLog->BCI_Log() << "EEG Connection not created! Stopping BCI..." << endl;
-        cout   << "EEG Disconnected! Stopping BCI..." << endl;
+        cerr   << "EEG Disconnected! Stopping BCI..." << endl;
         status = NOT_CONNECTED;
     }
 
     //Check PCC Connection Status...
     if (!pccConnectionStatus)
     {
-        cout   << "PCC Disconnected! Stopping BCI..." << endl;
+        cerr   << "PCC Disconnected! Stopping BCI..." << endl;
         status = NOT_CONNECTED;
     }
 
@@ -194,8 +164,9 @@ void C_BCI_Package::Run()
         switch (bciState)
         {
         case BCI_OFF:
-            bciState = BCI_INITIALIZATION;//Start initializing!
+            bciState = BCI_INITIALIZATION; //Start initializing!
             break;
+
         case BCI_INITIALIZATION:
 
             //Make Connections
@@ -207,53 +178,96 @@ void C_BCI_Package::Run()
             pFlasherIO->SendRVS();
 
             startEEG();
-            debugLog->BCI_Log() << "Initialization Complete, Moving to STANDBY..." << endl;
 
-            stopwatch.start(); //Check for a timeout
+
+            debugLog->BCI_Log() << "Initialization Complete, Moving to STANDBY..." << endl;
             bciState = BCI_STANDBY;
             break;
+
         case BCI_STANDBY:
-            //Wait for an interrupt or a timeout
-            if (stopwatch.elapsed() > COMMAND_TIMEOUT)
-            {
-                debugLog->BCI_Log() << "Timed out waiting for EEG Data: Count = " << ++missCount << endl;
-                stopwatch.restart();
+            //Keep Track of the Mission Time
+            stopwatch.start();
 
-                if (missCount < MAX_MISSES)
-                {
-                    debugLog->BCI_Log() << "Resending last command due to timeout..." << endl;
+            //Manage Telemetry Stream
+            updateTM();
 
-                    //Hack for Now
-                    pPCC_IO->SetCommand(PCC_FORWARD);
-                    pPCC_IO->SendCommand();
-                }
-                else
-                {
-                    debugLog->BCI_Log() << "Maximum Miss Count Reached." << endl;
-                    
-					//Hack for Now
-                    pPCC_IO->SetCommand(PCC_STOP);
-                    pPCC_IO->SendCommand();
-                    cout << "Connection to EEG Timed out" << endl;
-                    exit(1);
-                }
-            }
             break;
+
         case BCI_PROCESSING:
-            pJA->SetTM(pBRS_IO->GetLatestTM());
+            //Update the Judgment Algorithm with the current data
+            pJA->SetTM(currentTMFrame);
+
+            //Decide Final Power Chair Command
             pJA->computeCommand();
 
+            //Move to Ready to send the command
+            bciState = BCI_READY;
             break;
+
         case BCI_READY:
+            //Send the PCC Command then Revert to STANDBY
             pPCC_IO->SetCommand(pJA->GetFinalCommand());
             pPCC_IO->SendCommand();
 
-            pBRS_IO->SendTM();
             bciState = BCI_STANDBY;
             break;
         }
     }
 
-    //Should Never Get to this line
-    cout << "ERROR! BCI Lost Connection!" << endl;
+    cerr << "ERROR! BCI Lost Connection!" << endl;
+}
+
+void C_BCI_Package::updateTM()
+{
+    if (!currentTMFrame)
+    {
+        currentTMFrame = TM_Frame_t::createFrame();
+    }
+
+    //Update EEG, BRS, and Flasher Data
+    currentTMFrame->eegFrame  = eegData.GetFrame();
+    currentTMFrame->brsFrame  = pBRS_IO->GetLatestBRSFrame();
+    currentTMFrame->ledGroups = pRVS->GetAllLEDGroups();
+
+    //Update Connection Status
+    currentTMFrame->eegConnectionStatus = eegConnectionStatus;
+    currentTMFrame->pccConnectionStatus = pccConnectionStatus;
+    currentTMFrame->brsConnectionStatus = brshConnectionStatus;
+    currentTMFrame->flasherConnectionStatus = flasherConnectionStatus;
+}
+
+//Slots
+void C_BCI_Package::onEEGDataProcessed(C_EEG_Data &eegData)
+{
+    //If we're not in standby, then just ignore the EEG
+    if (bciState == BCI_STANDBY)
+    {
+        //Update our EEG Data with the Latest Data
+        this->eegData = eegData;
+
+        //Update Telemetry and Process Command
+        updateTM();
+        bciState = BCI_PROCESSING;
+    }
+}
+
+void C_BCI_Package::onRemoteCmdReceived(PCC_Command_Type& cmd)
+{
+    //If we're not in standby, then just ignore the Cmd
+    if (bciState == BCI_STANDBY)
+    {
+        //Update TM with the command, then let the
+        //Judgment Algorithm take care of the rest
+        updateTM();
+        currentTMFrame->brsFrame.remoteCommand = cmd;
+
+        bciState = BCI_PROCESSING;
+    }
+}
+
+void C_BCI_Package::onEmergencyStopRequested()
+{
+    //No messing around here, just send the command
+    pPCC_IO->SetCommand(PCC_STOP);
+    pPCC_IO->SendCommand();
 }

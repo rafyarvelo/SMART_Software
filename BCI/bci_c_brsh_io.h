@@ -14,13 +14,24 @@ public:
 
     static C_BRSH_IO* Instance(){ return new C_BRSH_IO; }
 
-    C_TM* GetLatestTM();
-    void  SendTM();
+    //Send TM to the BRSH
+    void SetTMFrame(TM_Frame_t* pFrame);
+    void SendTMFrame();
+
+    //Return the latest BRS Data
+    BRS_Frame_t& GetLatestBRSFrame();
+
 
     virtual ConnectionStatusType connect() { return CONNECTED; }
 
+signals:
+    void BRSDataReceived(BRS_Frame_t& brsData);
+    void remoteCommandReceived(PCC_Command_Type cmd);
+    void EmergencyStopRequested();
+
 private:
-    C_TM* tmDataBuffer;
+    TM_Frame_t  currentTMFrame;
+    BRS_Frame_t currentBRSFrame;
 };
 
 #endif // C_BRSH_IO_H

@@ -6,8 +6,9 @@
 #include "../smart_debug_log.h"
 #include "bci_c_eeg_io.h"
 
-class C_SignalProcessing
+class C_SignalProcessing : public QObject
 {
+    Q_OBJECT
 public:
 	 C_SignalProcessing(C_EEG_IO* eegIO);
 	~C_SignalProcessing();
@@ -16,9 +17,16 @@ public:
 	{
 		return new C_SignalProcessing(eegIO);
 	}
+
+signals:
+    void eegDataProcessed(C_EEG_Data& processedData);
+
+public slots:
+    void processEEGData(C_EEG_Data& rawEEGData);
 	
 private:
-	C_EEG_IO* mEEG_IO_Ptr;		
+    C_EEG_IO*  mEEG_IO_Ptr;
+    C_EEG_Data processedData;
 };
 
 #endif // BCI_C_SIGNAL_PROCESSING_H

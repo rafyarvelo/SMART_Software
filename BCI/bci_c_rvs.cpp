@@ -17,7 +17,7 @@ C_RVS::~C_RVS()
 	}
 }
 
-const LED_Group*  C_RVS::GetLEDGroup(LED_Group_ID id)
+LED_Group*  C_RVS::GetLEDGroup(LED_Group_ID id)
 {
 	if (id < 0 || id > NUM_LED_GROUPS)
 	{
@@ -26,7 +26,10 @@ const LED_Group*  C_RVS::GetLEDGroup(LED_Group_ID id)
 	return ledGroups[id];
 }
 
-const LED_Group** GetAllLEDGroups();
+LED_Group** C_RVS::GetAllLEDGroups()
+{
+    return ledGroups;
+}
 
 void C_RVS::SetFrequency(LED_Group_ID id, unsigned short frequency)
 {

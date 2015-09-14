@@ -78,8 +78,8 @@ public:
      ~C_RVS();
 
 	static C_RVS* Instance(){ return new C_RVS; }
-    const LED_Group*  GetLEDGroup(LED_Group_ID id);
-    const LED_Group** GetAllLEDGroups();
+    LED_Group*  GetLEDGroup(LED_Group_ID id);
+    LED_Group** GetAllLEDGroups();
     void SetFrequency(LED_Group_ID id, unsigned short frequency);
 
     void Generate(); //Creates RVS frequencies

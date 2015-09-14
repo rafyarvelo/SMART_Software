@@ -30,7 +30,7 @@ public:
 	}
 
     void SetRVS(C_RVS* pRVS);
-    void SetTM (C_TM*  pTM);
+    void SetTM (TM_Frame_t* pTMFrame);
     PCC_Command_Type GetFinalCommand();
 
     //To be effective, make sure the RVS and TM are set before calling this
@@ -39,7 +39,7 @@ public:
 private:
 	C_SignalProcessing* mSignalProcessingPtr;
     C_RVS*              mRVS_Ptr;
-    C_TM*               mTM_Ptr;
+    TM_Frame_t*         mTMFrame;
     PCC_Command_Type    finalCommand;
     PCC_Command_Type    prevCommand;
     bool commandSafe; //Just in case user forgets to call computeCommand()

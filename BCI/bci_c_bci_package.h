@@ -14,8 +14,7 @@
 #include "bci_c_pcc_io.h"
 #include "bci_c_rvs.h"
 
-#define COMMAND_TIMEOUT 5000 //ms
-#define MAX_MISSES      5    //Max Time outs before quitting
+#define COMMAND_TIMEOUT 20000 //Wait 20 seconds before killing the System
 
 typedef enum BCIState
 {
@@ -51,8 +50,9 @@ typedef enum BCIState
      */
 }BCIState;
 
-class C_BCI_Package
+class C_BCI_Package : public QObject
 {
+    Q_OBJECT
 public:
 
     //Factory Constructor
@@ -65,12 +65,15 @@ private:
 	 C_BCI_Package();
     ~C_BCI_Package();
     void initialize();
+    void updateTM();
     bool checkConnections();
     void startEEG();
     C_EEG_IO* createEEG_IO(eegTypeEnum type=DEFAULT_EEG_TYPE);//factory EEG Construction
 
 private slots:
-    void onEEGDataReady(EEG_Data* pData);
+    void onEEGDataProcessed(C_EEG_Data& data);
+    void onRemoteCmdReceived(PCC_Command_Type& cmd);
+    void onEmergencyStopRequested();
 
 private:
 	SMART_DEBUG_LOG*     debugLog;
@@ -95,8 +98,10 @@ private:
     QTime        stopwatch;
     unsigned int missCount;
 
-    EEG_Data* eegDataBuffer;
-    C_TM*     tmDataBuffer;
+    //The Current EEG and TM Data we're seeing
+    C_EEG_Data  eegData;
+    C_TM        tmData;
+    TM_Frame_t* currentTMFrame;
 };
 
 #endif // BCI_C_BCI_PACKAGE_H

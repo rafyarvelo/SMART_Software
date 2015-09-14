@@ -1,7 +1,6 @@
 #include "bci_c_brsh_io.h"
 
 C_BRSH_IO::C_BRSH_IO()
-    :tmDataBuffer(0)
 {
     connectionStatus = CONNECTED;
 }
@@ -11,12 +10,20 @@ C_BRSH_IO::~C_BRSH_IO()
 
 }
 
-void C_BRSH_IO::SendTM()
+void C_BRSH_IO::SendTMFrame()
 {
 
 }
 
-C_TM* C_BRSH_IO::GetLatestTM()
+void C_BRSH_IO::SetTMFrame(TM_Frame_t *pFrame)
 {
-    return tmDataBuffer;
+    if (pFrame)
+    {
+        memcpy(&currentTMFrame, pFrame, sizeof(TM_Frame_t));
+    }
+}
+
+BRS_Frame_t& C_BRSH_IO::GetLatestBRSFrame()
+{
+    return currentBRSFrame;
 }

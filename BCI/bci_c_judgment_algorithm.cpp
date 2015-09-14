@@ -2,7 +2,6 @@
 
 C_JudgmentAlgorithm::C_JudgmentAlgorithm(C_SignalProcessing* signalProcessing)
     : mRVS_Ptr(0),
-      mTM_Ptr(0),
       commandSafe(false),
       prevCommand(PCC_CMD_NONE),
       finalCommand(PCC_CMD_NONE),
@@ -22,9 +21,9 @@ void C_JudgmentAlgorithm::SetRVS(C_RVS* pRVS)
 }
 
 //Remote and Sensor Data contained within TM
-void C_JudgmentAlgorithm::SetTM(C_TM*  pTM)
+void C_JudgmentAlgorithm::SetTM(TM_Frame_t *pTMFrame)
 {
-    mTM_Ptr  = pTM;
+    mTMFrame = pTMFrame;
 }
 
 PCC_Command_Type C_JudgmentAlgorithm::GetFinalCommand()
