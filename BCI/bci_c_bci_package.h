@@ -1,6 +1,9 @@
 #ifndef BCI_C_BCI_PACKAGE_H
 #define BCI_C_BCI_PACKAGE_H
 
+//Forward Declaration
+class C_TelemetryManager;
+
 #include <QTime>
 #include "bci_c_signal_processing.h"
 #include "bci_c_tm.h"
@@ -10,7 +13,9 @@
 #include "bci_c_eeg_io_emotiv.h"
 #include "bci_c_eeg_io_nautilus.h"
 #include "bci_c_judgment_algorithm.h"
-#include "bci_c_brsh_io.h"
+#include "bci_c_brsh_io_serial.h"
+#include "bci_c_brsh_io_debug.h"
+#include "bci_c_telemetrymanager.h"
 #include "bci_c_pcc_io.h"
 #include "bci_c_rvs.h"
 
@@ -61,6 +66,13 @@ public:
     //Infinite Loop when called
     void Run();
 
+    QTime& currentTime() { return stopwatch; }
+
+    //Connection Status
+    ConnectionStatusType eegConnectionStatus;
+    ConnectionStatusType flasherConnectionStatus;
+    ConnectionStatusType brshConnectionStatus;
+    ConnectionStatusType pccConnectionStatus;
 private:
 	 C_BCI_Package();
     ~C_BCI_Package();
@@ -68,7 +80,8 @@ private:
     void updateTM();
     bool checkConnections();
     void startEEG();
-    C_EEG_IO* createEEG_IO(eegTypeEnum type=DEFAULT_EEG_TYPE);//factory EEG Construction
+    C_EEG_IO*  createEEG_IO(eegTypeEnum type=DEFAULT_EEG_TYPE);//factory EEG Construction
+    C_BRSH_IO* createBRS_IO(brsTypeEnum type=DEFAULT_BRS_TYPE);//factory BRS Construction
 
 private slots:
     void onEEGDataProcessed(C_EEG_Data& data);
@@ -85,23 +98,15 @@ private:
     C_Flasher_IO*        pFlasherIO;
     C_RVS*               pRVS;
 
-    //Connection Status
-    ConnectionStatusType eegConnectionStatus;
-    ConnectionStatusType flasherConnectionStatus;
-    ConnectionStatusType brshConnectionStatus;
-    ConnectionStatusType pccConnectionStatus;
-
     //Used to control event loop
     BCIState bciState;
 
-    //If our comm is slow, lets reuse the last command up till a pre-defined miss_count
-    QTime        stopwatch;
-    unsigned int missCount;
+    //Mission Time
+    QTime stopwatch;
 
-    //The Current EEG and TM Data we're seeing
-    C_EEG_Data  eegData;
-    C_TM        tmData;
-    TM_Frame_t* currentTMFrame;
+    //Manage the Telemetry Stream
+    C_TelemetryManager* pTelemetryManager;
+    TM_Frame_t*         pLatestTM_Frame;
 };
 
 #endif // BCI_C_BCI_PACKAGE_H

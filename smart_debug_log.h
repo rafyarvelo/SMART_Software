@@ -9,12 +9,12 @@
 
 using namespace std;
 
-//All executables will be one directory below the base
-#define BCI_LOG_FILENAME "../debug_logs/bci_debug_log.txt"
-#define BRS_LOG_FILENAME "../debug_logs/brs_debug_log.txt"
-#define PCC_LOG_FILENAME "../debug_logs/pcc_debug_log.txt"
-#define FLASHER_LOG_FILENAME "../debug_logs/flasher_debug_log.txt"
-#define SERIAL_COMM_LOG_FILENAME "../debug_logs/serial_comm_debug_log.txt"
+//All files will be one directory below the base
+#define BCI_LOG_FILENAME         "../debug_files/bci_debug_log.txt"
+#define BRS_LOG_FILENAME         "../debug_files/brs_debug_log.txt"
+#define PCC_LOG_FILENAME         "../debug_files/pcc_debug_log.txt"
+#define FLASHER_LOG_FILENAME     "../debug_files/flasher_debug_log.txt"
+#define SERIAL_COMM_LOG_FILENAME "../debug_files/serial_comm_debug_log.txt"
 
 //What happens if we get an error in the Error log class???
 //INCEPTION, Thats what happens...

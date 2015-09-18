@@ -36,10 +36,15 @@ public:
     //To be effective, make sure the RVS and TM are set before calling this
     Confidence_Type computeCommand();
 
+    //Check for an Emergency Stop
+    bool SafeToProceed();
+
 private:
+    void ParseEEGData(Confidence_Type& confidence);
+
 	C_SignalProcessing* mSignalProcessingPtr;
     C_RVS*              mRVS_Ptr;
-    TM_Frame_t*         mTMFrame;
+    TM_Frame_t          mCurrentTMFrame;
     PCC_Command_Type    finalCommand;
     PCC_Command_Type    prevCommand;
     bool commandSafe; //Just in case user forgets to call computeCommand()

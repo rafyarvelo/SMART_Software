@@ -4,7 +4,7 @@ SET(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 SET(CMAKE_DEPENDS_CHECK_C
-  "/home/pi/SENIOR_DESIGN/SMART_Software/emokit/src/emokit.c" "/home/pi/SENIOR_DESIGN/SMART_Software/emokit/src/CMakeFiles/emokit.dir/emokit.c.o"
+  "/home/arvelor/SENIOR_DESIGN/SMART_Software/emokit/src/emokit.c" "/home/arvelor/SENIOR_DESIGN/SMART_Software/emokit/src/CMakeFiles/emokit.dir/emokit.c.o"
   )
 SET(CMAKE_C_COMPILER_ID "GNU")
 

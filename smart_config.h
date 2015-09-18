@@ -22,17 +22,17 @@
 #endif
 
 //Common Typedefs
-typedef unsigned char      PCC_Command_Type;
-typedef unsigned char      byteType;
-typedef unsigned short     shortType;
-typedef unsigned int       wordType;
-typedef unsigned long      sizeType;
-typedef unsigned long long longType;
+typedef u_int8_t  PCC_Command_Type;
+typedef u_int8_t  byteType;
+typedef u_int16_t shortType;
+typedef u_int32_t wordType;
+typedef u_int32_t sizeType;
+typedef u_int64_t longType;
 
-#define CONNECTED     true
-#define NOT_CONNECTED false
+#define CONNECTED     1
+#define NOT_CONNECTED 0
 
-//=====================EEG Declaration======================
+//=====================EEG/BRS IO Declaration======================
 typedef enum
 {
 	EEG_TYPE_EMOTIV=0,
@@ -40,11 +40,28 @@ typedef enum
 	EEG_TYPE_DEBUG
 } eegTypeEnum;
 
+typedef enum
+{
+    BRS_TYPE_TIVA=0,
+    BRS_TYPE_DEBUG
+} brsTypeEnum;
+
 //EEG Type (only select one)
-#define DEFAULT_EEG_TYPE EEG_TYPE_DEBUG //Supported Options:
-                                        //EEG_TYPE_DEBUG
-                                        //EEG_TYPE_NAUTILUS
-                                        //EEG_TYPE_EMOTIV
+//Supported Options:
+//EEG_TYPE_DEBUG
+//EEG_TYPE_NAUTILUS
+//EEG_TYPE_EMOTIV
+
+
+//Use Windows for Debugging by default
+#if 1 //def WIN32
+    #define DEFAULT_EEG_TYPE EEG_TYPE_DEBUG
+    #define DEFAULT_BRS_TYPE BRS_TYPE_DEBUG
+#else
+    #define DEFAULT_EEG_TYPE EEG_TYPE_EMOTIV
+    #define DEFAULT_BRS_TYPE BRS_TYPE_TIVA
+#endif
+
 //==========================================================
 
 //==================Mobile Device Declaration================
@@ -75,9 +92,11 @@ typedef enum
 
 //PCC Serial Port
 #ifdef WIN32
-	#define PCC_PORT "COM5"
+    #define PCC_PORT "COM5"
+    #define BRS_PORT "COM7"
 #else
-	#define PCC_PORT "/dev/ttyACMO"
+    #define PCC_PORT "/dev/ttyACM0"
+    #define BRS_PORT "/dev/ttyAMA0"
 #endif
 
 #endif /* SMART_CONFIG_H_ */

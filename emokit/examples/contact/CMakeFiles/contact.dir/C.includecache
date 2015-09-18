@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/home/pi/SENIOR_DESIGN/SMART_Software/emokit/examples/contact/contact.c
+/home/arvelor/SENIOR_DESIGN/SMART_Software/emokit/examples/contact/contact.c
 stdio.h
 -
 string.h
@@ -14,7 +14,7 @@ string.h
 signal.h
 -
 emokit/emokit.h
-/home/pi/SENIOR_DESIGN/SMART_Software/emokit/examples/contact/emokit/emokit.h
+/home/arvelor/SENIOR_DESIGN/SMART_Software/emokit/examples/contact/emokit/emokit.h
 
 include/emokit/emokit.h
 stdint.h

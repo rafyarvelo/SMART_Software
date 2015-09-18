@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/home/pi/SENIOR_DESIGN/SMART_Software/emokit/src/emokit.c
+/home/arvelor/SENIOR_DESIGN/SMART_Software/emokit/src/emokit.c
 stdio.h
 -
 stdlib.h
@@ -14,11 +14,11 @@ stdlib.h
 string.h
 -
 emokit/emokit.h
-/home/pi/SENIOR_DESIGN/SMART_Software/emokit/src/emokit/emokit.h
+/home/arvelor/SENIOR_DESIGN/SMART_Software/emokit/src/emokit/emokit.h
 hidapi/hidapi.h
-/home/pi/SENIOR_DESIGN/SMART_Software/emokit/src/hidapi/hidapi.h
+/home/arvelor/SENIOR_DESIGN/SMART_Software/emokit/src/hidapi/hidapi.h
 mcrypt.h
-/home/pi/SENIOR_DESIGN/SMART_Software/emokit/src/mcrypt.h
+/home/arvelor/SENIOR_DESIGN/SMART_Software/emokit/src/mcrypt.h
 
 /usr/local/include/hidapi/hidapi.h
 wchar.h

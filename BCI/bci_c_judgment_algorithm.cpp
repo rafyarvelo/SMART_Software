@@ -23,7 +23,7 @@ void C_JudgmentAlgorithm::SetRVS(C_RVS* pRVS)
 //Remote and Sensor Data contained within TM
 void C_JudgmentAlgorithm::SetTM(TM_Frame_t *pTMFrame)
 {
-    mTMFrame = pTMFrame;
+    memcpy(&mCurrentTMFrame, pTMFrame,sizeof(TM_Frame_t));
 }
 
 PCC_Command_Type C_JudgmentAlgorithm::GetFinalCommand()
@@ -43,13 +43,43 @@ Confidence_Type C_JudgmentAlgorithm::computeCommand()
 {
     Confidence_Type confidence = UNSURE;
 
+    //Check for Emergency Stop
+    if (!SafeToProceed())
+    {
+        finalCommand = PCC_STOP;
+        return confidence = ABSOLUTE;
+    }
 
+    //Check for Remote Command
+    if (mCurrentTMFrame.brsFrame.remoteCommand != PCC_CMD_NONE)
+    {
+        //Update Final Command with Remote Command
+        finalCommand = mCurrentTMFrame.brsFrame.remoteCommand;
+
+        //Return Confidence Value
+        return confidence = ABSOLUTE;
+    }
+
+    //Process EEG Data
+    ParseEEGData(confidence);
+
+    commandSafe = true;
+    return confidence;
+}
+
+
+//Check if we are requesting an emergency stop
+bool C_JudgmentAlgorithm::SafeToProceed()
+{
+    return (mCurrentTMFrame.brsFrame.usData.rangeToObject <= EMERGENCY_STOP_DISTANCE);
+}
+
+//Parse the EEG Data, Update the Final Command and the Confidence Value
+void C_JudgmentAlgorithm::ParseEEGData(Confidence_Type& confidence)
+{
     //Let's not change the command unless we're sure
     if (confidence == UNSURE && prevCommand != PCC_CMD_NONE)
     {
         finalCommand = prevCommand;
     }
-
-    commandSafe = true;
-    return confidence;
 }

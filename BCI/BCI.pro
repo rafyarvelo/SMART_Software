@@ -24,7 +24,15 @@ HEADERS += \
     bci_c_connected_device.h \
     bci_c_brsh_io.h \
     bci_c_pcc_io.h \
-    bci_c_eeg_data.h
+    bci_c_eeg_data.h \
+    bci_c_xml_parser.h \
+    ../BRS/brs_c_sensor_data.h \
+    bci_c_abstract_parser.h \
+    bci_c_binary_parser.h \
+    bci_c_textparser.h \
+    bci_c_telemetrymanager.h \
+    bci_c_brsh_io_debug.h \
+    bci_c_brsh_io_serial.h
 
 SOURCES += \
     bci_c_bci_package.cpp \
@@ -35,10 +43,17 @@ SOURCES += \
     bci_c_serial_comm.cpp \
     bci_c_signal_processing.cpp \
     bci_main.cpp \
-    bci_c_brsh_io.cpp \
     bci_c_pcc_io.cpp \
     bci_c_eeg_io_emotiv.cpp \
-    bci_c_eeg_data.cpp
+    bci_c_eeg_data.cpp \
+    bci_c_xml_parser.cpp \
+    bci_c_tm.cpp \
+    bci_c_abstract_parser.cpp \
+    bci_c_binary_parser.cpp \
+    bci_c_textparser.cpp \
+    bci_c_telemetrymanager.cpp \
+    bci_c_brsh_io_debug.cpp \
+    bci_c_brsh_io_serial.cpp
 
 #Junk needed for Emokit Libraries
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../emokit/lib/release/ -lemokit

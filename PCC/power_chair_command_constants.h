@@ -27,7 +27,7 @@
 
 #define PCC_OFF      0x6B //ASCII 'k' , Kill PWM Signal to save power
 
-#define PCC_CMD_NONE NULL
+#define PCC_CMD_NONE 0x6E //ASCII 'n' , Means "None"
 
 
 //===================SERVO CONFIGURATION================

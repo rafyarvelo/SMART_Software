@@ -60,6 +60,7 @@ typedef struct EEG_Frame_t
     EEG_Frame_t()
     {
         eegType = DEFAULT_EEG_TYPE;
+        counter = 0;
 
         for (int i = 0; i < MAX_EEG_ELECTRODES;i++)
         {
@@ -70,6 +71,18 @@ typedef struct EEG_Frame_t
         gyroX = 0;
         gyroY = 0;
         batteryPercentage = 0;
+    }
+
+    //Factory Method
+    EEG_Frame_t(EEG_Frame_t* other)
+    {
+        memcpy(this, other, sizeof(EEG_Frame_t));
+    }
+
+    //Factory Method
+    static EEG_Frame_t* create(EEG_Frame_t* other)
+    {
+        return new EEG_Frame_t(other);
     }
 
     //Factory Method
@@ -129,7 +142,7 @@ public:
     bool isFull() { return eegDataFull; }
 
     //Return the number of Frames Available
-    sizeType size() { return currentFrame; }
+    sizeType size() { return frames.size(); }
 
     //Assignment Operator
     C_EEG_Data& operator =(C_EEG_Data& rhs);

@@ -1,1 +1,1 @@
-/usr/bin/cc      CMakeFiles/contact.dir/contact.c.o  -o ../../bin/contact -rdynamic ../../lib/libemokit.a -lmcrypt /usr/local/lib/libhidapi-hidraw.so -Wl,-rpath,/usr/local/lib:/usr/local/lib 
+/usr/bin/cc      CMakeFiles/contact.dir/contact.c.o  -o ../../bin/contact -rdynamic ../../lib/libemokit.a -lmcrypt /usr/local/lib/libhidapi-hidraw.so -Wl,-rpath,/usr/local/lib 

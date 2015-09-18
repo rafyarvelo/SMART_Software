@@ -4,19 +4,21 @@
 #include <QList>
 #include "../smart_config.h"
 #include "../smart_debug_log.h"
-#include "../BRS/brs_c_abstract_sensor.h"
 #include "../PCC/power_chair_command_constants.h"
+#include "../BRS/brs_c_sensor_data.h"
 #include "bci_c_eeg_data.h"
 #include "bci_c_rvs.h"
+
+#define EMERGENCY_STOP_DISTANCE 1 //meters
 
 //Data from the BRSH
 typedef struct BRS_Frame_t
 {
-    sensorData_t     gpsData;
-    sensorData_t     usData;
+    GPS_Data_t       gpsData;
+    US_Data_t        usData;
     PCC_Command_Type remoteCommand;
 
-    BRS_Frame_t(sensorData_t& gpsData, sensorData_t& usData, PCC_Command_Type cmd)
+    BRS_Frame_t(GPS_Data_t& gpsData, US_Data_t& usData, PCC_Command_Type cmd)
     {
         this->gpsData       = gpsData;
         this->usData        = usData;
@@ -25,21 +27,38 @@ typedef struct BRS_Frame_t
 
     BRS_Frame_t()
     {
-        memset(&gpsData,0 , sizeof(sensorData_t));
-        memset(&usData ,0 , sizeof(sensorData_t));
+        memset(&gpsData,0 , sizeof(GPS_Data_t));
+        memset(&usData ,0 , sizeof(US_Data_t));
         remoteCommand = PCC_CMD_NONE;
     }
 
-    static BRS_Frame_t* create(sensorData_t& gpsData, sensorData_t& usData, PCC_Command_Type cmd)
+    static BRS_Frame_t* create()
+    {
+        return new BRS_Frame_t();
+    }
+
+    static BRS_Frame_t* create(GPS_Data_t& gpsData, US_Data_t& usData, PCC_Command_Type cmd)
     {
         return new BRS_Frame_t(gpsData, usData, cmd);
     }
+
+    BRS_Frame_t& operator =(BRS_Frame_t* rhs)
+    {
+        memcpy(this, rhs, sizeof(BRS_Frame_t));
+    }
+
+    BRS_Frame_t& operator =(BRS_Frame_t& rhs)
+    {
+        memcpy(this, &rhs, sizeof(BRS_Frame_t));
+    }
+
 
 } BRS_Frame_t;
 
 //A Single Frame of Telemetry Data
 typedef struct TM_Frame_t
 {
+    int          timeStamp;
     EEG_Frame_t  eegFrame;
     BRS_Frame_t  brsFrame;
     LED_Group**  ledGroups;
@@ -59,6 +78,7 @@ typedef struct TM_Frame_t
     //Defaults
     TM_Frame_t()
     {
+        timeStamp = 0;
         ledGroups = LED_Group::DefaultGroups();
         eegConnectionStatus     = NOT_CONNECTED;
         pccConnectionStatus     = NOT_CONNECTED;
@@ -66,10 +86,21 @@ typedef struct TM_Frame_t
         flasherConnectionStatus = NOT_CONNECTED;
     }
 
+    TM_Frame_t(TM_Frame_t* other)
+    {
+        memcpy(this, other, sizeof(TM_Frame_t));
+    }
+
     //Factory Constructors
     static TM_Frame_t* createFrame()
     {
         return new TM_Frame_t;
+    }
+
+    //Factory Constructors
+    static TM_Frame_t* createFrame(TM_Frame_t* other)
+    {
+        return new TM_Frame_t(other);
     }
 
     static TM_Frame_t* createFrame(EEG_Frame_t& eegFrame, BRS_Frame_t brsFrame,
@@ -95,17 +126,21 @@ typedef struct TM_Frame_t
 class C_TM
 {
 public:
-	 C_TM(){}//Implement later...lazy right now
-	~C_TM(){}//Implement later...lazy right now
+     C_TM();
+    ~C_TM();
 	
 	static C_TM* Instance() { return new C_TM; }
 	
-    void addFrame(TM_Frame_t* tmFrame, int index=-1);//back of list by default
-    TM_Frame_t* getFrame(int index=-1);//last frame by default
+    void addFrame(TM_Frame_t* frame, int index=-1);//back of list by default
+    TM_Frame_t* GetFrame(int index=-1);//last frame by default
     TM_Frame_t* popFrame();
-	
 	sizeType size(){ return (sizeType) tmFrames.size();}
 	
+    //Clear the TM Data
+    void clear() { tmFrames.clear(); }
+
+    C_TM& operator =(C_TM& rhs);
+private:
     QList<TM_Frame_t*> tmFrames;
 };
 

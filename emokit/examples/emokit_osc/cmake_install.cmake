@@ -1,4 +1,4 @@
-# Install script for directory: /home/pi/SENIOR_DESIGN/SMART_Software/emokit/examples/emokit_osc
+# Install script for directory: /home/arvelor/SENIOR_DESIGN/SMART_Software/emokit/examples/emokit_osc
 
 # Set the install prefix
 IF(NOT DEFINED CMAKE_INSTALL_PREFIX)

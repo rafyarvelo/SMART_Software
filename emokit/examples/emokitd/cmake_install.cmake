@@ -1,4 +1,4 @@
-# Install script for directory: /home/pi/SENIOR_DESIGN/SMART_Software/emokit/examples/emokitd
+# Install script for directory: /home/arvelor/SENIOR_DESIGN/SMART_Software/emokit/examples/emokitd
 
 # Set the install prefix
 IF(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -33,7 +33,7 @@ IF(NOT DEFINED CMAKE_INSTALL_SO_NO_EXE)
 ENDIF(NOT DEFINED CMAKE_INSTALL_SO_NO_EXE)
 
 IF(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
-  FILE(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/bin" TYPE EXECUTABLE FILES "/home/pi/SENIOR_DESIGN/SMART_Software/emokit/bin/emokitd")
+  FILE(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/bin" TYPE EXECUTABLE FILES "/home/arvelor/SENIOR_DESIGN/SMART_Software/emokit/bin/emokitd")
   IF(EXISTS "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/emokitd" AND
      NOT IS_SYMLINK "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/emokitd")
     IF(CMAKE_INSTALL_DO_STRIP)

@@ -38,19 +38,19 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /usr/local/bin/cmake
+CMAKE_COMMAND = /usr/bin/cmake
 
 # The command to remove a file.
-RM = /usr/local/bin/cmake -E remove -f
+RM = /usr/bin/cmake -E remove -f
 
 # Escaping for special characters.
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/pi/SENIOR_DESIGN/SMART_Software/emokit
+CMAKE_SOURCE_DIR = /home/arvelor/SENIOR_DESIGN/SMART_Software/emokit
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/pi/SENIOR_DESIGN/SMART_Software/emokit
+CMAKE_BINARY_DIR = /home/arvelor/SENIOR_DESIGN/SMART_Software/emokit
 
 #=============================================================================
 # Directory level rules for directory src
@@ -74,7 +74,7 @@ src/preinstall:
 src/CMakeFiles/emokit.dir/all:
 	$(MAKE) -f src/CMakeFiles/emokit.dir/build.make src/CMakeFiles/emokit.dir/depend
 	$(MAKE) -f src/CMakeFiles/emokit.dir/build.make src/CMakeFiles/emokit.dir/build
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/pi/SENIOR_DESIGN/SMART_Software/emokit/CMakeFiles  2
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/arvelor/SENIOR_DESIGN/SMART_Software/emokit/CMakeFiles  2
 	@echo "Built target emokit"
 .PHONY : src/CMakeFiles/emokit.dir/all
 
@@ -84,9 +84,9 @@ all: src/CMakeFiles/emokit.dir/all
 
 # Build rule for subdir invocation for target.
 src/CMakeFiles/emokit.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/pi/SENIOR_DESIGN/SMART_Software/emokit/CMakeFiles 1
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/arvelor/SENIOR_DESIGN/SMART_Software/emokit/CMakeFiles 1
 	$(MAKE) -f CMakeFiles/Makefile2 src/CMakeFiles/emokit.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/pi/SENIOR_DESIGN/SMART_Software/emokit/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/arvelor/SENIOR_DESIGN/SMART_Software/emokit/CMakeFiles 0
 .PHONY : src/CMakeFiles/emokit.dir/rule
 
 # Convenience name for target.
@@ -124,7 +124,7 @@ examples/emokitd/preinstall:
 examples/emokitd/CMakeFiles/emokitd.dir/all: src/CMakeFiles/emokit.dir/all
 	$(MAKE) -f examples/emokitd/CMakeFiles/emokitd.dir/build.make examples/emokitd/CMakeFiles/emokitd.dir/depend
 	$(MAKE) -f examples/emokitd/CMakeFiles/emokitd.dir/build.make examples/emokitd/CMakeFiles/emokitd.dir/build
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/pi/SENIOR_DESIGN/SMART_Software/emokit/CMakeFiles  3
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/arvelor/SENIOR_DESIGN/SMART_Software/emokit/CMakeFiles  3
 	@echo "Built target emokitd"
 .PHONY : examples/emokitd/CMakeFiles/emokitd.dir/all
 
@@ -134,9 +134,9 @@ all: examples/emokitd/CMakeFiles/emokitd.dir/all
 
 # Build rule for subdir invocation for target.
 examples/emokitd/CMakeFiles/emokitd.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/pi/SENIOR_DESIGN/SMART_Software/emokit/CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/arvelor/SENIOR_DESIGN/SMART_Software/emokit/CMakeFiles 2
 	$(MAKE) -f CMakeFiles/Makefile2 examples/emokitd/CMakeFiles/emokitd.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/pi/SENIOR_DESIGN/SMART_Software/emokit/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/arvelor/SENIOR_DESIGN/SMART_Software/emokit/CMakeFiles 0
 .PHONY : examples/emokitd/CMakeFiles/emokitd.dir/rule
 
 # Convenience name for target.
@@ -174,7 +174,7 @@ examples/contact/preinstall:
 examples/contact/CMakeFiles/contact.dir/all: src/CMakeFiles/emokit.dir/all
 	$(MAKE) -f examples/contact/CMakeFiles/contact.dir/build.make examples/contact/CMakeFiles/contact.dir/depend
 	$(MAKE) -f examples/contact/CMakeFiles/contact.dir/build.make examples/contact/CMakeFiles/contact.dir/build
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/pi/SENIOR_DESIGN/SMART_Software/emokit/CMakeFiles  1
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/arvelor/SENIOR_DESIGN/SMART_Software/emokit/CMakeFiles  1
 	@echo "Built target contact"
 .PHONY : examples/contact/CMakeFiles/contact.dir/all
 
@@ -184,9 +184,9 @@ all: examples/contact/CMakeFiles/contact.dir/all
 
 # Build rule for subdir invocation for target.
 examples/contact/CMakeFiles/contact.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/pi/SENIOR_DESIGN/SMART_Software/emokit/CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/arvelor/SENIOR_DESIGN/SMART_Software/emokit/CMakeFiles 2
 	$(MAKE) -f CMakeFiles/Makefile2 examples/contact/CMakeFiles/contact.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/pi/SENIOR_DESIGN/SMART_Software/emokit/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/arvelor/SENIOR_DESIGN/SMART_Software/emokit/CMakeFiles 0
 .PHONY : examples/contact/CMakeFiles/contact.dir/rule
 
 # Convenience name for target.

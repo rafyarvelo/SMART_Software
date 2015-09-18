@@ -34,7 +34,15 @@ EEG_Frame_t* C_EEG_Data::GetFramePtr(int index)
 {
     if (index < 0 || index > currentFrame)
     {
-        return frames.back();
+        //Return a Blank Frame if we're Empty to avoid a seg fault
+        if (frames.size() == 0)
+        {
+            return EEG_Frame_t::create();
+        }
+        else
+        {
+            return frames.back();
+        }
     }
     else
     {
@@ -56,14 +64,18 @@ void C_EEG_Data::clear()
     eegDataFull  = false;
 }
 
+//Overloaded Assignment Operator
 C_EEG_Data& C_EEG_Data::operator =(C_EEG_Data& rhs)
 {
     //Empty Current Data and replace it with this data
     clear();
-    for (int i = 0; i < rhs.size(); i++)
+
+    //Copy the EEG Data into our Current Object
+    for (int i = 0; i < rhs.frames.size(); i++)
     {
-        frames.append(rhs.GetFramePtr(i));
+        frames.append(EEG_Frame_t::create(rhs.frames.at(i)));
     }
+
     currentFrame = frames.size();
     eegDataFull  = (currentFrame == MAX_EEG_FRAMES);
 }
