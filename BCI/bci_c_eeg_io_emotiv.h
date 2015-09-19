@@ -21,15 +21,13 @@ enum EmotivReadStatus
     EMOKIT_READ_SUCCESS
 };
 
-class C_EEG_IO_EMOTIV : public C_EEG_IO
+class C_EEG_IO_EMOTIV : public C_EEG_IO , public C_Singleton<C_EEG_IO_EMOTIV>
 {
     Q_OBJECT
 public:
              C_EEG_IO_EMOTIV();
     virtual ~C_EEG_IO_EMOTIV();
-    static C_EEG_IO_EMOTIV* Instance() {return new C_EEG_IO_EMOTIV;}
-	
-    virtual C_EEG_Data&  getData() { return eegData; }
+
 	virtual eegTypeEnum  getType(){ return EEG_TYPE_EMOTIV; }
     virtual ConnectionStatusType connect();
 
@@ -39,8 +37,6 @@ public slots:
     void clearEEGData();
 
 private:
-    C_EEG_Data eegData; //All Emotiv Data goes here
-
     struct emokit_device* m_device;
 
     //Number of times we have missed a read

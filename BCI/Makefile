@@ -326,7 +326,7 @@ qmake_all: FORCE
 
 dist: 
 	@test -d .tmp/BCI1.0.0 || mkdir -p .tmp/BCI1.0.0
-	$(COPY_FILE) --parents $(SOURCES) $(DIST) .tmp/BCI1.0.0/ && $(COPY_FILE) --parents bci_c_bci_package.h bci_c_eeg_io.h bci_c_eeg_io_debug.h bci_c_eeg_io_emotiv.h bci_c_eeg_io_nautilus.h bci_c_flasher_io.h bci_c_judgment_algorithm.h bci_c_rvs.h bci_c_serial_comm.h bci_c_signal_processing.h bci_c_tm.h ../smart_config.h ../smart_debug_log.h ../PCC/power_chair_command_constants.h bci_c_connected_device.h bci_c_brsh_io.h bci_c_pcc_io.h bci_c_eeg_data.h bci_c_xml_parser.h ../BRS/brs_c_sensor_data.h bci_c_abstract_parser.h bci_c_binary_parser.h bci_c_textparser.h bci_c_telemetrymanager.h bci_c_brsh_io_debug.h bci_c_brsh_io_serial.h .tmp/BCI1.0.0/ && $(COPY_FILE) --parents bci_c_bci_package.cpp bci_c_eeg_io_debug.cpp bci_c_flasher_io.cpp bci_c_judgment_algorithm.cpp bci_c_rvs.cpp bci_c_serial_comm.cpp bci_c_signal_processing.cpp bci_main.cpp bci_c_pcc_io.cpp bci_c_eeg_io_emotiv.cpp bci_c_eeg_data.cpp bci_c_xml_parser.cpp bci_c_tm.cpp bci_c_abstract_parser.cpp bci_c_binary_parser.cpp bci_c_textparser.cpp bci_c_telemetrymanager.cpp bci_c_brsh_io_debug.cpp bci_c_brsh_io_serial.cpp .tmp/BCI1.0.0/ && (cd `dirname .tmp/BCI1.0.0` && $(TAR) BCI1.0.0.tar BCI1.0.0 && $(COMPRESS) BCI1.0.0.tar) && $(MOVE) `dirname .tmp/BCI1.0.0`/BCI1.0.0.tar.gz . && $(DEL_FILE) -r .tmp/BCI1.0.0
+	$(COPY_FILE) --parents $(SOURCES) $(DIST) .tmp/BCI1.0.0/ && $(COPY_FILE) --parents bci_c_bci_package.h bci_c_eeg_io.h bci_c_eeg_io_debug.h bci_c_eeg_io_emotiv.h bci_c_eeg_io_nautilus.h bci_c_flasher_io.h bci_c_judgment_algorithm.h bci_c_rvs.h bci_c_serial_comm.h bci_c_signal_processing.h bci_c_tm.h ../smart_config.h ../smart_debug_log.h ../PCC/power_chair_command_constants.h bci_c_connected_device.h bci_c_brsh_io.h bci_c_pcc_io.h bci_c_eeg_data.h bci_c_xml_parser.h ../BRS/brs_c_sensor_data.h bci_c_abstract_parser.h bci_c_binary_parser.h bci_c_textparser.h bci_c_telemetrymanager.h bci_c_brsh_io_debug.h bci_c_brsh_io_serial.h bci_c_tm_header_names.h .tmp/BCI1.0.0/ && $(COPY_FILE) --parents bci_c_bci_package.cpp bci_c_eeg_io_debug.cpp bci_c_flasher_io.cpp bci_c_judgment_algorithm.cpp bci_c_rvs.cpp bci_c_serial_comm.cpp bci_c_signal_processing.cpp bci_main.cpp bci_c_pcc_io.cpp bci_c_eeg_io_emotiv.cpp bci_c_eeg_data.cpp bci_c_xml_parser.cpp bci_c_tm.cpp bci_c_abstract_parser.cpp bci_c_binary_parser.cpp bci_c_textparser.cpp bci_c_telemetrymanager.cpp bci_c_brsh_io_debug.cpp bci_c_brsh_io_serial.cpp .tmp/BCI1.0.0/ && (cd `dirname .tmp/BCI1.0.0` && $(TAR) BCI1.0.0.tar BCI1.0.0 && $(COMPRESS) BCI1.0.0.tar) && $(MOVE) `dirname .tmp/BCI1.0.0`/BCI1.0.0.tar.gz . && $(DEL_FILE) -r .tmp/BCI1.0.0
 
 
 clean:compiler_clean 
@@ -488,6 +488,7 @@ moc_bci_c_bci_package.cpp: /usr/include/qt5/QtCore/QTime \
 		bci_c_binary_parser.h \
 		bci_c_abstract_parser.h \
 		/usr/include/qt5/QtCore/QString \
+		/usr/include/qt5/QtCore/QStringList \
 		bci_c_textparser.h \
 		bci_c_bci_package.h
 	/usr/lib/x86_64-linux-gnu/qt5/bin/moc $(DEFINES) $(INCPATH) -I/usr/include/c++/4.8 -I/usr/include/x86_64-linux-gnu/c++/4.8 -I/usr/include/c++/4.8/backward -I/usr/lib/gcc/x86_64-linux-gnu/4.8/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include bci_c_bci_package.h -o moc_bci_c_bci_package.cpp
@@ -1429,6 +1430,7 @@ bci_c_bci_package.o: bci_c_bci_package.cpp bci_c_bci_package.h \
 		bci_c_binary_parser.h \
 		bci_c_abstract_parser.h \
 		/usr/include/qt5/QtCore/QString \
+		/usr/include/qt5/QtCore/QStringList \
 		bci_c_textparser.h \
 		bci_c_pcc_io.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bci_c_bci_package.o bci_c_bci_package.cpp
@@ -1975,6 +1977,7 @@ bci_main.o: bci_main.cpp bci_c_bci_package.h \
 		bci_c_binary_parser.h \
 		bci_c_abstract_parser.h \
 		/usr/include/qt5/QtCore/QString \
+		/usr/include/qt5/QtCore/QStringList \
 		bci_c_textparser.h \
 		bci_c_pcc_io.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bci_main.o bci_main.cpp
@@ -2326,6 +2329,12 @@ bci_c_xml_parser.o: bci_c_xml_parser.cpp bci_c_xml_parser.h \
 		/usr/include/qt5/QtCore/QXmlStreamWriter \
 		bci_c_abstract_parser.h \
 		/usr/include/qt5/QtCore/QString \
+		/usr/include/qt5/QtCore/QStringList \
+		/usr/include/qt5/QtCore/qstringlist.h \
+		/usr/include/qt5/QtCore/qdatastream.h \
+		/usr/include/qt5/QtCore/qpair.h \
+		/usr/include/qt5/QtCore/qregexp.h \
+		/usr/include/qt5/QtCore/qstringmatcher.h \
 		/usr/include/qt5/QtCore/QFile \
 		/usr/include/qt5/QtCore/qfile.h \
 		/usr/include/qt5/QtCore/qfiledevice.h \
@@ -2487,24 +2496,30 @@ bci_c_abstract_parser.o: bci_c_abstract_parser.cpp bci_c_abstract_parser.h \
 		/usr/include/stdlib.h \
 		/usr/include/alloca.h \
 		/usr/include/qt5/QtCore/qstringbuilder.h \
-		/usr/include/qt5/QtCore/QFile \
-		/usr/include/qt5/QtCore/qfile.h \
-		/usr/include/qt5/QtCore/qfiledevice.h \
+		/usr/include/qt5/QtCore/QStringList \
+		/usr/include/qt5/QtCore/qstringlist.h \
+		/usr/include/qt5/QtCore/qalgorithms.h \
+		/usr/include/qt5/QtCore/qdatastream.h \
+		/usr/include/qt5/QtCore/qscopedpointer.h \
 		/usr/include/qt5/QtCore/qiodevice.h \
 		/usr/include/qt5/QtCore/qobject.h \
 		/usr/include/qt5/QtCore/qobjectdefs.h \
 		/usr/include/qt5/QtCore/qobjectdefs_impl.h \
 		/usr/include/qt5/QtCore/qlist.h \
-		/usr/include/qt5/QtCore/qalgorithms.h \
 		/usr/include/qt5/QtCore/qiterator.h \
 		/usr/include/limits.h \
 		/usr/include/qt5/QtCore/qcoreevent.h \
-		/usr/include/qt5/QtCore/qscopedpointer.h \
 		/usr/include/qt5/QtCore/qmetatype.h \
 		/usr/include/qt5/QtCore/qvarlengtharray.h \
 		/usr/include/qt5/QtCore/qcontainerfwd.h \
 		/usr/include/qt5/QtCore/qisenum.h \
 		/usr/include/qt5/QtCore/qobject_impl.h \
+		/usr/include/qt5/QtCore/qpair.h \
+		/usr/include/qt5/QtCore/qregexp.h \
+		/usr/include/qt5/QtCore/qstringmatcher.h \
+		/usr/include/qt5/QtCore/QFile \
+		/usr/include/qt5/QtCore/qfile.h \
+		/usr/include/qt5/QtCore/qfiledevice.h \
 		/usr/include/stdio.h \
 		/usr/include/libio.h \
 		/usr/include/_G_config.h \
@@ -2597,6 +2612,10 @@ bci_c_binary_parser.o: bci_c_binary_parser.cpp bci_c_binary_parser.h \
 		/usr/include/qt5/QtCore/qpair.h \
 		bci_c_abstract_parser.h \
 		/usr/include/qt5/QtCore/QString \
+		/usr/include/qt5/QtCore/QStringList \
+		/usr/include/qt5/QtCore/qstringlist.h \
+		/usr/include/qt5/QtCore/qregexp.h \
+		/usr/include/qt5/QtCore/qstringmatcher.h \
 		/usr/include/qt5/QtCore/QFile \
 		/usr/include/qt5/QtCore/qfile.h \
 		/usr/include/qt5/QtCore/qfiledevice.h \
@@ -2715,6 +2734,7 @@ bci_c_textparser.o: bci_c_textparser.cpp bci_c_textparser.h \
 		/usr/include/ctype.h \
 		bci_c_abstract_parser.h \
 		/usr/include/qt5/QtCore/QString \
+		/usr/include/qt5/QtCore/QStringList \
 		/usr/include/qt5/QtCore/QFile \
 		/usr/include/qt5/QtCore/qfile.h \
 		/usr/include/qt5/QtCore/qfiledevice.h \
@@ -2867,6 +2887,7 @@ bci_c_telemetrymanager.o: bci_c_telemetrymanager.cpp bci_c_telemetrymanager.h \
 		bci_c_binary_parser.h \
 		bci_c_abstract_parser.h \
 		/usr/include/qt5/QtCore/QString \
+		/usr/include/qt5/QtCore/QStringList \
 		bci_c_textparser.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bci_c_telemetrymanager.o bci_c_telemetrymanager.cpp
 

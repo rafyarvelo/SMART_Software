@@ -2,6 +2,7 @@
 #define BCI_C_FILEPARSER_H
 
 #include <QString>
+#include <QStringList>
 #include <QFile>
 #include "bci_c_tm.h"
 #include "bci_c_eeg_data.h"
@@ -41,7 +42,7 @@ namespace FILE_FORMAT
     const QString LED_GROUPS[]    = {"Forward", "Backward", "Right", "Left"};
     const QString EEG_TYPES[]     = {"EEG_Emotiv", "EEG_Nautilus", "EEG_Debug"};
     const QString CONN_STATUSES[] = {"NOT_CONNECTED", "CONNECTED"};
-}
+};
 
 //Abstract Telemetry File Parser Class
 class C_AbstractParser

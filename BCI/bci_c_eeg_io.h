@@ -4,6 +4,7 @@
 #include <QThread>
 #include "../smart_config.h"
 #include "../smart_debug_log.h"
+#include "bci_c_singleton.h"
 #include "bci_c_connected_device.h"
 #include "bci_c_eeg_data.h"
 
@@ -24,8 +25,9 @@ public:
 	virtual ~C_EEG_IO(){}
 	
     //Must implement these members in subclasses
-    virtual C_EEG_Data& getData() = 0;
-    virtual eegTypeEnum getType() = 0;
+    virtual C_EEG_Data&  getData()  { return eegData; }
+    virtual EEG_Frame_t* getFrame() { return eegData.GetFramePtr(); }
+    virtual eegTypeEnum  getType() = 0;
     virtual ConnectionStatusType connect() = 0;
 
 signals:
@@ -35,8 +37,9 @@ private slots:
     void SetConnected(){ connectionStatus = CONNECTED;}
     void SetDisconnected(){ connectionStatus = NOT_CONNECTED;}
 
-public:
+protected:
     SMART_DEBUG_LOG* debugLog;
+    C_EEG_Data       eegData;
 };
 
 #endif // BCI_C_EEG_IO

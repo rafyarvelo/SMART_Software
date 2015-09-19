@@ -33,10 +33,21 @@ public:
     virtual void writeEEGFrame(EEG_Frame_t* frame);
     virtual void writeTMFrame(TM_Frame_t* frame);
 
-    //Text Filea I/O Api
+    void SetDelimeter(const QString& delim) { delimeter = delim; }
+    void SetDelimeter(const char* delim) { SetDelimeter(QString(delim));}
+
+    //TM Header Names
+    static QStringList eegFrameNames;
+    static QStringList brsFrameNames;
+    static QStringList connectionStatusNames;
+    static QStringList tmFrameNames;
+
+    //Text Files I/O Api
 private:
     QTextStream dataIn;
     QTextStream dataOut;
+
+    QString delimeter;
 };
 
 #endif // BCI_C_TEXTPARSER_H

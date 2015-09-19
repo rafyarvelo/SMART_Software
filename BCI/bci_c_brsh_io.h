@@ -1,13 +1,15 @@
 #ifndef C_BRSH_IO_H
 #define C_BRSH_IO_H
 
+#include <QThread>
 #include "../smart_config.h"
 #include "../smart_debug_log.h"
+#include "bci_c_singleton.h"
 #include "bci_c_connected_device.h"
 #include "bci_c_tm.h"
 
 //Abstract BRS IO Class
-class C_BRSH_IO : public QObject, public C_ConnectedDevice
+class C_BRSH_IO : public QThread, public C_ConnectedDevice
 {
     Q_OBJECT
 public:
@@ -23,7 +25,7 @@ public:
     virtual ConnectionStatusType connect() = 0;
 
 signals:
-    void BRSDataReceived(BRS_Frame_t& brsData);
+    void BRSFrameReceived(BRS_Frame_t& brsFrame);
     void remoteCommandReceived(PCC_Command_Type& cmd);
     void EmergencyStopRequested();
 

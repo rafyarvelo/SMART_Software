@@ -100,6 +100,8 @@ void *C_BCI_Package::qt_metacast(const char *_clname)
     if (!_clname) return 0;
     if (!strcmp(_clname, qt_meta_stringdata_C_BCI_Package.stringdata))
         return static_cast<void*>(const_cast< C_BCI_Package*>(this));
+    if (!strcmp(_clname, "C_Singleton<C_BCI_Package>"))
+        return static_cast< C_Singleton<C_BCI_Package>*>(const_cast< C_BCI_Package*>(this));
     return QObject::qt_metacast(_clname);
 }
 

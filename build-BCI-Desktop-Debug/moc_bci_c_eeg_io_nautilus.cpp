@@ -75,6 +75,8 @@ void *C_EEG_IO_NAUTILUS::qt_metacast(const char *_clname)
     if (!_clname) return 0;
     if (!strcmp(_clname, qt_meta_stringdata_C_EEG_IO_NAUTILUS.stringdata))
         return static_cast<void*>(const_cast< C_EEG_IO_NAUTILUS*>(this));
+    if (!strcmp(_clname, "C_Singleton<C_EEG_IO_NAUTILUS>"))
+        return static_cast< C_Singleton<C_EEG_IO_NAUTILUS>*>(const_cast< C_EEG_IO_NAUTILUS*>(this));
     return C_EEG_IO::qt_metacast(_clname);
 }
 

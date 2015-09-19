@@ -10,6 +10,12 @@ C_TM::~C_TM()
 
 void C_TM::addFrame(TM_Frame_t* frame, int index)
 {
+    //Don't Grow infinitely Large
+    if (size() >= MAX_TM_FRAMES)
+    {
+        clear();
+    }
+
     if (index < 0 || index > tmFrames.size())
     {
         tmFrames.append(frame);
@@ -18,6 +24,15 @@ void C_TM::addFrame(TM_Frame_t* frame, int index)
     {
         tmFrames.insert(index, frame);
     }
+}
+
+void C_TM::clear()
+{
+    for (int i = 0; i < size(); i++)
+    {
+        delete tmFrames.at(i);
+    }
+    tmFrames.clear();
 }
 
 TM_Frame_t* C_TM::GetFrame(int index)

@@ -10,7 +10,7 @@
 #include "bci_c_rvs.h"
 
 #define EMERGENCY_STOP_DISTANCE 1 //meters
-
+#define MAX_TM_FRAMES           25//Only store the latest 25 Frames
 //Data from the BRSH
 typedef struct BRS_Frame_t
 {
@@ -115,6 +115,13 @@ typedef struct TM_Frame_t
         return new TM_Frame_t(eegFrame, brsFrame, ledGroups);
 	}
 
+    //destructor
+    ~TM_Frame_t()
+    {
+        delete[] ledGroups;
+        clear();
+    }
+
     //Clear the current frame
     void clear()
     {
@@ -137,7 +144,7 @@ public:
 	sizeType size(){ return (sizeType) tmFrames.size();}
 	
     //Clear the TM Data
-    void clear() { tmFrames.clear(); }
+    void clear();
 
     C_TM& operator =(C_TM& rhs);
 private:

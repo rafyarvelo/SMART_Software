@@ -14,10 +14,11 @@ C_EEG_Data::~C_EEG_Data()
 //Add a Frame if we're not full and it is a valid pointer
 void C_EEG_Data::AddFrame(EEG_Frame_t *eegFrame)
 {
-    if (currentFrame == MAX_EEG_FRAMES)
+    if (currentFrame >= MAX_EEG_FRAMES)
     {
         eegDataFull = true;
         emit EEG_Data_Full();
+        clear();
     }
     else
     {
@@ -59,6 +60,11 @@ EEG_Frame_t& C_EEG_Data::GetFrame(int index)
 //Clear all of the current frames
 void C_EEG_Data::clear()
 {
+    for (int i = 0; i < frames.size(); i++)
+    {
+        delete frames.at(i);
+    }
+
     frames.clear();
     currentFrame = 0;
     eegDataFull  = false;

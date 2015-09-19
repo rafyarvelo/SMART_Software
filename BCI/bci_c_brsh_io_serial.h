@@ -4,7 +4,7 @@
 #include "bci_c_brsh_io.h"
 #include "bci_c_serial_comm.h"
 
-class C_BRSH_IO_Serial : public C_BRSH_IO
+class C_BRSH_IO_Serial : public C_BRSH_IO , public C_Singleton<C_BRSH_IO_Serial>
 {
 public:
     C_BRSH_IO_Serial();

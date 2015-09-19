@@ -5,19 +5,18 @@
 class C_TelemetryManager;
 
 #include <QTime>
-#include "bci_c_signal_processing.h"
-#include "bci_c_tm.h"
+#include "bci_c_rvs.h"
 #include "bci_c_flasher_io.h"
-#include "bci_c_eeg_io.h"
+#include "bci_c_signal_processing.h"
 #include "bci_c_eeg_io_debug.h"
 #include "bci_c_eeg_io_emotiv.h"
 #include "bci_c_eeg_io_nautilus.h"
-#include "bci_c_judgment_algorithm.h"
 #include "bci_c_brsh_io_serial.h"
 #include "bci_c_brsh_io_debug.h"
+#include "bci_c_judgment_algorithm.h"
 #include "bci_c_telemetrymanager.h"
-#include "bci_c_pcc_io.h"
-#include "bci_c_rvs.h"
+#include "bci_c_pcc_io_serial.h"
+#include "bci_c_pcc_io_debug.h"
 
 #define COMMAND_TIMEOUT 20000 //Wait 20 seconds before killing the System
 
@@ -55,33 +54,26 @@ typedef enum BCIState
      */
 }BCIState;
 
-class C_BCI_Package : public QObject
+class C_BCI_Package : public QObject , public C_Singleton<C_BCI_Package>
 {
     Q_OBJECT
 public:
+    C_BCI_Package();
+   ~C_BCI_Package();
 
-    //Factory Constructor
-    static C_BCI_Package* Instance();
-
-    //Infinite Loop when called
+    //Main Program Execution here, Begins an infinite state machine
     void Run();
 
-    QTime& currentTime() { return stopwatch; }
-
-    //Connection Status
-    ConnectionStatusType eegConnectionStatus;
-    ConnectionStatusType flasherConnectionStatus;
-    ConnectionStatusType brshConnectionStatus;
-    ConnectionStatusType pccConnectionStatus;
 private:
-	 C_BCI_Package();
-    ~C_BCI_Package();
     void initialize();
     void updateTM();
     bool checkConnections();
     void startEEG();
-    C_EEG_IO*  createEEG_IO(eegTypeEnum type=DEFAULT_EEG_TYPE);//factory EEG Construction
-    C_BRSH_IO* createBRS_IO(brsTypeEnum type=DEFAULT_BRS_TYPE);//factory BRS Construction
+
+    //Factory Constructors for our IO Classes
+    C_EEG_IO*  createEEG_IO(eegTypeEnum type=DEFAULT_EEG_TYPE);
+    C_BRSH_IO* createBRS_IO(brsTypeEnum type=DEFAULT_BRS_TYPE);
+    C_PCC_IO*  createPCC_IO(pccTypeEnum type=DEFAULT_PCC_TYPE);
 
 private slots:
     void onEEGDataProcessed(C_EEG_Data& data);
@@ -106,7 +98,19 @@ private:
 
     //Manage the Telemetry Stream
     C_TelemetryManager* pTelemetryManager;
-    TM_Frame_t*         pLatestTM_Frame;
+    TM_Frame_t          latestTM_Frame;
+
+    //Connection Status
+    ConnectionStatusType eegConnectionStatus;
+    ConnectionStatusType flasherConnectionStatus;
+    ConnectionStatusType brshConnectionStatus;
+    ConnectionStatusType pccConnectionStatus;
+
+    //buffer to hold some debug prints
+    QString consoleOutput;
+
+    //Allow Telemetry Manager to access private variables
+    friend class C_TelemetryManager;
 };
 
 #endif // BCI_C_BCI_PACKAGE_H

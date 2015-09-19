@@ -1,8 +1,9 @@
 #include "bci_c_textparser.h"
 
+
+
 C_TextParser::C_TextParser()
 {
-
     //Initialize Default Input/Output Files
     SetTMInputFilename(TM_DATA_INPUTFILE_TXT);
     SetTMOutputFilename(TM_DATA_OUTPUTFILE_TXT);
@@ -12,6 +13,7 @@ C_TextParser::C_TextParser()
 
 C_TextParser::~C_TextParser()
 {
+
 }
 
 //Read EEG Data
@@ -44,6 +46,10 @@ void C_TextParser::writeTMData(const QString& filename)
 {
     //Set TM Filename
     SetTMOutputFilename(filename);
+    dataOut.setDevice(tmDataIn);
+
+    //Write Header
+
 
 }
 

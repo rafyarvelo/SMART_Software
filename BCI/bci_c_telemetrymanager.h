@@ -15,8 +15,9 @@ enum FileFormatType
 };
 
 //Manage the SMART Telemetry Stream
-class C_TelemetryManager
+class C_TelemetryManager : public QObject
 {
+    Q_OBJECT
 public:
     C_TelemetryManager(C_BCI_Package* pBCI, C_EEG_IO* pEEG_IO,
                        C_BRSH_IO* pBRS_IO,  C_RVS* pRVS);

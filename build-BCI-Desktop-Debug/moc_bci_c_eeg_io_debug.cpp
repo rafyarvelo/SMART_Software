@@ -75,6 +75,8 @@ void *C_EEG_IO_DEBUG::qt_metacast(const char *_clname)
     if (!_clname) return 0;
     if (!strcmp(_clname, qt_meta_stringdata_C_EEG_IO_DEBUG.stringdata))
         return static_cast<void*>(const_cast< C_EEG_IO_DEBUG*>(this));
+    if (!strcmp(_clname, "C_Singleton<C_EEG_IO_DEBUG>"))
+        return static_cast< C_Singleton<C_EEG_IO_DEBUG>*>(const_cast< C_EEG_IO_DEBUG*>(this));
     return C_EEG_IO::qt_metacast(_clname);
 }
 

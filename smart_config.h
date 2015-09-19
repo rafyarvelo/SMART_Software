@@ -46,20 +46,33 @@ typedef enum
     BRS_TYPE_DEBUG
 } brsTypeEnum;
 
+typedef enum
+{
+    PCC_TYPE_MSP=0,
+    PCC_TYPE_DEBUG
+} pccTypeEnum;
+
 //EEG Type (only select one)
 //Supported Options:
 //EEG_TYPE_DEBUG
 //EEG_TYPE_NAUTILUS
 //EEG_TYPE_EMOTIV
 
+//Use this definition to decide which kind of configuration to run
+//#define TACTICAL
+#define DEBUG_ONLY
 
-//Use Windows for Debugging by default
-#if 1 //def WIN32
-    #define DEFAULT_EEG_TYPE EEG_TYPE_DEBUG
-    #define DEFAULT_BRS_TYPE BRS_TYPE_DEBUG
-#else
+//The Actual Configuration for a real setup
+#ifdef TACTICAL
     #define DEFAULT_EEG_TYPE EEG_TYPE_EMOTIV
     #define DEFAULT_BRS_TYPE BRS_TYPE_TIVA
+    #define DEFAULT_PCC_TYPE PCC_TYPE_MSP
+
+//Debug Configuration for testing
+#else
+    #define DEFAULT_EEG_TYPE EEG_TYPE_DEBUG
+    #define DEFAULT_BRS_TYPE BRS_TYPE_DEBUG
+    #define DEFAULT_PCC_TYPE PCC_TYPE_DEBUG
 #endif
 
 //==========================================================
@@ -94,9 +107,11 @@ typedef enum
 #ifdef WIN32
     #define PCC_PORT "COM5"
     #define BRS_PORT "COM7"
+    #define ENDL "/r/n"
 #else
     #define PCC_PORT "/dev/ttyACM0"
     #define BRS_PORT "/dev/ttyAMA0"
+    #define ENDL "/n"
 #endif
 
 #endif /* SMART_CONFIG_H_ */

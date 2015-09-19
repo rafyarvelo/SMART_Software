@@ -13,29 +13,25 @@ C_BCI_Package::C_BCI_Package()
     debugLog = SMART_DEBUG_LOG::Instance();
     debugLog->BCI_Log() << "Instantiating BCI Package..." << endl;
 
-    //Create Container Classes
+    //Repetitive Visual Stimulus API
     pRVS              = C_RVS::Instance();
     pFlasherIO        = C_Flasher_IO::Instance(pRVS);
 
+    //Device Input/Output
     pEEG_IO           = createEEG_IO(DEFAULT_EEG_TYPE);
-    pSignalProcessing = C_SignalProcessing::Instance(pEEG_IO);
-    pJA               = C_JudgmentAlgorithm::Instance(pSignalProcessing);
-
     pBRS_IO           = createBRS_IO(DEFAULT_BRS_TYPE);
-    pPCC_IO           = C_PCC_IO::Instance();
+    pPCC_IO           = createPCC_IO(DEFAULT_PCC_TYPE);
 
-    //Telemetry Management with instances of our classes
-    pTelemetryManager = C_TelemetryManager::Instance(this, pEEG_IO,pBRS_IO, pRVS);
-    pTelemetryManager->RecordTMToFile(TM_DATA_OUTPUTFILE_BIN, BINARY_FILE);
+    //Classes with dependencies
+    pSignalProcessing = C_SignalProcessing ::Instance(pEEG_IO);
+    pJA               = C_JudgmentAlgorithm::Instance(pSignalProcessing);
+    pTelemetryManager = C_TelemetryManager ::Instance(this, pEEG_IO,pBRS_IO, pRVS);
 
+    //Connection Status of Peripherals
     eegConnectionStatus      = NOT_CONNECTED;
     flasherConnectionStatus  = NOT_CONNECTED;
     pccConnectionStatus      = NOT_CONNECTED;
     brshConnectionStatus     = NOT_CONNECTED;
-
-    debugLog->BCI_Log() << "BCI Package Instantiated Successfully" << endl;
-
-    //Connections for Interrupt Actions
 
     //Listen for Processed EEG Data
     QObject::connect(pSignalProcessing, SIGNAL(eegDataProcessed(C_EEG_Data&)),
@@ -48,6 +44,8 @@ C_BCI_Package::C_BCI_Package()
     //Listen for Remote Commands
     QObject::connect(pBRS_IO , SIGNAL(remoteCommandReceived(PCC_Command_Type&)),
                      this, SLOT(onRemoteCmdReceived(PCC_Command_Type&)));
+
+    debugLog->println(BCI_LOG, "BCI Package Instantiated Successfully", true);
 }
 
 C_BCI_Package::~C_BCI_Package()
@@ -74,22 +72,6 @@ C_BCI_Package::~C_BCI_Package()
     }
 }
 
-C_BCI_Package* C_BCI_Package::Instance()
-{
-    C_BCI_Package* ptr = new C_BCI_Package();
-
-    if (!ptr)
-    {
-        cout << "C_BCI_Package Instance could not be created!" << endl;
-    }
-    else
-    {
-        cout << "BCI Package Instance Created at: " << ptr << endl;
-    }
-    return ptr;
-}
-
-
 void C_BCI_Package::startEEG()
 {
     pEEG_IO->start();
@@ -97,19 +79,21 @@ void C_BCI_Package::startEEG()
 
 void C_BCI_Package::initialize()
 {
-    debugLog->BCI_Log() << "Connecting to Flasher..." << endl;
+    debugLog->println(BCI_LOG, "Connecting to Flasher...", true);
     flasherConnectionStatus = pFlasherIO->connect();
 
-    debugLog->BCI_Log() << "Connecting to EEG..." << endl;
+    debugLog->println(BCI_LOG, "Connecting to EEG..." , true );
     eegConnectionStatus = pEEG_IO->connect();
 
-    debugLog->BCI_Log() << "Connecting to BRSH..." << endl;
+    debugLog->println(BCI_LOG, "Connecting to BRSH..." , true );
     brshConnectionStatus = pBRS_IO->connect();
 
-    debugLog->BCI_Log() << "Connecting to PCC..." << endl;
+    debugLog->println(BCI_LOG, "Connecting to PCC..." , true );
     pccConnectionStatus = pPCC_IO->connect();
 
-    pLatestTM_Frame = pTelemetryManager->updateTM();
+    //Record our TM to an output file
+    pTelemetryManager->RecordTMToFile(TM_DATA_OUTPUTFILE_BIN, BINARY_FILE);
+    latestTM_Frame = *pTelemetryManager->updateTM();
 }
 
 C_EEG_IO* C_BCI_Package::createEEG_IO(eegTypeEnum type)
@@ -152,6 +136,23 @@ C_BRSH_IO* C_BCI_Package::createBRS_IO(brsTypeEnum type)
     return ptr;
 }
 
+C_PCC_IO* C_BCI_Package::createPCC_IO(pccTypeEnum type)
+{
+    C_PCC_IO* ptr = 0;
+
+    switch (type)
+    {
+        case PCC_TYPE_MSP:
+            ptr = C_PCC_IO_Serial::Instance();
+        break;
+        default:
+            ptr = C_PCC_IO_Debug::Instance();
+        break;
+    }
+
+    return ptr;
+}
+
 bool C_BCI_Package::checkConnections()
 {
     ConnectionStatusType status = CONNECTED;
@@ -164,15 +165,14 @@ bool C_BCI_Package::checkConnections()
     //Check EEG Connection Status...
     if (!eegConnectionStatus)
     {
-        debugLog->BCI_Log() << "EEG Connection not created! Stopping BCI..." << endl;
-        cerr   << "EEG Disconnected! Stopping BCI..." << endl;
+        debugLog->println(BCI_LOG, "EEG Connection not created! Stopping BCI..." , false, true );
         status = NOT_CONNECTED;
     }
 
     //Check PCC Connection Status...
     if (!pccConnectionStatus)
     {
-        cerr   << "PCC Disconnected! Stopping BCI..." << endl;
+    debugLog->println(BCI_LOG, "PCC Disconnected! Stopping BCI..." , false, true );
         status = NOT_CONNECTED;
     }
 
@@ -180,14 +180,14 @@ bool C_BCI_Package::checkConnections()
     //Check BRSH Connection Status...
     if (!brshConnectionStatus)
     {
-        debugLog->BCI_Log() << "BRSH Disconnected! Stopping BCI..." << endl;
+        debugLog->println(BCI_LOG, "BRSH Disconnected! Stopping BCI..." , false, true );
         status = NOT_CONNECTED;
     }
 
     //Check EEG Connection Status...
     if (!flasherConnectionStatus)
     {
-        debugLog->BCI_Log() << "Flasher Disconnected! Stopping BCI..." << endl;
+        debugLog->println(BCI_LOG, "Flasher Disconnected! Stopping BCI..." , false, true );
         status = NOT_CONNECTED;
     }
 
@@ -222,14 +222,15 @@ void C_BCI_Package::Run()
 
             startEEG();
 
-            debugLog->BCI_Log() << "Initialization Complete, Moving to STANDBY..." << endl;
+            debugLog->println(BCI_LOG, "Initialization Complete, Moving to STANDBY..." , true );
             bciState = BCI_STANDBY;
             break;
 
         case BCI_STANDBY:
 
             //Manage Telemetry Stream
-            pLatestTM_Frame = pTelemetryManager->updateTM();
+            latestTM_Frame = *pTelemetryManager->updateTM();
+            pBRS_IO->SendTMFrame(&latestTM_Frame);
 
             //This is all we need to do here, the Signals and Slots will
             //take care of notifying us for remote commands and Emergency Stops
@@ -238,7 +239,7 @@ void C_BCI_Package::Run()
         case BCI_PROCESSING:
 
             //Update the Judgment Algorithm with the current data
-            pJA->SetTM(pLatestTM_Frame);
+            pJA->SetTM(&latestTM_Frame);
 
             //Decide Final Power Chair Command
             pJA->computeCommand();

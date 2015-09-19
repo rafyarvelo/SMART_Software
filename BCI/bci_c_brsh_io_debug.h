@@ -3,14 +3,12 @@
 
 #include "bci_c_brsh_io.h"
 
-class C_BRSH_IO_Debug : public C_BRSH_IO
+class C_BRSH_IO_Debug : public C_BRSH_IO, public C_Singleton<C_BRSH_IO_Debug>
 {
     Q_OBJECT
 public:
     C_BRSH_IO_Debug();
     virtual ~C_BRSH_IO_Debug(){}
-
-    static C_BRSH_IO_Debug* Instance() {return new C_BRSH_IO_Debug;}
 
     //Send TM to the BRSH
     virtual void SendTMFrame(TM_Frame_t* pFrame){}

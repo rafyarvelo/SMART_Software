@@ -6,6 +6,8 @@
 #include <fstream>
 #include <stdio.h>
 #include <stdlib.h>
+#include "smart_config.h"
+#include "BCI/bci_c_singleton.h"
 
 using namespace std;
 
@@ -19,10 +21,19 @@ using namespace std;
 //What happens if we get an error in the Error log class???
 //INCEPTION, Thats what happens...
 
-class SMART_DEBUG_LOG
+typedef enum
 {
-private:
-	 SMART_DEBUG_LOG()//private constructor, use singleton method
+    BCI_LOG,
+    BRS_LOG,
+    PCC_LOG,
+    FLASHER_LOG,
+    SERIAL_COMM_LOG
+} DebugLogType;
+
+class SMART_DEBUG_LOG : public C_Singleton<SMART_DEBUG_LOG>
+{
+public:
+    SMART_DEBUG_LOG()
 	 {
 	 	bciLog.open(BCI_LOG_FILENAME, ofstream::out);
 	 	brsLog.open(BRS_LOG_FILENAME, ofstream::out);
@@ -30,8 +41,7 @@ private:
 	 	flasherLog.open(FLASHER_LOG_FILENAME, ofstream::out);
         serialCommLog.open(SERIAL_COMM_LOG_FILENAME, ofstream::out);
 	 }	
-	 
-public: 
+
     ~SMART_DEBUG_LOG()
 	{
 		bciLog.close();
@@ -40,19 +50,7 @@ public:
 		flasherLog.close();
         serialCommLog.close();
 	}
-    
-	static SMART_DEBUG_LOG* Instance()
-	{
-		static SMART_DEBUG_LOG* ptr = 0;
-		
-		if (!ptr)//only create one instance of the log
-		{
-			ptr = new SMART_DEBUG_LOG();
-		}	
-		
-		return ptr;
-	}
-	
+
 	//return References to file streams when requested
 	ofstream& BCI_Log()    { return bciLog; }
 	ofstream& BRS_Log()    { return brsLog; }
@@ -60,6 +58,45 @@ public:
 	ofstream& Flasher_Log(){ return flasherLog; }	
     ofstream& SerialComm_Log(){ return serialCommLog; }
 	
+    void println(DebugLogType log,string str, bool printToStdOut=false, bool printToStdErr=false)
+    {
+        //Print to console if enabled
+        if (printToStdOut)
+        {
+            cout << str << endl;
+        }
+
+        if (printToStdErr)
+        {
+            cerr << str << endl;
+        }
+
+        //Track in desired log
+        switch (log)
+        {
+            case BCI_LOG:
+                bciLog << str << endl;;
+            break;
+            case BRS_LOG:
+                brsLog << str << endl;;
+            break;
+            case PCC_LOG:
+                pccLog << str << endl;;
+            break;
+            case FLASHER_LOG:
+                flasherLog << str << endl;;
+            break;
+            case SERIAL_COMM_LOG:
+                serialCommLog << str << endl;;
+            break;
+        }
+    }
+
+    void println(DebugLogType log, const char* str, bool printToStdOut=false, bool printToStdErr=false)
+    {
+        println(log, string(str), printToStdOut, printToStdErr);
+    }
+
 private:
 	//fileStreams
 	ofstream bciLog;

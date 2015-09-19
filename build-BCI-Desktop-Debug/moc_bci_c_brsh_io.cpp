@@ -20,7 +20,7 @@
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_C_BRSH_IO_t {
     QByteArrayData data[9];
-    char stringdata[116];
+    char stringdata[118];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -30,17 +30,17 @@ struct qt_meta_stringdata_C_BRSH_IO_t {
 static const qt_meta_stringdata_C_BRSH_IO_t qt_meta_stringdata_C_BRSH_IO = {
     {
 QT_MOC_LITERAL(0, 0, 9),
-QT_MOC_LITERAL(1, 10, 15),
-QT_MOC_LITERAL(2, 26, 0),
-QT_MOC_LITERAL(3, 27, 12),
-QT_MOC_LITERAL(4, 40, 7),
-QT_MOC_LITERAL(5, 48, 21),
-QT_MOC_LITERAL(6, 70, 17),
-QT_MOC_LITERAL(7, 88, 3),
-QT_MOC_LITERAL(8, 92, 22)
+QT_MOC_LITERAL(1, 10, 16),
+QT_MOC_LITERAL(2, 27, 0),
+QT_MOC_LITERAL(3, 28, 12),
+QT_MOC_LITERAL(4, 41, 8),
+QT_MOC_LITERAL(5, 50, 21),
+QT_MOC_LITERAL(6, 72, 17),
+QT_MOC_LITERAL(7, 90, 3),
+QT_MOC_LITERAL(8, 94, 22)
     },
-    "C_BRSH_IO\0BRSDataReceived\0\0BRS_Frame_t&\0"
-    "brsData\0remoteCommandReceived\0"
+    "C_BRSH_IO\0BRSFrameReceived\0\0BRS_Frame_t&\0"
+    "brsFrame\0remoteCommandReceived\0"
     "PCC_Command_Type&\0cmd\0EmergencyStopRequested\0"
 };
 #undef QT_MOC_LITERAL
@@ -76,7 +76,7 @@ void C_BRSH_IO::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, v
     if (_c == QMetaObject::InvokeMetaMethod) {
         C_BRSH_IO *_t = static_cast<C_BRSH_IO *>(_o);
         switch (_id) {
-        case 0: _t->BRSDataReceived((*reinterpret_cast< BRS_Frame_t(*)>(_a[1]))); break;
+        case 0: _t->BRSFrameReceived((*reinterpret_cast< BRS_Frame_t(*)>(_a[1]))); break;
         case 1: _t->remoteCommandReceived((*reinterpret_cast< PCC_Command_Type(*)>(_a[1]))); break;
         case 2: _t->EmergencyStopRequested(); break;
         default: ;
@@ -86,7 +86,7 @@ void C_BRSH_IO::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, v
         void **func = reinterpret_cast<void **>(_a[1]);
         {
             typedef void (C_BRSH_IO::*_t)(BRS_Frame_t & );
-            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&C_BRSH_IO::BRSDataReceived)) {
+            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&C_BRSH_IO::BRSFrameReceived)) {
                 *result = 0;
             }
         }
@@ -106,7 +106,7 @@ void C_BRSH_IO::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, v
 }
 
 const QMetaObject C_BRSH_IO::staticMetaObject = {
-    { &QObject::staticMetaObject, qt_meta_stringdata_C_BRSH_IO.data,
+    { &QThread::staticMetaObject, qt_meta_stringdata_C_BRSH_IO.data,
       qt_meta_data_C_BRSH_IO,  qt_static_metacall, 0, 0}
 };
 
@@ -123,12 +123,12 @@ void *C_BRSH_IO::qt_metacast(const char *_clname)
         return static_cast<void*>(const_cast< C_BRSH_IO*>(this));
     if (!strcmp(_clname, "C_ConnectedDevice"))
         return static_cast< C_ConnectedDevice*>(const_cast< C_BRSH_IO*>(this));
-    return QObject::qt_metacast(_clname);
+    return QThread::qt_metacast(_clname);
 }
 
 int C_BRSH_IO::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 {
-    _id = QObject::qt_metacall(_c, _id, _a);
+    _id = QThread::qt_metacall(_c, _id, _a);
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
@@ -144,7 +144,7 @@ int C_BRSH_IO::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 }
 
 // SIGNAL 0
-void C_BRSH_IO::BRSDataReceived(BRS_Frame_t & _t1)
+void C_BRSH_IO::BRSFrameReceived(BRS_Frame_t & _t1)
 {
     void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 0, _a);
