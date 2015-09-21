@@ -25,7 +25,7 @@
 #define MAX_EEG_ELECTRODES 32
 
 //This is the maximum amount of frames before we're full
-#define MAX_EEG_FRAMES 500
+#define MAX_EEG_FRAMES 30
 
 //For Easy access to Emotiv Electrode Data
 typedef enum Emotiv_Electrodes
@@ -36,7 +36,7 @@ typedef enum Emotiv_Electrodes
 } Emotiv_Electrodes;
 
 //This struct defines what a single frame of EEG Data looks like
-typedef struct EEG_Frame_t
+struct EEG_Frame_t
 {
     //The type of EEG that the frame belongs to, appended by EEG IO class
     eegTypeEnum eegType;
@@ -57,66 +57,20 @@ typedef struct EEG_Frame_t
     quint8 batteryPercentage;
 
     //Default Frame
-    EEG_Frame_t()
-    {
-        eegType = DEFAULT_EEG_TYPE;
-        counter = 0;
+    EEG_Frame_t();
 
-        for (int i = 0; i < MAX_EEG_ELECTRODES;i++)
-        {
-            electrodeData[i]  = 0;
-            contactQuality[i] = 0;
-        }
-
-        gyroX = 0;
-        gyroY = 0;
-        batteryPercentage = 0;
-    }
+    //Copy Constructor
+    EEG_Frame_t(EEG_Frame_t* other);
 
     //Factory Method
-    EEG_Frame_t(EEG_Frame_t* other)
-    {
-        memcpy(this, other, sizeof(EEG_Frame_t));
-    }
+    static EEG_Frame_t* create(EEG_Frame_t* other);
 
     //Factory Method
-    static EEG_Frame_t* create(EEG_Frame_t* other)
-    {
-        return new EEG_Frame_t(other);
-    }
-
-    //Factory Method
-    static EEG_Frame_t* create()
-    {
-        return new EEG_Frame_t;
-    }
+    static EEG_Frame_t* create();
 
     //Easy conversion from Emotiv since thats the default EEG
-    static EEG_Frame_t* fromEmotivFrame(struct emokit_frame* emotiv_frame)
-    {
-        EEG_Frame_t* frame = EEG_Frame_t::create();
-
-        //Initialize frame from Emotiv Data
-        frame->eegType = EEG_TYPE_EMOTIV;
-        frame->counter = (quint32) emotiv_frame->counter;
-
-        //Electrode Data from Emotiv Frame
-        memcpy((void*) &frame->electrodeData[0], (void*) &emotiv_frame->F3,
-                (size_t) sizeof(int) * NUM_EMOTIV_ELECTRODES);
-
-        //Contact Quality from Emotiv Frame
-        memcpy((void*) &frame->contactQuality[0], (void*) &emotiv_frame->cq,
-                (size_t) sizeof(struct emokit_contact_quality));
-
-        //The rest of the Emotiv Data
-        frame->gyroX = emotiv_frame->gyroX;
-        frame->gyroY = emotiv_frame->gyroY;
-        frame->batteryPercentage = emotiv_frame->battery;
-
-        return frame;
-    }
-
-} EEG_Frame_t;
+    static EEG_Frame_t* fromEmotivFrame(struct emokit_frame* emotiv_frame);
+};
 
 class C_EEG_Data : public QObject
 {
@@ -138,9 +92,6 @@ public:
     //Clear all of the Frames
     void clear();
 
-    //check if we have reached the max amount of data
-    bool isFull() { return eegDataFull; }
-
     //Return the number of Frames Available
     sizeType size() { return frames.size(); }
 
@@ -152,8 +103,6 @@ signals:
     void EEG_Data_Full();
 
 private:
-    sizeType            currentFrame;
-    bool                eegDataFull;
     QList<EEG_Frame_t*> frames;
 };
 

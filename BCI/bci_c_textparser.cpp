@@ -46,11 +46,12 @@ void C_TextParser::writeTMData(const QString& filename)
 {
     //Set TM Filename
     SetTMOutputFilename(filename);
-    dataOut.setDevice(tmDataIn);
+    dataOut.setDevice(tmDataOut);
 
-    //Write Header
-
-
+    for (int i = 0; i < tmData.size(); i++)
+    {
+        writeTMFrame(tmData.GetFrame(i));
+    }
 }
 
 void C_TextParser::writeEEGData(C_EEG_Data& data, const QString& filename)
@@ -79,10 +80,77 @@ TM_Frame_t*  C_TextParser::readTMFrame()
 
 void C_TextParser::writeEEGFrame(EEG_Frame_t* frame)
 {
+    int i = 0;
+    dataOut << frame->eegType << delimeter;
+    dataOut << frame->counter << delimeter;
 
+    //Electrode Data
+    for (i = 0; i < MAX_EEG_ELECTRODES; i++)
+    {
+        dataOut << frame->electrodeData[i];
+    }
+
+    //Contact Quality
+    for (i = 0; i < MAX_EEG_ELECTRODES; i++)
+    {
+        dataOut << frame->contactQuality[i];
+    }
+
+    //The Rest of the Crap
+    dataOut << frame->gyroX             << delimeter;
+    dataOut << frame->gyroY             << delimeter;
+    dataOut << frame->batteryPercentage << delimeter;
 }
 
 void C_TextParser::writeTMFrame(TM_Frame_t* frame)
 {
+    static bool firstFrame = true;
 
+    if (firstFrame)
+    {
+        writeTMHeader();
+        firstFrame = false;
+    }
+
+    dataOut << frame->timeStamp << delimeter;
+    writeEEGFrame(&frame->eegFrame);
+    writeBRSFrame(&frame->brsFrame);
+    dataOut << frame->ledGroups[LED_FORWARD]->frequency  << delimeter;
+    dataOut << frame->ledGroups[LED_BACKWARD]->frequency << delimeter;
+    dataOut << frame->ledGroups[LED_RIGHT]->frequency    << delimeter;
+    dataOut << frame->ledGroups[LED_LEFT]->frequency     << delimeter;
+    dataOut << frame->eegConnectionStatus     << delimeter;
+    dataOut << frame->pccConnectionStatus     << delimeter;
+    dataOut << frame->brsConnectionStatus     << delimeter;
+    dataOut << frame->flasherConnectionStatus << delimeter;
+
+    dataOut << endl;
+}
+
+void C_TextParser::writeBRSFrame(BRS_Frame_t* frame)
+{
+    dataOut << frame->gpsData.altitude     << delimeter;
+    dataOut << frame->gpsData.longitude    << delimeter;
+    dataOut << frame->gpsData.altitude     << delimeter;
+    dataOut << frame->gpsData.groundSpeed  << delimeter;
+    dataOut << frame->usData.rangeToObject << delimeter;
+    dataOut << frame->remoteCommand        << delimeter;
+}
+
+void C_TextParser::writeTMHeader()
+{
+    for (int i = 0; i < headerNames.tmFrameNames.size(); i++)
+    {
+        dataOut << headerNames.tmFrameNames.at(i) << delimeter;
+    }
+    dataOut << endl;
+}
+
+void C_TextParser::writeEEGHeader()
+{
+    for (int i = 0; i < headerNames.eegFrameNames.size(); i++)
+    {
+        dataOut << headerNames.eegFrameNames.at(i) << delimeter;
+    }
+    dataOut << endl;
 }

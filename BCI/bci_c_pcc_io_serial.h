@@ -16,7 +16,6 @@ public:
     virtual ConnectionStatusType connect();
 
 private:
-
     //Serial Communication API
     C_Serial_Comm *serialComm;
 };

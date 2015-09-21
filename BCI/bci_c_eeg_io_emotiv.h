@@ -11,15 +11,16 @@
 
 //Constants
 #define EMOTIV_FRAME_SIZE sizeof(emokit_frame)
-#define READ_TIMEOUT      2000 //ms
-#define MAX_TIMEOUTS      10 //Give up after 20 seconds of timeouts
-#define MIN_FRAMES_NEEDED 10 //Need at least 10 frames for a good sample
+#define READ_TIMEOUT      1000 //ms
+#define MAX_TIMEOUTS      5 //Give up after 5 timeouts
 
 enum EmotivReadStatus
 {
     EMOKIT_READ_TIMEOUT=0,
     EMOKIT_READ_SUCCESS
 };
+
+
 
 class C_EEG_IO_EMOTIV : public C_EEG_IO , public C_Singleton<C_EEG_IO_EMOTIV>
 {
@@ -31,16 +32,12 @@ public:
 	virtual eegTypeEnum  getType(){ return EEG_TYPE_EMOTIV; }
     virtual ConnectionStatusType connect();
 
-    virtual void run();       //Thread Execution
-
 public slots:
-    void clearEEGData();
+    virtual bool fetchEEGFrame();
+    void clearEEGData() { eegData.clear(); }
 
 private:
     struct emokit_device* m_device;
-
-    //Number of times we have missed a read
-    int m_timeout_count;
 
     //Number of EPOC Devices Connected
     int m_device_count;

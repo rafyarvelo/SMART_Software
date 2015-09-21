@@ -45,11 +45,12 @@ typedef struct BRS_Frame_t
     BRS_Frame_t& operator =(BRS_Frame_t* rhs)
     {
         memcpy(this, rhs, sizeof(BRS_Frame_t));
+        return *this;
     }
 
     BRS_Frame_t& operator =(BRS_Frame_t& rhs)
     {
-        memcpy(this, &rhs, sizeof(BRS_Frame_t));
+        return operator =(&rhs);
     }
 
 
@@ -59,7 +60,7 @@ typedef struct BRS_Frame_t
 typedef struct TM_Frame_t
 {
     int          timeStamp;
-    EEG_Frame_t  eegFrame;
+    EEG_Frame_t  eegFrame; //Only the Latest Frame, EEG Telemetry is managed by the C_EEG_IO class
     BRS_Frame_t  brsFrame;
     LED_Group**  ledGroups;
     ConnectionStatusType eegConnectionStatus;

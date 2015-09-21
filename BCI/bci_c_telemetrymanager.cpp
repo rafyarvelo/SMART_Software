@@ -11,8 +11,11 @@ C_TelemetryManager::C_TelemetryManager(C_BCI_Package* pBCI, C_EEG_IO* pEEG_IO,
     mBRS_IOPtr     = pBRS_IO;
     mRVSPtr        = pRVS;
 
-    outputBinaryFile = false;
-    outputTextFile   = false;
+    //Don't Record TM By Default
+    recordTM = false;
+
+    //Make Connections
+    connect(this, SIGNAL(tmFrameCreated(TM_Frame_t*)), mBRS_IOPtr, SLOT(SendTMFrame(TM_Frame_t*)));
 }
 
 C_TelemetryManager::~C_TelemetryManager()
@@ -35,7 +38,7 @@ TM_Frame_t* C_TelemetryManager::updateTM()
     //Update TM from Interfaces
     frame->timeStamp               = mBCIPackagePtr->stopwatch.elapsed();
     frame->brsFrame                = mBRS_IOPtr    ->GetLatestBRSFrame();
-    frame->eegFrame                = mEEG_IOPtr    ->getFrame();
+    frame->eegFrame                = mEEG_IOPtr    ->GetFramePtr();
     frame->ledGroups               = mRVSPtr       ->GetAllLEDGroups();
     frame->eegConnectionStatus     = mBCIPackagePtr->eegConnectionStatus;
     frame->brsConnectionStatus     = mBCIPackagePtr->brshConnectionStatus;
@@ -43,45 +46,30 @@ TM_Frame_t* C_TelemetryManager::updateTM()
     frame->flasherConnectionStatus = mBCIPackagePtr->flasherConnectionStatus;
 
     //Record TM to Output Files if requested
-    if (outputBinaryFile)
+    if (recordTM)
     {
-        OutputFrame(frame, BINARY_FILE);
+        OutputFrameToFile(frame);
     }
 
-    if (outputTextFile)
-    {
-        OutputFrame(frame, TEXT_FILE);
-    }
+    //Notify Listeners that our frame is ready
+    emit tmFrameCreated(frame);
 
+    //Buffer and Return Frame
+    mTMData.addFrame(frame);
     return frame;
 }
 
-void C_TelemetryManager::OutputFrame(TM_Frame_t* frame, FileFormatType format)
+void C_TelemetryManager::OutputFrameToFile(TM_Frame_t* frame)
 {
-    if (BINARY_FILE == format)
-    {
-        binaryParser.writeTMFrame(frame);
-    }
-    else
-    {
-        textParser.writeTMFrame(frame);
-    }
+    binaryParser.writeTMFrame(frame);
 }
 
 //Record Telemetry to an output File
-void C_TelemetryManager::RecordTMToFile(const QString& filename, FileFormatType format)
+void C_TelemetryManager::RecordTMToFile(const QString& filename)
 {
     string temp = string("Recording Telemetry to File: ") + filename.toStdString();
     debugLog->println(BCI_LOG, temp, true);
 
-    if (format == TEXT_FILE)
-    {
-        outputTextFile = true;
-        textParser.SetTMOutputFilename(filename);
-    }
-    else
-    {
-        outputBinaryFile = true;
-        binaryParser.SetTMOutputFilename(filename);
-    }
+    recordTM = true;
+    binaryParser.SetTMOutputFilename(filename);
 }

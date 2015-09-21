@@ -10,13 +10,9 @@ public:
     C_BRSH_IO_Serial();
     virtual ~C_BRSH_IO_Serial();
 
-    static C_BRSH_IO_Serial* Instance() { return new C_BRSH_IO_Serial; }
-
-    //Send TM to the BRSH
+    //Send TM to/from the BRSH
+    virtual bool fetchBRSFrame();
     virtual void SendTMFrame(TM_Frame_t* pFrame);
-
-    //Return the latest BRS Data
-    virtual BRS_Frame_t* GetLatestBRSFrame();
 
     virtual ConnectionStatusType connect();
 private:

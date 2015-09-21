@@ -29,25 +29,34 @@ public:
     //Create a New TM Frame from the Latest Data
     TM_Frame_t* updateTM();
 
+    //Retrieve the Latest Frame
+    TM_Frame_t* GetLatestFramePtr()    { return mTMData.GetFrame(); }
+
     //Record Telemetry to an output File
-    void RecordTMToFile(const QString& filename, FileFormatType format);
+    void RecordTMToFile(const QString& filename);
+
+public slots:
+    //Update Telemetry when a BRS Frame is Received
+    void onBRSFrameReceived(BRS_Frame_t* frame) { updateTM();}
+
+signals:
+    void tmFrameCreated(TM_Frame_t* frame);
 
 private:
-    void OutputFrame(TM_Frame_t* frame, FileFormatType format);
+    void OutputFrameToFile(TM_Frame_t* frame);
 
     C_BCI_Package* mBCIPackagePtr;
     C_EEG_IO*      mEEG_IOPtr;
     C_BRSH_IO*     mBRS_IOPtr;
     C_RVS*         mRVSPtr;
 
-    //File Parsers
-    C_TextParser   textParser;
+    //Used to Record TM to File
     C_BinaryParser binaryParser;
-    bool outputBinaryFile;
-    bool outputTextFile;
 
     //TM Data Buffer
-    C_TM           mTMData;
+    C_TM mTMData;
+
+    bool recordTM;
 
     //Debug Logging
     SMART_DEBUG_LOG* debugLog;

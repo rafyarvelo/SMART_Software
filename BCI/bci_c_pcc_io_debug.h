@@ -3,14 +3,16 @@
 
 #include "bci_c_pcc_io.h"
 
-class C_PCC_IO_Debug : public C_PCC_IO
+class C_PCC_IO_Debug : public C_PCC_IO , public C_Singleton<C_PCC_IO_Debug>
 {
 public:
     C_PCC_IO_Debug();
     virtual ~C_PCC_IO_Debug(){}
 
-    static C_PCC_IO_Debug* Instance() {return new C_PCC_IO_Debug; }
-    virtual void SendCommand() { }
+    virtual void SendCommand()
+    {
+        cout << "Sending PCC Command: " << currentCommand << endl;
+    }
 
     virtual ConnectionStatusType connect() { return CONNECTED; }
 };

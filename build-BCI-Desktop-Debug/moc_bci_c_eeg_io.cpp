@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_C_EEG_IO_t {
-    QByteArrayData data[7];
-    char stringdata[73];
+    QByteArrayData data[9];
+    char stringdata[94];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -30,15 +30,18 @@ struct qt_meta_stringdata_C_EEG_IO_t {
 static const qt_meta_stringdata_C_EEG_IO_t qt_meta_stringdata_C_EEG_IO = {
     {
 QT_MOC_LITERAL(0, 0, 8),
-QT_MOC_LITERAL(1, 9, 12),
-QT_MOC_LITERAL(2, 22, 0),
-QT_MOC_LITERAL(3, 23, 11),
-QT_MOC_LITERAL(4, 35, 7),
-QT_MOC_LITERAL(5, 43, 12),
-QT_MOC_LITERAL(6, 56, 15)
+QT_MOC_LITERAL(1, 9, 16),
+QT_MOC_LITERAL(2, 26, 0),
+QT_MOC_LITERAL(3, 27, 12),
+QT_MOC_LITERAL(4, 40, 5),
+QT_MOC_LITERAL(5, 46, 12),
+QT_MOC_LITERAL(6, 59, 11),
+QT_MOC_LITERAL(7, 71, 7),
+QT_MOC_LITERAL(8, 79, 13)
     },
-    "C_EEG_IO\0EEGDataReady\0\0C_EEG_Data&\0"
-    "eegData\0SetConnected\0SetDisconnected\0"
+    "C_EEG_IO\0EEGFrameReceived\0\0EEG_Frame_t*\0"
+    "frame\0EEGDataReady\0C_EEG_Data&\0eegData\0"
+    "fetchEEGFrame\0"
 };
 #undef QT_MOC_LITERAL
 
@@ -53,21 +56,21 @@ static const uint qt_meta_data_C_EEG_IO[] = {
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
-       1,       // signalCount
+       2,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
        1,    1,   29,    2, 0x06,
+       5,    1,   32,    2, 0x06,
 
  // slots: name, argc, parameters, tag, flags
-       5,    0,   32,    2, 0x08,
-       6,    0,   33,    2, 0x08,
+       8,    0,   35,    2, 0x0a,
 
  // signals: parameters
     QMetaType::Void, 0x80000000 | 3,    4,
+    QMetaType::Void, 0x80000000 | 6,    7,
 
  // slots: parameters
-    QMetaType::Void,
-    QMetaType::Void,
+    QMetaType::Bool,
 
        0        // eod
 };
@@ -77,25 +80,32 @@ void C_EEG_IO::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, vo
     if (_c == QMetaObject::InvokeMetaMethod) {
         C_EEG_IO *_t = static_cast<C_EEG_IO *>(_o);
         switch (_id) {
-        case 0: _t->EEGDataReady((*reinterpret_cast< C_EEG_Data(*)>(_a[1]))); break;
-        case 1: _t->SetConnected(); break;
-        case 2: _t->SetDisconnected(); break;
+        case 0: _t->EEGFrameReceived((*reinterpret_cast< EEG_Frame_t*(*)>(_a[1]))); break;
+        case 1: _t->EEGDataReady((*reinterpret_cast< C_EEG_Data(*)>(_a[1]))); break;
+        case 2: { bool _r = _t->fetchEEGFrame();
+            if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = _r; }  break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
         int *result = reinterpret_cast<int *>(_a[0]);
         void **func = reinterpret_cast<void **>(_a[1]);
         {
+            typedef void (C_EEG_IO::*_t)(EEG_Frame_t * );
+            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&C_EEG_IO::EEGFrameReceived)) {
+                *result = 0;
+            }
+        }
+        {
             typedef void (C_EEG_IO::*_t)(C_EEG_Data & );
             if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&C_EEG_IO::EEGDataReady)) {
-                *result = 0;
+                *result = 1;
             }
         }
     }
 }
 
 const QMetaObject C_EEG_IO::staticMetaObject = {
-    { &QThread::staticMetaObject, qt_meta_stringdata_C_EEG_IO.data,
+    { &QObject::staticMetaObject, qt_meta_stringdata_C_EEG_IO.data,
       qt_meta_data_C_EEG_IO,  qt_static_metacall, 0, 0}
 };
 
@@ -112,12 +122,12 @@ void *C_EEG_IO::qt_metacast(const char *_clname)
         return static_cast<void*>(const_cast< C_EEG_IO*>(this));
     if (!strcmp(_clname, "C_ConnectedDevice"))
         return static_cast< C_ConnectedDevice*>(const_cast< C_EEG_IO*>(this));
-    return QThread::qt_metacast(_clname);
+    return QObject::qt_metacast(_clname);
 }
 
 int C_EEG_IO::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 {
-    _id = QThread::qt_metacall(_c, _id, _a);
+    _id = QObject::qt_metacall(_c, _id, _a);
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
@@ -133,9 +143,16 @@ int C_EEG_IO::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 }
 
 // SIGNAL 0
-void C_EEG_IO::EEGDataReady(C_EEG_Data & _t1)
+void C_EEG_IO::EEGFrameReceived(EEG_Frame_t * _t1)
 {
     void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 0, _a);
+}
+
+// SIGNAL 1
+void C_EEG_IO::EEGDataReady(C_EEG_Data & _t1)
+{
+    void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
+    QMetaObject::activate(this, &staticMetaObject, 1, _a);
 }
 QT_END_MOC_NAMESPACE

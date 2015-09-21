@@ -3,6 +3,7 @@
 
 #include <QTextStream>
 #include "bci_c_abstract_parser.h"
+#include "bci_c_tm_header_names.h"
 
 //Default Input/Output Filenames
 const QString TM_DATA_INPUTFILE_TXT  = "../debug_files/brs_input_data.txt";
@@ -33,20 +34,20 @@ public:
     virtual void writeEEGFrame(EEG_Frame_t* frame);
     virtual void writeTMFrame(TM_Frame_t* frame);
 
+    //Set Delimeter for output files
     void SetDelimeter(const QString& delim) { delimeter = delim; }
-    void SetDelimeter(const char* delim) { SetDelimeter(QString(delim));}
+    void SetDelimeter(const char* delim = ",") { SetDelimeter(QString(delim));}
 
-    //TM Header Names
-    static QStringList eegFrameNames;
-    static QStringList brsFrameNames;
-    static QStringList connectionStatusNames;
-    static QStringList tmFrameNames;
+private:
+    void writeBRSFrame(BRS_Frame_t* frame);
+    void writeTMHeader();
+    void writeEEGHeader();
 
-    //Text Files I/O Api
 private:
     QTextStream dataIn;
     QTextStream dataOut;
 
+    C_HEADER_NAMES headerNames;
     QString delimeter;
 };
 

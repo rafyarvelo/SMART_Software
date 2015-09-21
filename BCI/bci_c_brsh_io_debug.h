@@ -10,11 +10,9 @@ public:
     C_BRSH_IO_Debug();
     virtual ~C_BRSH_IO_Debug(){}
 
-    //Send TM to the BRSH
+    //Send TM to/from the BRSH
+    virtual bool fetchBRSFrame(){ return true; }
     virtual void SendTMFrame(TM_Frame_t* pFrame){}
-
-    //Return the latest BRS Data
-    virtual BRS_Frame_t* GetLatestBRSFrame(){ return BRS_Frame_t::create();}
 
     virtual ConnectionStatusType connect() { return CONNECTED;}
 };

@@ -10,10 +10,10 @@
 class C_PCC_IO : public C_ConnectedDevice
 {
 public:
-     C_PCC_IO();
-     virtual ~C_PCC_IO();
+     C_PCC_IO(){}
+     virtual ~C_PCC_IO(){}
 
-    void SetCommand(PCC_Command_Type cmd);
+    void SetCommand(PCC_Command_Type cmd) { currentCommand = cmd; }
     virtual void SendCommand() = 0;
 
     virtual ConnectionStatusType connect() = 0;

@@ -58,8 +58,9 @@ SOURCES += \
     bci_c_brsh_io_debug.cpp \
     bci_c_brsh_io_serial.cpp \
     bci_c_pcc_io_serial.cpp \
-    bci_c_pcc_io.cpp \
-    bci_c_pcc_io_debug.cpp
+    bci_c_pcc_io_debug.cpp \
+    bci_c_brsh_io.cpp \
+    bci_c_eeg_io.cpp
 
 #Junk needed for Emokit Libraries
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../emokit/lib/release/ -lemokit

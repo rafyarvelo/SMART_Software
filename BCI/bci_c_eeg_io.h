@@ -2,6 +2,7 @@
 #define BCI_C_EEG_IO
 
 #include <QThread>
+#include <QTimer>
 #include "../smart_config.h"
 #include "../smart_debug_log.h"
 #include "bci_c_singleton.h"
@@ -10,37 +11,59 @@
 
 using namespace std;
 
+//Need at least 10 frames for a good sample
+#define MIN_FRAMES_NEEDED 10
+
 //This is an abstract EEG interface to be used in the BCI_Package
 //Implement these methods in subclasses to connect to the corresponding EEG
-class C_EEG_IO : public QThread, public C_ConnectedDevice
+class C_EEG_IO : public QObject, public C_ConnectedDevice
 {
     Q_OBJECT
 public:
-    C_EEG_IO()
-    {
-        this->debugLog = SMART_DEBUG_LOG::Instance();
-        QObject::connect(this, SIGNAL(started()), this, SLOT(SetConnected()));
-        QObject::connect(this, SIGNAL(finished()), this, SLOT(SetDisconnected()));
-    }
-	virtual ~C_EEG_IO(){}
-	
+    C_EEG_IO();
+    virtual ~C_EEG_IO();
+
+    //Basic Getters
+    virtual C_EEG_Data&  GetData()     { return eegData; }
+    virtual EEG_Frame_t& GetFrame()    { return eegData.GetFrame(); }
+    virtual EEG_Frame_t* GetFramePtr() { return eegData.GetFramePtr(); }
+
     //Must implement these members in subclasses
-    virtual C_EEG_Data&  getData()  { return eegData; }
-    virtual EEG_Frame_t* getFrame() { return eegData.GetFramePtr(); }
     virtual eegTypeEnum  getType() = 0;
     virtual ConnectionStatusType connect() = 0;
 
-signals:
-    void EEGDataReady(C_EEG_Data& eegData);
+public slots:
+    //Try to Get an EEG Frame, return true and emit EEG Frame Received if Successful
+    virtual bool fetchEEGFrame() = 0;
 
-private slots:
-    void SetConnected(){ connectionStatus = CONNECTED;}
-    void SetDisconnected(){ connectionStatus = NOT_CONNECTED;}
+signals:
+    void EEGFrameReceived(EEG_Frame_t* frame);
+
+    //Emit when we have received 10 frames successfully
+    void EEGDataReady(C_EEG_Data& eegData);
 
 protected:
     SMART_DEBUG_LOG* debugLog;
     C_EEG_Data       eegData;
 };
 
+//Class to perform actual thread execution
+class C_EEG_IO_Task : public QThread
+{
+public:
+    static C_EEG_IO_Task* Instance(C_EEG_IO* ptr);
+
+    void run();
+
+    //The Rate we will execute the EEG IO Task (50 Hz)
+    static const u_int16_t EXECUTION_RATE;
+
+private://Private Constructor, Use Singleton Method
+    C_EEG_IO_Task(C_EEG_IO* pEEG_IO);
+
+private:
+    C_EEG_IO* mEEG_IO_Ptr;
+    QTimer    timer;
+};
 #endif // BCI_C_EEG_IO
 

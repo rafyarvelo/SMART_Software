@@ -22,7 +22,11 @@ C_BCI_Package::C_BCI_Package()
     pBRS_IO           = createBRS_IO(DEFAULT_BRS_TYPE);
     pPCC_IO           = createPCC_IO(DEFAULT_PCC_TYPE);
 
-    //Classes with dependencies
+    //Thread Execution
+    pEEG_IO_Task      = C_EEG_IO_Task::Instance(pEEG_IO);
+    pBRS_IO_Task      = C_BRSH_IO_Task::Instance(pBRS_IO);
+
+    //Other Classes with dependencies
     pSignalProcessing = C_SignalProcessing ::Instance(pEEG_IO);
     pJA               = C_JudgmentAlgorithm::Instance(pSignalProcessing);
     pTelemetryManager = C_TelemetryManager ::Instance(this, pEEG_IO,pBRS_IO, pRVS);
@@ -72,12 +76,7 @@ C_BCI_Package::~C_BCI_Package()
     }
 }
 
-void C_BCI_Package::startEEG()
-{
-    pEEG_IO->start();
-}
-
-void C_BCI_Package::initialize()
+void C_BCI_Package::createConnections()
 {
     debugLog->println(BCI_LOG, "Connecting to Flasher...", true);
     flasherConnectionStatus = pFlasherIO->connect();
@@ -90,10 +89,6 @@ void C_BCI_Package::initialize()
 
     debugLog->println(BCI_LOG, "Connecting to PCC..." , true );
     pccConnectionStatus = pPCC_IO->connect();
-
-    //Record our TM to an output file
-    pTelemetryManager->RecordTMToFile(TM_DATA_OUTPUTFILE_BIN, BINARY_FILE);
-    latestTM_Frame = *pTelemetryManager->updateTM();
 }
 
 C_EEG_IO* C_BCI_Package::createEEG_IO(eegTypeEnum type)
@@ -197,9 +192,6 @@ bool C_BCI_Package::checkConnections()
 
 void C_BCI_Package::Run()
 {
-    //Keep Track of the Mission Time
-    stopwatch.start();
-
     while (checkConnections())
     {
         switch (bciState)
@@ -212,15 +204,23 @@ void C_BCI_Package::Run()
 
         case BCI_INITIALIZATION:
 
-            //Make Connections
-            initialize();
+            //Keep Track of the Mission Time
+            stopwatch.start();
+
+            //Make Connections to peripherals
+            createConnections();
 
             //Configure Repetitive Visual Stimulus and send to Flasher
             pRVS->Generate();
             pJA->SetRVS(pRVS);
             pFlasherIO->SendRVS();
 
-            startEEG();
+            //Record our TM to an output file
+            pTelemetryManager->RecordTMToFile(TM_DATA_OUTPUTFILE_BIN);
+
+            //Begin Thread Execution
+            pEEG_IO_Task->start();
+            pBRS_IO_Task->start();
 
             debugLog->println(BCI_LOG, "Initialization Complete, Moving to STANDBY..." , true );
             bciState = BCI_STANDBY;
@@ -228,18 +228,16 @@ void C_BCI_Package::Run()
 
         case BCI_STANDBY:
 
-            //Manage Telemetry Stream
-            latestTM_Frame = *pTelemetryManager->updateTM();
-            pBRS_IO->SendTMFrame(&latestTM_Frame);
-
             //This is all we need to do here, the Signals and Slots will
             //take care of notifying us for remote commands and Emergency Stops
+            //standby(COMMAND_TIMEOUT);
+
             break;
 
         case BCI_PROCESSING:
 
             //Update the Judgment Algorithm with the current data
-            pJA->SetTM(&latestTM_Frame);
+            pJA->SetTM(pTelemetryManager->GetLatestFramePtr());
 
             //Decide Final Power Chair Command
             pJA->computeCommand();
@@ -262,38 +260,22 @@ void C_BCI_Package::Run()
     cerr << "ERROR! BCI Lost Connection!" << endl;
 }
 
-void C_BCI_Package::updateTM()
-{
-
-}
-
 //Slots
 void C_BCI_Package::onEEGDataProcessed(C_EEG_Data &eegData)
 {
     //If we're not in standby, then just ignore the EEG
     if (bciState == BCI_STANDBY)
     {
-        //Update our EEG Data with the Latest Data
-        //this->eegData = eegData;
-
-        //Update Telemetry and Process Command
-        updateTM();
         bciState = BCI_PROCESSING;
     }
 }
 
 void C_BCI_Package::onRemoteCmdReceived(PCC_Command_Type& cmd)
 {
-    //If we're not in standby, then just ignore the Cmd
-    if (bciState == BCI_STANDBY)
-    {
-        //Update TM with the command, then let the
-        //Judgment Algorithm take care of the rest
-        updateTM();
-        //currentTMFrame->brsFrame.remoteCommand = cmd;
-
-        bciState = BCI_PROCESSING;
-    }
+    //Update TM with the command, then let the
+    //Judgment Algorithm take care of the rest
+    pTelemetryManager->updateTM();
+    bciState = BCI_PROCESSING;
 }
 
 void C_BCI_Package::onEmergencyStopRequested()
@@ -301,4 +283,14 @@ void C_BCI_Package::onEmergencyStopRequested()
     //No messing around here, just send the command
     pPCC_IO->SetCommand(PCC_STOP);
     pPCC_IO->SendCommand();
+}
+
+//Relax in BCI_Package Standby
+void C_BCI_Package::standby( int millisecondsToWait )
+{
+    QTime dieTime = QTime::currentTime().addMSecs( millisecondsToWait );
+    while( QTime::currentTime() < dieTime )
+    {
+        QCoreApplication::processEvents( QEventLoop::AllEvents, 100 );
+    }
 }

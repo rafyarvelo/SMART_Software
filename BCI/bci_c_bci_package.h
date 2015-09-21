@@ -5,6 +5,7 @@
 class C_TelemetryManager;
 
 #include <QTime>
+#include <QtCore>
 #include "bci_c_rvs.h"
 #include "bci_c_flasher_io.h"
 #include "bci_c_signal_processing.h"
@@ -65,10 +66,9 @@ public:
     void Run();
 
 private:
-    void initialize();
-    void updateTM();
+    void createConnections();
     bool checkConnections();
-    void startEEG();
+    void standby( int millisecondsToWait );
 
     //Factory Constructors for our IO Classes
     C_EEG_IO*  createEEG_IO(eegTypeEnum type=DEFAULT_EEG_TYPE);
@@ -89,16 +89,17 @@ private:
     C_EEG_IO*            pEEG_IO;
     C_Flasher_IO*        pFlasherIO;
     C_RVS*               pRVS;
+    C_TelemetryManager*  pTelemetryManager;
+
+    //Thread Execution
+    C_EEG_IO_Task*       pEEG_IO_Task; //50 Hz
+    C_BRSH_IO_Task*      pBRS_IO_Task; //10 Hz
 
     //Used to control event loop
     BCIState bciState;
 
     //Mission Time
     QTime stopwatch;
-
-    //Manage the Telemetry Stream
-    C_TelemetryManager* pTelemetryManager;
-    TM_Frame_t          latestTM_Frame;
 
     //Connection Status
     ConnectionStatusType eegConnectionStatus;

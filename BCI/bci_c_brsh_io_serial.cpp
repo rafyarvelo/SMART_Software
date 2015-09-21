@@ -17,15 +17,14 @@ void C_BRSH_IO_Serial::SendTMFrame(TM_Frame_t* pFrame)
 
 }
 
-//Return the latest BRS Data
-BRS_Frame_t* C_BRSH_IO_Serial::GetLatestBRSFrame()
+bool C_BRSH_IO_Serial::fetchBRSFrame()
 {
-    BRS_Frame_t* frame = BRS_Frame_t::create();
-
-    return frame;
+    return false;
 }
 
 ConnectionStatusType C_BRSH_IO_Serial::connect()
 {
+    ConnectionStatusType status = NOT_CONNECTED;
 
+    return status;
 }

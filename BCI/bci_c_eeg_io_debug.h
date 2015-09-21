@@ -19,8 +19,8 @@ public:
 	virtual eegTypeEnum  getType() { return EEG_TYPE_DEBUG; }
     virtual ConnectionStatusType connect() {return CONNECTED;}
 
-private:	
-    C_EEG_Data& createRandomData(); //Creates Dummy Data
+public slots:
+    virtual bool fetchEEGFrame() { return true; }
 };
 
 #endif

@@ -2,7 +2,7 @@
 
 //Constructor
 C_EEG_IO_EMOTIV::C_EEG_IO_EMOTIV()
-    : m_timeout_count(0),
+    :
       m_resource(0)
 {
     debugLog = SMART_DEBUG_LOG::Instance();
@@ -10,9 +10,6 @@ C_EEG_IO_EMOTIV::C_EEG_IO_EMOTIV()
     //Create New Emotiv Device, Wait to connect until connect() is called
     m_device       = emokit_create();
     m_device_count = emokit_get_count(m_device, EMOKIT_VID, EMOKIT_PID);
-
-    //Delete EEG Data when it gets full
-    QObject::connect(&eegData, SIGNAL(EEG_Data_Full()), this, SLOT(clearEEGData()));
 }
 
 //~Destructor
@@ -61,14 +58,11 @@ ConnectionStatusType C_EEG_IO_EMOTIV::connect()
     return CONNECTED;
 }
 
-//Thread Execution
-void C_EEG_IO_EMOTIV::run()
+bool C_EEG_IO_EMOTIV::fetchEEGFrame()
 {
-    struct emokit_frame frame; //buffer to hold each EEG Frame
+    struct emokit_frame frame;
     EmotivReadStatus readStatus;
-    int newFrameCount = 0;
-
-    debugLog->BCI_Log() << "EEG Thread Started: " << QThread::currentThreadId() << endl;
+    int timeout_count = 0;
 
     //Connect if we aren't connected yet
     if (m_resource != 0 || connectionStatus == NOT_CONNECTED)
@@ -77,7 +71,7 @@ void C_EEG_IO_EMOTIV::run()
     }
 
     //Execute Thread Mainloop
-    while (m_timeout_count < MAX_TIMEOUTS)
+    while (timeout_count < MAX_TIMEOUTS)
     {
         //Attempt to read the next frame
         readStatus = (EmotivReadStatus) emokit_read_data_timeout(m_device, READ_TIMEOUT);
@@ -85,32 +79,26 @@ void C_EEG_IO_EMOTIV::run()
         //Check if we timed out
         if (readStatus == EMOKIT_READ_TIMEOUT)
         {
-            debugLog->BCI_Log() << "Emotiv Read Timeout: Count = " << ++m_timeout_count << endl;
+            debugLog->BCI_Log() << "Emotiv Read Timeout: Count = " << ++timeout_count << endl;
         }
         else
         {
             //Get the current EEG Frame and add it to our data
             frame = emokit_get_next_frame(m_device);
             eegData.AddFrame(EEG_Frame_t::fromEmotivFrame(&frame));
-            newFrameCount++;
+
+            //Notify Listeners that we received a frame
+            emit EEGFrameReceived(eegData.GetFramePtr());
+
+            return (bool) EMOKIT_READ_SUCCESS;
         }
 
         //Signal that our EEG Data is Ready every 10 Frames
-        if (newFrameCount >= MIN_FRAMES_NEEDED)
+        if (eegData.size() >= MIN_FRAMES_NEEDED)
         {
             emit EEGDataReady(eegData);
-            newFrameCount = 0;
         }
     }
 
-    if (m_timeout_count >= MAX_TIMEOUTS)
-    {
-        cout                << "Max Time Outs reached waiting for Emotiv." << endl;
-        debugLog->BCI_Log() << "Max Time Outs reached waiting for Emotiv." << endl;
-    }
-}
-
-void C_EEG_IO_EMOTIV::clearEEGData()
-{
-    eegData.clear();
+    return (bool) EMOKIT_READ_TIMEOUT;
 }
