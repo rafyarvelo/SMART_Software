@@ -11,8 +11,8 @@ public:
     virtual ~C_BRSH_IO_Debug(){}
 
     //Send TM to/from the BRSH
-    virtual bool fetchBRSFrame(){ return true; }
-    virtual void SendTMFrame(TM_Frame_t* pFrame){}
+    virtual bool fetchBRSFrame();
+    virtual void SendTMFrame(TM_Frame_t* pFrame);
 
     virtual ConnectionStatusType connect() { return CONNECTED;}
 };

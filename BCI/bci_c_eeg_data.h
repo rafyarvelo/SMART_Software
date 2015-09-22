@@ -4,7 +4,6 @@
 #include <QObject>
 #include <QList>
 #include "smart_config.h"
-#include "emokit.h"
 
 //This is here to show the Structure of the an Emotiv Frame, which is our default EEG
 /*
@@ -67,9 +66,6 @@ struct EEG_Frame_t
 
     //Factory Method
     static EEG_Frame_t* create();
-
-    //Easy conversion from Emotiv since thats the default EEG
-    static EEG_Frame_t* fromEmotivFrame(struct emokit_frame* emotiv_frame);
 };
 
 class C_EEG_Data : public QObject

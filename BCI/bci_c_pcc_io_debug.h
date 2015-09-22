@@ -9,6 +9,7 @@ public:
     C_PCC_IO_Debug();
     virtual ~C_PCC_IO_Debug(){}
 
+public slots:
     virtual void SendCommand()
     {
         cout << "Sending PCC Command: " << currentCommand << endl;

@@ -14,14 +14,11 @@ const TelemetrySyncType C_BinaryParser::TM_FRAME_END    = 0xBA987654;
 bool C_BinaryParser::eegDataStarted = false;
 bool C_BinaryParser::tmDataStarted  = false;
 
-C_BinaryParser::C_BinaryParser()
+C_BinaryParser::C_BinaryParser(const QString& filename, ReadOrWrite direction)
+    : C_AbstractParser(filename, direction)
 {
-
-    //Initialize Default Input/Output Files
-    SetTMInputFilename(TM_DATA_INPUTFILE_BIN);
-    SetTMOutputFilename(TM_DATA_OUTPUTFILE_BIN);
-    SetEEGInputFilename(EEG_DATA_INPUTFILE_BIN);
-    SetEEGOutputFilename(EEG_DATA_OUTPUTFILE_BIN);
+    stream.setByteOrder(QDataStream::LittleEndian);
+    stream.setDevice(this->fp);
 }
 
 C_BinaryParser::~C_BinaryParser()
@@ -40,20 +37,16 @@ C_BinaryParser::~C_BinaryParser()
 
 void C_BinaryParser::writeRawData(char *data, sizeType size)
 {
-    dataOut.writeBytes(data, size);
+    stream.writeRawData(data, size);
 }
 
 //Read EEG Data
-C_EEG_Data& C_BinaryParser::readEEGData (const QString& filename)
+C_EEG_Data& C_BinaryParser::readEEGData ()
 {
     //Clear Existing Data
     eegData.clear();
 
-    //Set EEG Filename
-    SetEEGInputFilename(filename);
-    dataIn.setDevice(eegDataIn);
-
-    while (!dataIn.atEnd())
+    while (!stream.atEnd())
     {
         eegData.AddFrame(readEEGFrame());
     }
@@ -62,12 +55,8 @@ C_EEG_Data& C_BinaryParser::readEEGData (const QString& filename)
 }
 
 //Write EEG Data
-void C_BinaryParser::writeEEGData(const QString& filename)
+void C_BinaryParser::writeEEGData()
 {
-    //Set EEG Filename
-    SetEEGOutputFilename(filename);
-    dataOut.setDevice(eegDataOut);
-
     //Tell the other functions that we already wrote the start sync
     eegDataStarted = true;
 
@@ -81,16 +70,12 @@ void C_BinaryParser::writeEEGData(const QString& filename)
 }
 
 //Read BRS Data
-C_TM& C_BinaryParser::readTMData (const QString& filename)
+C_TM& C_BinaryParser::readTMData ()
 {
     //Clear Existing Data
     tmData.clear();
 
-    //Set EEG Filename
-    SetTMInputFilename(filename);
-    dataIn.setDevice(tmDataIn);
-
-    while (!dataIn.atEnd())
+    while (!stream.atEnd())
     {
         tmData.addFrame(readTMFrame());
     }
@@ -99,12 +84,8 @@ C_TM& C_BinaryParser::readTMData (const QString& filename)
 }
 
 //Write BRS Data
-void C_BinaryParser::writeTMData(const QString& filename)
+void C_BinaryParser::writeTMData()
 {
-    //Set TM Filename
-    SetTMOutputFilename(filename);
-    dataOut.setDevice(tmDataOut);
-
     //Tell the other functions that we already wrote the start sync
     tmDataStarted = true;
 
@@ -117,16 +98,6 @@ void C_BinaryParser::writeTMData(const QString& filename)
     writeRawData((char*) TM_DATA_END, sizeof(TelemetrySyncType));
 }
 
-void C_BinaryParser::writeEEGData(C_EEG_Data& data, const QString& filename)
-{
-    C_AbstractParser::writeEEGData(data, filename);
-}
-
-void C_BinaryParser::writeTMData(C_TM& data, const QString& filename)
-{
-    C_AbstractParser::writeTMData(data, filename);
-}
-
 EEG_Frame_t* C_BinaryParser::readEEGFrame()
 {
     EEG_Frame_t* frame = EEG_Frame_t::create();
@@ -135,7 +106,7 @@ EEG_Frame_t* C_BinaryParser::readEEGFrame()
     if (findSync(EEG_FRAME_START))
     {
         //Read Data
-        dataIn.readRawData(reinterpret_cast<char*> (frame), sizeof(EEG_Frame_t));
+        stream.readRawData(reinterpret_cast<char*> (frame), sizeof(EEG_Frame_t));
     }
 
     return frame;
@@ -149,7 +120,7 @@ TM_Frame_t*  C_BinaryParser::readTMFrame()
     if (findSync(TM_FRAME_START))
     {
         //Read Data
-        dataIn.readRawData(reinterpret_cast<char*> (frame), sizeof(TM_Frame_t));
+        stream.readRawData(reinterpret_cast<char*> (frame), sizeof(TM_Frame_t));
     }
 
     return frame;
@@ -191,9 +162,9 @@ bool C_BinaryParser::findSync(TelemetrySyncType sync)
     TelemetrySyncType temp;
 
     //Find the Start of the EEG Frame
-    while (!dataIn.atEnd())
+    while (!stream.atEnd())
     {
-        dataIn.readRawData((char*) &temp, sizeof(TelemetrySyncType));
+        stream.readRawData((char*) &temp, sizeof(TelemetrySyncType));
 
         if (sync == temp)
         {

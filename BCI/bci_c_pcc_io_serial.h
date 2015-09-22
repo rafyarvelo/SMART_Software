@@ -12,8 +12,10 @@ public:
     ~C_PCC_IO_Serial();
 	
     //Implementation of virtual functions
-    virtual void SendCommand();
     virtual ConnectionStatusType connect();
+
+public slots:
+    virtual void SendCommand();
 
 private:
     //Serial Communication API

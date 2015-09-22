@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <ctime>
 #include "bci_c_eeg_io.h"
+#include "bci_c_framegenerator.h"
 
 //Change As Needed...
 #define MIN_DEBUG_DATA_SIZE   10
@@ -20,7 +21,7 @@ public:
     virtual ConnectionStatusType connect() {return CONNECTED;}
 
 public slots:
-    virtual bool fetchEEGFrame() { return true; }
+    virtual bool fetchEEGFrame();
 };
 
 #endif

@@ -36,7 +36,8 @@ HEADERS += \
     bci_c_pcc_io_serial.h \
     bci_c_pcc_io.h \
     bci_c_pcc_io_debug.h \
-    bci_c_singleton.h
+    bci_c_singleton.h \
+    bci_c_framegenerator.h
 
 SOURCES += \
     bci_c_bci_package.cpp \
@@ -60,7 +61,8 @@ SOURCES += \
     bci_c_pcc_io_serial.cpp \
     bci_c_pcc_io_debug.cpp \
     bci_c_brsh_io.cpp \
-    bci_c_eeg_io.cpp
+    bci_c_eeg_io.cpp \
+    bci_c_framegenerator.cpp
 
 #Junk needed for Emokit Libraries
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../emokit/lib/release/ -lemokit

@@ -85,7 +85,7 @@ bool C_EEG_IO_EMOTIV::fetchEEGFrame()
         {
             //Get the current EEG Frame and add it to our data
             frame = emokit_get_next_frame(m_device);
-            eegData.AddFrame(EEG_Frame_t::fromEmotivFrame(&frame));
+            eegData.AddFrame(fromEmotivFrame(&frame));
 
             //Notify Listeners that we received a frame
             emit EEGFrameReceived(eegData.GetFramePtr());
@@ -101,4 +101,33 @@ bool C_EEG_IO_EMOTIV::fetchEEGFrame()
     }
 
     return (bool) EMOKIT_READ_TIMEOUT;
+}
+
+EEG_Frame_t* C_EEG_IO_EMOTIV::fromEmotivFrame(emokit_frame* emotiv_frame)
+{
+    EEG_Frame_t* frame = EEG_Frame_t::create();
+
+    if (!emotiv_frame)
+    {
+        return frame;
+    }
+
+    //Initialize frame from Emotiv Data
+    frame->eegType = EEG_TYPE_EMOTIV;
+    frame->counter = (quint32) emotiv_frame->counter;
+
+    //Electrode Data from Emotiv Frame
+    memcpy((void*) &frame->electrodeData[0], (void*) &emotiv_frame->F3,
+            (size_t) sizeof(int) * NUM_EMOTIV_ELECTRODES);
+
+    //Contact Quality from Emotiv Frame
+    memcpy((void*) &frame->contactQuality[0], (void*) &emotiv_frame->cq,
+            (size_t) sizeof(struct emokit_contact_quality));
+
+    //The rest of the Emotiv Data
+    frame->gyroX = emotiv_frame->gyroX;
+    frame->gyroY = emotiv_frame->gyroY;
+    frame->batteryPercentage = emotiv_frame->battery;
+
+    return frame;
 }

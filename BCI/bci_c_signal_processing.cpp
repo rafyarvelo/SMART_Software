@@ -14,8 +14,7 @@ C_SignalProcessing::~C_SignalProcessing()
 
 void C_SignalProcessing::processEEGData(C_EEG_Data &rawEEGData)
 {
-    //Do stuff here....
     processedData = rawEEGData;
-
+    //TODO: Do stuff here....
     emit eegDataProcessed(processedData);
 }

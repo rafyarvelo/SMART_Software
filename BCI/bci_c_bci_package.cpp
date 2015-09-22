@@ -22,10 +22,6 @@ C_BCI_Package::C_BCI_Package()
     pBRS_IO           = createBRS_IO(DEFAULT_BRS_TYPE);
     pPCC_IO           = createPCC_IO(DEFAULT_PCC_TYPE);
 
-    //Thread Execution
-    pEEG_IO_Task      = C_EEG_IO_Task::Instance(pEEG_IO);
-    pBRS_IO_Task      = C_BRSH_IO_Task::Instance(pBRS_IO);
-
     //Other Classes with dependencies
     pSignalProcessing = C_SignalProcessing ::Instance(pEEG_IO);
     pJA               = C_JudgmentAlgorithm::Instance(pSignalProcessing);
@@ -43,11 +39,11 @@ C_BCI_Package::C_BCI_Package()
 
     //Listen for Emergency Stop Commands
     QObject::connect(pBRS_IO , SIGNAL(EmergencyStopRequested()),
-                     this, SLOT(onEmergencyStopRequested()));
+                     this    , SLOT(onEmergencyStopRequested()));
 
     //Listen for Remote Commands
     QObject::connect(pBRS_IO , SIGNAL(remoteCommandReceived(PCC_Command_Type&)),
-                     this, SLOT(onRemoteCmdReceived(PCC_Command_Type&)));
+                     this    , SLOT(onRemoteCmdReceived(PCC_Command_Type&)));
 
     debugLog->println(BCI_LOG, "BCI Package Instantiated Successfully", true);
 }
@@ -192,82 +188,75 @@ bool C_BCI_Package::checkConnections()
 
 void C_BCI_Package::Run()
 {
-    while (checkConnections())
+    switch (bciState)
     {
-        switch (bciState)
-        {
-        case BCI_OFF:
+    case BCI_OFF:
 
-            //Start initializing!
-            bciState = BCI_INITIALIZATION;
-            break;
+        //Start initializing!
+        goToState(BCI_INITIALIZATION);
+        break;
 
-        case BCI_INITIALIZATION:
+    case BCI_INITIALIZATION:
 
-            //Keep Track of the Mission Time
-            stopwatch.start();
+        //Keep Track of the Mission Time
+        stopwatch.start();
 
-            //Make Connections to peripherals
-            createConnections();
+        //Make Connections to peripherals
+        createConnections();
 
-            //Configure Repetitive Visual Stimulus and send to Flasher
-            pRVS->Generate();
-            pJA->SetRVS(pRVS);
-            pFlasherIO->SendRVS();
+        //Configure Repetitive Visual Stimulus and send to Flasher
+        pRVS->Generate();
+        pJA->SetRVS(pRVS);
+        pFlasherIO->SendRVS();
 
-            //Record our TM to an output file
-            pTelemetryManager->RecordTMToFile(TM_DATA_OUTPUTFILE_BIN);
+        //Record our TM to an output file
+        pTelemetryManager->RecordTMToFile(TM_DATA_OUTPUTFILE_BIN);
 
-            //Begin Thread Execution
-            pEEG_IO_Task->start();
-            pBRS_IO_Task->start();
+        //Begin Thread Execution for EEG and BRS IO
+        startThreads();
 
-            debugLog->println(BCI_LOG, "Initialization Complete, Moving to STANDBY..." , true );
-            bciState = BCI_STANDBY;
-            break;
+        debugLog->println(BCI_LOG, "Initialization Complete, Moving to STANDBY..." , true );
 
-        case BCI_STANDBY:
+        //Wait for Data in Standby
+        goToState(BCI_STANDBY);
 
-            //This is all we need to do here, the Signals and Slots will
-            //take care of notifying us for remote commands and Emergency Stops
-            //standby(COMMAND_TIMEOUT);
+        break;
 
-            break;
+    case BCI_STANDBY:
 
-        case BCI_PROCESSING:
+        //This is all we need to do here, the Signals and Slots will
+        //take care of notifying us for remote commands and Emergency Stops
+        break;
 
-            //Update the Judgment Algorithm with the current data
-            pJA->SetTM(pTelemetryManager->GetLatestFramePtr());
+    case BCI_PROCESSING:
 
-            //Decide Final Power Chair Command
-            pJA->computeCommand();
+        //Update the Judgment Algorithm with the current data
+        pJA->SetTM(pTelemetryManager->GetLatestFramePtr());
 
-            //Move to Ready to send the command
-            bciState = BCI_READY;
-            break;
+        //Decide Final Power Chair Command
+        pJA->computeCommand();
 
-        case BCI_READY:
+        //Move to Ready to send the command
+        goToState(BCI_READY);
 
-            //Send the PCC Command then Revert to STANDBY
-            pPCC_IO->SetCommand(pJA->GetFinalCommand());
-            pPCC_IO->SendCommand();
+        break;
 
-            bciState = BCI_STANDBY;
-            break;
-        }
+    case BCI_READY:
+
+        //Send the PCC Command then Revert to STANDBY
+        pPCC_IO->SetCommand(pJA->GetFinalCommand());
+        pPCC_IO->SendCommand();
+
+        goToState(BCI_STANDBY);
+        break;
     }
-
-    cerr << "ERROR! BCI Lost Connection!" << endl;
 }
 
 //Slots
 void C_BCI_Package::onEEGDataProcessed(C_EEG_Data &eegData)
 {
-    //If we're not in standby, then just ignore the EEG
-    if (bciState == BCI_STANDBY)
-    {
-        bciState = BCI_PROCESSING;
-    }
+    //Go Process the Command
+    goToState(BCI_PROCESSING);
 }
 
 void C_BCI_Package::onRemoteCmdReceived(PCC_Command_Type& cmd)
@@ -275,7 +264,7 @@ void C_BCI_Package::onRemoteCmdReceived(PCC_Command_Type& cmd)
     //Update TM with the command, then let the
     //Judgment Algorithm take care of the rest
     pTelemetryManager->updateTM();
-    bciState = BCI_PROCESSING;
+    goToState(BCI_PROCESSING);
 }
 
 void C_BCI_Package::onEmergencyStopRequested()
@@ -285,12 +274,25 @@ void C_BCI_Package::onEmergencyStopRequested()
     pPCC_IO->SendCommand();
 }
 
-//Relax in BCI_Package Standby
-void C_BCI_Package::standby( int millisecondsToWait )
+//Begin EEG and BRS IO Tasks
+void C_BCI_Package::startThreads()
 {
-    QTime dieTime = QTime::currentTime().addMSecs( millisecondsToWait );
-    while( QTime::currentTime() < dieTime )
-    {
-        QCoreApplication::processEvents( QEventLoop::AllEvents, 100 );
-    }
+    pEEG_IO->start();
+    pBRS_IO->start();
 }
+
+void C_BCI_Package::goToState(BCIState state)
+{
+    bciState = state;
+    Run();
+}
+
+////Relax in BCI_Package Standby
+//void C_BCI_Package::standby( int millisecondsToWait )
+//{
+//    QTime dieTime = QTime::currentTime().addMSecs( millisecondsToWait );
+//    while( QTime::currentTime() < dieTime )
+//    {
+//        QCoreApplication::processEvents( QEventLoop::AllEvents, 100 );
+//    }
+//}

@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_C_BRSH_IO_t {
-    QByteArrayData data[9];
-    char stringdata[116];
+    QByteArrayData data[14];
+    char stringdata[167];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -30,18 +30,25 @@ struct qt_meta_stringdata_C_BRSH_IO_t {
 static const qt_meta_stringdata_C_BRSH_IO_t qt_meta_stringdata_C_BRSH_IO = {
     {
 QT_MOC_LITERAL(0, 0, 9),
-QT_MOC_LITERAL(1, 10, 15),
-QT_MOC_LITERAL(2, 26, 0),
-QT_MOC_LITERAL(3, 27, 12),
-QT_MOC_LITERAL(4, 40, 7),
-QT_MOC_LITERAL(5, 48, 21),
-QT_MOC_LITERAL(6, 70, 17),
-QT_MOC_LITERAL(7, 88, 3),
-QT_MOC_LITERAL(8, 92, 22)
+QT_MOC_LITERAL(1, 10, 16),
+QT_MOC_LITERAL(2, 27, 0),
+QT_MOC_LITERAL(3, 28, 12),
+QT_MOC_LITERAL(4, 41, 8),
+QT_MOC_LITERAL(5, 50, 21),
+QT_MOC_LITERAL(6, 72, 17),
+QT_MOC_LITERAL(7, 90, 3),
+QT_MOC_LITERAL(8, 94, 20),
+QT_MOC_LITERAL(9, 115, 5),
+QT_MOC_LITERAL(10, 121, 13),
+QT_MOC_LITERAL(11, 135, 11),
+QT_MOC_LITERAL(12, 147, 11),
+QT_MOC_LITERAL(13, 159, 6)
     },
-    "C_BRSH_IO\0BRSDataReceived\0\0BRS_Frame_t&\0"
-    "brsData\0remoteCommandReceived\0"
-    "PCC_Command_Type&\0cmd\0EmergencyStopRequested\0"
+    "C_BRSH_IO\0BRSFrameReceived\0\0BRS_Frame_t*\0"
+    "brsFrame\0remoteCommandReceived\0"
+    "PCC_Command_Type&\0cmd\0RequestEmergencyStop\0"
+    "start\0fetchBRSFrame\0SendTMFrame\0"
+    "TM_Frame_t*\0pFrame\0"
 };
 #undef QT_MOC_LITERAL
 
@@ -51,7 +58,7 @@ static const uint qt_meta_data_C_BRSH_IO[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-       3,   14, // methods
+       6,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -59,14 +66,24 @@ static const uint qt_meta_data_C_BRSH_IO[] = {
        3,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
-       1,    1,   29,    2, 0x06,
-       5,    1,   32,    2, 0x06,
-       8,    0,   35,    2, 0x06,
+       1,    1,   44,    2, 0x06,
+       5,    1,   47,    2, 0x06,
+       8,    0,   50,    2, 0x06,
+
+ // slots: name, argc, parameters, tag, flags
+       9,    0,   51,    2, 0x0a,
+      10,    0,   52,    2, 0x0a,
+      11,    1,   53,    2, 0x0a,
 
  // signals: parameters
     QMetaType::Void, 0x80000000 | 3,    4,
     QMetaType::Void, 0x80000000 | 6,    7,
     QMetaType::Void,
+
+ // slots: parameters
+    QMetaType::Void,
+    QMetaType::Bool,
+    QMetaType::Void, 0x80000000 | 12,   13,
 
        0        // eod
 };
@@ -76,17 +93,21 @@ void C_BRSH_IO::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, v
     if (_c == QMetaObject::InvokeMetaMethod) {
         C_BRSH_IO *_t = static_cast<C_BRSH_IO *>(_o);
         switch (_id) {
-        case 0: _t->BRSDataReceived((*reinterpret_cast< BRS_Frame_t(*)>(_a[1]))); break;
+        case 0: _t->BRSFrameReceived((*reinterpret_cast< BRS_Frame_t*(*)>(_a[1]))); break;
         case 1: _t->remoteCommandReceived((*reinterpret_cast< PCC_Command_Type(*)>(_a[1]))); break;
-        case 2: _t->EmergencyStopRequested(); break;
+        case 2: _t->RequestEmergencyStop(); break;
+        case 3: _t->start(); break;
+        case 4: { bool _r = _t->fetchBRSFrame();
+            if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = _r; }  break;
+        case 5: _t->SendTMFrame((*reinterpret_cast< TM_Frame_t*(*)>(_a[1]))); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
         int *result = reinterpret_cast<int *>(_a[0]);
         void **func = reinterpret_cast<void **>(_a[1]);
         {
-            typedef void (C_BRSH_IO::*_t)(BRS_Frame_t & );
-            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&C_BRSH_IO::BRSDataReceived)) {
+            typedef void (C_BRSH_IO::*_t)(BRS_Frame_t * );
+            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&C_BRSH_IO::BRSFrameReceived)) {
                 *result = 0;
             }
         }
@@ -98,7 +119,7 @@ void C_BRSH_IO::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, v
         }
         {
             typedef void (C_BRSH_IO::*_t)();
-            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&C_BRSH_IO::EmergencyStopRequested)) {
+            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&C_BRSH_IO::RequestEmergencyStop)) {
                 *result = 2;
             }
         }
@@ -132,19 +153,19 @@ int C_BRSH_IO::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 3)
+        if (_id < 6)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 3;
+        _id -= 6;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 3)
+        if (_id < 6)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 3;
+        _id -= 6;
     }
     return _id;
 }
 
 // SIGNAL 0
-void C_BRSH_IO::BRSDataReceived(BRS_Frame_t & _t1)
+void C_BRSH_IO::BRSFrameReceived(BRS_Frame_t * _t1)
 {
     void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 0, _a);
@@ -158,7 +179,7 @@ void C_BRSH_IO::remoteCommandReceived(PCC_Command_Type & _t1)
 }
 
 // SIGNAL 2
-void C_BRSH_IO::EmergencyStopRequested()
+void C_BRSH_IO::RequestEmergencyStop()
 {
     QMetaObject::activate(this, &staticMetaObject, 2, 0);
 }

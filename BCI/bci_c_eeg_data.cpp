@@ -34,31 +34,6 @@ EEG_Frame_t* EEG_Frame_t::create()
 {
     return new EEG_Frame_t;
 }
-
-//Easy conversion from Emotiv since thats the default EEG
-EEG_Frame_t* EEG_Frame_t::fromEmotivFrame(struct emokit_frame* emotiv_frame)
-{
-    EEG_Frame_t* frame = EEG_Frame_t::create();
-
-    //Initialize frame from Emotiv Data
-    frame->eegType = EEG_TYPE_EMOTIV;
-    frame->counter = (quint32) emotiv_frame->counter;
-
-    //Electrode Data from Emotiv Frame
-    memcpy((void*) &frame->electrodeData[0], (void*) &emotiv_frame->F3,
-            (size_t) sizeof(int) * NUM_EMOTIV_ELECTRODES);
-
-    //Contact Quality from Emotiv Frame
-    memcpy((void*) &frame->contactQuality[0], (void*) &emotiv_frame->cq,
-            (size_t) sizeof(struct emokit_contact_quality));
-
-    //The rest of the Emotiv Data
-    frame->gyroX = emotiv_frame->gyroX;
-    frame->gyroY = emotiv_frame->gyroY;
-    frame->batteryPercentage = emotiv_frame->battery;
-
-    return frame;
-}
 //===============================================
 
 //===============EEG DATA CLASS==================

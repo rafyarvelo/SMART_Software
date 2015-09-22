@@ -16,18 +16,18 @@ const QString EEG_DATA_OUTPUTFILE_XML = "../debug_files/eeg_output_data.xml";
 class C_XML_Parser : public C_AbstractParser
 {
 public:
-     C_XML_Parser();
+     C_XML_Parser(const QString& filename, ReadOrWrite direction);
     ~C_XML_Parser();
 
     //Read/Write EEG Data
-    virtual C_EEG_Data& readEEGData (const QString& filename = EEG_DATA_INPUTFILE_XML);
-    virtual void writeEEGData(const QString& filename = EEG_DATA_OUTPUTFILE_XML);
-    void writeEEGData(C_EEG_Data& data, const QString& filename = EEG_DATA_OUTPUTFILE_XML);
+    virtual C_EEG_Data& readEEGData ();
+    virtual void writeEEGData();
+    void writeEEGData(C_EEG_Data& data);
 
     //Read/Write BRS Data
-    virtual C_TM& readTMData (const QString& filename = TM_DATA_INPUTFILE_XML);
-    virtual void writeTMData(const QString& filename = TM_DATA_OUTPUTFILE_XML);
-    void writeTMData(C_TM& data, const QString& filename = TM_DATA_OUTPUTFILE_XML);
+    virtual C_TM& readTMData ();
+    virtual void writeTMData();
+    void writeTMData(C_TM& data);
 
 
     //Read Individual Frames

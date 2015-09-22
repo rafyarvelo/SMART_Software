@@ -17,8 +17,9 @@ typedef enum Confidence_Type
     ABSOLUTE
 }Confidence_Type;
 
-class C_JudgmentAlgorithm
+class C_JudgmentAlgorithm : public QObject
 {
+    Q_OBJECT
 public:
 	//The Signal Processing class with deliver the processed data to the JA
 	 C_JudgmentAlgorithm(C_SignalProcessing* signalProcessing);
@@ -29,25 +30,36 @@ public:
 		return new C_JudgmentAlgorithm(signalProcessing);
 	}
 
-    void SetRVS(C_RVS* pRVS);
-    void SetTM (TM_Frame_t* pTMFrame);
+
     PCC_Command_Type GetFinalCommand();
 
     //To be effective, make sure the RVS and TM are set before calling this
-    Confidence_Type computeCommand();
+    void computeCommand();
 
     //Check for an Emergency Stop
     bool SafeToProceed();
 
+public slots:
+    void SetRVS(C_RVS* pRVS);
+    void SetTM (TM_Frame_t* pTMFrame);
+
+signals:
+    void commandReady(PCC_Command_Type& cmd);
+
 private:
-    void ParseEEGData(Confidence_Type& confidence);
+    PCC_Command_Type ParseEEGData();
+    void finalizeCommand(PCC_Command_Type cmd);
 
 	C_SignalProcessing* mSignalProcessingPtr;
     C_RVS*              mRVS_Ptr;
     TM_Frame_t          mCurrentTMFrame;
+
+
     PCC_Command_Type    finalCommand;
     PCC_Command_Type    prevCommand;
-    bool commandSafe; //Just in case user forgets to call computeCommand()
+    Confidence_Type     cmdConfidence;
+
+    bool commandFinalized; //Just in case user forgets to call computeCommand()
 };
 
 #endif // BCI_C_JUDGMENT_ALGORITHM_H

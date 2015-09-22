@@ -2,9 +2,10 @@
 
 C_JudgmentAlgorithm::C_JudgmentAlgorithm(C_SignalProcessing* signalProcessing)
     : mRVS_Ptr(0),
-      commandSafe(false),
+      commandFinalized(false),
       prevCommand(PCC_CMD_NONE),
       finalCommand(PCC_CMD_NONE),
+      cmdConfidence(UNSURE),
       mSignalProcessingPtr(signalProcessing)
 {
 
@@ -28,58 +29,74 @@ void C_JudgmentAlgorithm::SetTM(TM_Frame_t *pTMFrame)
 
 PCC_Command_Type C_JudgmentAlgorithm::GetFinalCommand()
 {
-    if (!commandSafe)
+    if (!commandFinalized)
     {
         computeCommand();
     }
 
-    prevCommand = finalCommand;
-    commandSafe = false; //Make sure we recompute next time
+    prevCommand      = finalCommand;
+    commandFinalized = false; //Make sure we recompute next time
     return finalCommand;
 }
 
 //To be effective, make sure the RVS and TM are set before calling this
-Confidence_Type C_JudgmentAlgorithm::computeCommand()
+void C_JudgmentAlgorithm::computeCommand()
 {
-    Confidence_Type confidence = UNSURE;
-
     //Check for Emergency Stop
     if (!SafeToProceed())
     {
-        finalCommand = PCC_STOP;
-        return confidence = ABSOLUTE;
+        cmdConfidence = ABSOLUTE;
+        finalizeCommand(PCC_STOP);
     }
 
     //Check for Remote Command
-    if (mCurrentTMFrame.brsFrame.remoteCommand != PCC_CMD_NONE)
+    else if (!commandFinalized && mCurrentTMFrame.brsFrame.remoteCommand != PCC_CMD_NONE)
     {
         //Update Final Command with Remote Command
-        finalCommand = mCurrentTMFrame.brsFrame.remoteCommand;
-
-        //Return Confidence Value
-        return confidence = ABSOLUTE;
+        cmdConfidence = ABSOLUTE;
+        finalizeCommand(mCurrentTMFrame.brsFrame.remoteCommand);
     }
 
     //Process EEG Data
-    ParseEEGData(confidence);
-
-    commandSafe = true;
-    return confidence;
+    else
+    {
+        finalizeCommand(ParseEEGData());
+    }
 }
 
 
 //Check if we are requesting an emergency stop
 bool C_JudgmentAlgorithm::SafeToProceed()
 {
-    return (mCurrentTMFrame.brsFrame.usData.rangeToObject <= EMERGENCY_STOP_DISTANCE);
+    return (mCurrentTMFrame.brsFrame.usData.rangeToObject > EMERGENCY_STOP_DISTANCE);
 }
 
 //Parse the EEG Data, Update the Final Command and the Confidence Value
-void C_JudgmentAlgorithm::ParseEEGData(Confidence_Type& confidence)
+PCC_Command_Type C_JudgmentAlgorithm::ParseEEGData()
 {
     //Let's not change the command unless we're sure
-    if (confidence == UNSURE && prevCommand != PCC_CMD_NONE)
+    if (cmdConfidence > UNSURE && prevCommand != PCC_CMD_NONE)
     {
-        finalCommand = prevCommand;
+        return prevCommand;
     }
+
+    else
+    {
+        //LOL
+        if (mSignalProcessingPtr->GetProcessedData().GetFramePtr()->counter % 7 == 0)
+        {
+            return PCC_FORWARD;
+        }
+        else
+        {
+            return PCC_RIGHT;
+        }
+    }
+}
+
+void C_JudgmentAlgorithm::finalizeCommand(PCC_Command_Type cmd)
+{
+    finalCommand      = cmd;
+    commandFinalized  = true;
+    emit commandReady(finalCommand);
 }

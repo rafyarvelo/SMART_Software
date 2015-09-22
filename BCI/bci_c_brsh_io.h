@@ -8,6 +8,7 @@
 #include "bci_c_singleton.h"
 #include "bci_c_connected_device.h"
 #include "bci_c_tm.h"
+#include "bci_c_framegenerator.h"
 
 //Abstract BRS IO Class, essentially just a worker-object
 class C_BRSH_IO : public QObject, public C_ConnectedDevice
@@ -24,21 +25,29 @@ public:
     //Connect to BRSH
     virtual ConnectionStatusType connect() = 0;
 
+    //The Rate we will execute the BRSH IO Task (10 Hz)
+    static const u_int16_t EXECUTION_RATE;
+
 public slots:
+    //Start Getting Data
+    void start();
+
     //Try to Retrieve a Frame, return true and emit BRSFrameReceived() if successful
     virtual bool fetchBRSFrame() = 0;
 
     //Send a Frame to the BRSH
     virtual void SendTMFrame(TM_Frame_t* pFrame) = 0;
 
+
 signals:
     void BRSFrameReceived(BRS_Frame_t* brsFrame);
     void remoteCommandReceived(PCC_Command_Type& cmd);
-    void EmergencyStopRequested();
+    void RequestEmergencyStop();
 
-private:
+protected:
     SMART_DEBUG_LOG* debugLog;
-    BRS_Frame_t currentBRSFrame;
+    BRS_Frame_t      currentBRSFrame;
+    QTimer           timer;
 };
 
 //Class to perform actual thread execution
@@ -48,9 +57,6 @@ public:
     static C_BRSH_IO_Task* Instance(C_BRSH_IO* ptr);
 
     void run();
-
-    //The Rate we will execute the BRSH IO Task (10 Hz)
-    static const u_int16_t EXECUTION_RATE;
 
 private://Private Constructor, Use Singleton Method
     C_BRSH_IO_Task(C_BRSH_IO* pBRSH_IO);

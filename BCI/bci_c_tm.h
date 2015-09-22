@@ -14,7 +14,8 @@
 //Data from the BRSH
 typedef struct BRS_Frame_t
 {
-    GPS_Data_t       gpsData;
+    GPS_Data_t    \
+    gpsData;
     US_Data_t        usData;
     PCC_Command_Type remoteCommand;
 

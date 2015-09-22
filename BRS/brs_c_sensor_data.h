@@ -1,6 +1,8 @@
 #ifndef BRS_SENSOR_DATA_H
 #define BRS_SENSOR_DATA_H
 
+#define MAX_RANGE_TO_OBJECT 6 //Meters
+
 struct GPS_Data_t
 {
     float latitude;

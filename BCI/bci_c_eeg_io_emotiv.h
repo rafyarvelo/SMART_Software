@@ -32,6 +32,9 @@ public:
 	virtual eegTypeEnum  getType(){ return EEG_TYPE_EMOTIV; }
     virtual ConnectionStatusType connect();
 
+    //Easy Conversion from Emokit Frames to EEG Frames
+    EEG_Frame_t* fromEmotivFrame(emokit_frame& frame) { return fromEmotivFrame(&frame); }
+    EEG_Frame_t* fromEmotivFrame(emokit_frame* frame);
 public slots:
     virtual bool fetchEEGFrame();
     void clearEEGData() { eegData.clear(); }

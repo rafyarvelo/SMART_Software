@@ -7,40 +7,35 @@
 
 #include "bci_c_bci_package.h"
 
-void ExtractTelemetry(QString inputfilename="", QString outputfilename="");
-
 int main(int argc, char **argv)
 {
-    QCoreApplication a(argc, argv);
-    C_BCI_Package* pBCIPackage = C_BCI_Package::Instance();
+//     QCoreApplication a(argc, argv);
+//     C_BCI_Package* pBCIPackage = C_BCI_Package::Instance();
 
-    //Lets Go!
-    //pBCIPackage->Run();
+//    //Lets Go!
+//    pBCIPackage->Run();
 
-    ExtractTelemetry();
+//    return a.exec();
 
-    return 0;
-}
 
-void ExtractTelemetry(QString inputfilename, QString outputfilename)
-{
-    QString DEFAULT_OUTPUT_NAME = QString("../debug_files/extracted_telemetry.txt");
-    QString DEFAULT_INPUT_NAME  = TM_DATA_OUTPUTFILE_BIN;
-    C_BinaryParser binaryParser;
-    C_TextParser   textParser;
-    C_TM           tmData;
+    QString in("../debug_files/TEST.bin");
+    QString out("../debug_files/TEST_OUT.txt");
+    C_BinaryParser binaryParser(in, WRITE);
+    C_BinaryParser bin(in, READ);
+    C_TextParser   textParser(out, WRITE);
 
-    //Get input/output filename from command line or use default
-    if (inputfilename == "" || outputfilename == "")
+    C_TM tmData;
+    int i;
+
+    for (i = 0; i < 10; i++)
     {
-        inputfilename  = DEFAULT_INPUT_NAME;
-        outputfilename = DEFAULT_OUTPUT_NAME;
+        tmData.addFrame(TM_Frame_t::createFrame());
     }
 
-    //Parse through binary input data
-    binaryParser.SetTMInputFilename(inputfilename);
-    binaryParser.readTMData(inputfilename);
+    for(i = 0; i < tmData.size(); i++)
+    {
+        binaryParser.writeTMFrame(tmData.GetFrame(i));
+    }
 
-    //Output TM Data to a file
-    textParser.writeTMData(tmData, outputfilename);
+    textParser.writeTMData(tmData);
 }

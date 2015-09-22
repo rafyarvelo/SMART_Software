@@ -66,17 +66,20 @@ SOURCES       = ../BCI/bci_c_bci_package.cpp \
 		../BCI/bci_c_pcc_io_serial.cpp \
 		../BCI/bci_c_pcc_io_debug.cpp \
 		../BCI/bci_c_brsh_io.cpp \
-		../BCI/bci_c_eeg_io.cpp moc_bci_c_bci_package.cpp \
+		../BCI/bci_c_eeg_io.cpp \
+		../BCI/bci_c_framegenerator.cpp moc_bci_c_bci_package.cpp \
 		moc_bci_c_eeg_io.cpp \
 		moc_bci_c_eeg_io_debug.cpp \
 		moc_bci_c_eeg_io_emotiv.cpp \
 		moc_bci_c_eeg_io_nautilus.cpp \
+		moc_bci_c_judgment_algorithm.cpp \
 		moc_bci_c_serial_comm.cpp \
 		moc_bci_c_signal_processing.cpp \
 		moc_bci_c_brsh_io.cpp \
 		moc_bci_c_eeg_data.cpp \
 		moc_bci_c_telemetrymanager.cpp \
-		moc_bci_c_brsh_io_debug.cpp
+		moc_bci_c_brsh_io_debug.cpp \
+		moc_bci_c_pcc_io.cpp
 OBJECTS       = bci_c_bci_package.o \
 		bci_c_eeg_io_debug.o \
 		bci_c_flasher_io.o \
@@ -99,17 +102,20 @@ OBJECTS       = bci_c_bci_package.o \
 		bci_c_pcc_io_debug.o \
 		bci_c_brsh_io.o \
 		bci_c_eeg_io.o \
+		bci_c_framegenerator.o \
 		moc_bci_c_bci_package.o \
 		moc_bci_c_eeg_io.o \
 		moc_bci_c_eeg_io_debug.o \
 		moc_bci_c_eeg_io_emotiv.o \
 		moc_bci_c_eeg_io_nautilus.o \
+		moc_bci_c_judgment_algorithm.o \
 		moc_bci_c_serial_comm.o \
 		moc_bci_c_signal_processing.o \
 		moc_bci_c_brsh_io.o \
 		moc_bci_c_eeg_data.o \
 		moc_bci_c_telemetrymanager.o \
-		moc_bci_c_brsh_io_debug.o
+		moc_bci_c_brsh_io_debug.o \
+		moc_bci_c_pcc_io.o
 DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/shell-unix.conf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/unix.conf \
@@ -341,7 +347,7 @@ qmake_all: FORCE
 
 dist: 
 	@test -d .tmp/BCI1.0.0 || mkdir -p .tmp/BCI1.0.0
-	$(COPY_FILE) --parents $(SOURCES) $(DIST) .tmp/BCI1.0.0/ && $(COPY_FILE) --parents ../BCI/bci_c_bci_package.h ../BCI/bci_c_eeg_io.h ../BCI/bci_c_eeg_io_debug.h ../BCI/bci_c_eeg_io_emotiv.h ../BCI/bci_c_eeg_io_nautilus.h ../BCI/bci_c_flasher_io.h ../BCI/bci_c_judgment_algorithm.h ../BCI/bci_c_rvs.h ../BCI/bci_c_serial_comm.h ../BCI/bci_c_signal_processing.h ../BCI/bci_c_tm.h ../smart_config.h ../smart_debug_log.h ../PCC/power_chair_command_constants.h ../BCI/bci_c_connected_device.h ../BCI/bci_c_brsh_io.h ../BCI/bci_c_eeg_data.h ../BCI/bci_c_xml_parser.h ../BRS/brs_c_sensor_data.h ../BCI/bci_c_abstract_parser.h ../BCI/bci_c_binary_parser.h ../BCI/bci_c_textparser.h ../BCI/bci_c_telemetrymanager.h ../BCI/bci_c_brsh_io_debug.h ../BCI/bci_c_brsh_io_serial.h ../BCI/bci_c_tm_header_names.h ../BCI/bci_c_pcc_io_serial.h ../BCI/bci_c_pcc_io.h ../BCI/bci_c_pcc_io_debug.h ../BCI/bci_c_singleton.h .tmp/BCI1.0.0/ && $(COPY_FILE) --parents ../BCI/bci_c_bci_package.cpp ../BCI/bci_c_eeg_io_debug.cpp ../BCI/bci_c_flasher_io.cpp ../BCI/bci_c_judgment_algorithm.cpp ../BCI/bci_c_rvs.cpp ../BCI/bci_c_serial_comm.cpp ../BCI/bci_c_signal_processing.cpp ../BCI/bci_main.cpp ../BCI/bci_c_eeg_io_emotiv.cpp ../BCI/bci_c_eeg_data.cpp ../BCI/bci_c_xml_parser.cpp ../BCI/bci_c_tm.cpp ../BCI/bci_c_abstract_parser.cpp ../BCI/bci_c_binary_parser.cpp ../BCI/bci_c_textparser.cpp ../BCI/bci_c_telemetrymanager.cpp ../BCI/bci_c_brsh_io_debug.cpp ../BCI/bci_c_brsh_io_serial.cpp ../BCI/bci_c_pcc_io_serial.cpp ../BCI/bci_c_pcc_io_debug.cpp ../BCI/bci_c_brsh_io.cpp ../BCI/bci_c_eeg_io.cpp .tmp/BCI1.0.0/ && (cd `dirname .tmp/BCI1.0.0` && $(TAR) BCI1.0.0.tar BCI1.0.0 && $(COMPRESS) BCI1.0.0.tar) && $(MOVE) `dirname .tmp/BCI1.0.0`/BCI1.0.0.tar.gz . && $(DEL_FILE) -r .tmp/BCI1.0.0
+	$(COPY_FILE) --parents $(SOURCES) $(DIST) .tmp/BCI1.0.0/ && $(COPY_FILE) --parents ../BCI/bci_c_bci_package.h ../BCI/bci_c_eeg_io.h ../BCI/bci_c_eeg_io_debug.h ../BCI/bci_c_eeg_io_emotiv.h ../BCI/bci_c_eeg_io_nautilus.h ../BCI/bci_c_flasher_io.h ../BCI/bci_c_judgment_algorithm.h ../BCI/bci_c_rvs.h ../BCI/bci_c_serial_comm.h ../BCI/bci_c_signal_processing.h ../BCI/bci_c_tm.h ../smart_config.h ../smart_debug_log.h ../PCC/power_chair_command_constants.h ../BCI/bci_c_connected_device.h ../BCI/bci_c_brsh_io.h ../BCI/bci_c_eeg_data.h ../BCI/bci_c_xml_parser.h ../BRS/brs_c_sensor_data.h ../BCI/bci_c_abstract_parser.h ../BCI/bci_c_binary_parser.h ../BCI/bci_c_textparser.h ../BCI/bci_c_telemetrymanager.h ../BCI/bci_c_brsh_io_debug.h ../BCI/bci_c_brsh_io_serial.h ../BCI/bci_c_tm_header_names.h ../BCI/bci_c_pcc_io_serial.h ../BCI/bci_c_pcc_io.h ../BCI/bci_c_pcc_io_debug.h ../BCI/bci_c_singleton.h ../BCI/bci_c_framegenerator.h .tmp/BCI1.0.0/ && $(COPY_FILE) --parents ../BCI/bci_c_bci_package.cpp ../BCI/bci_c_eeg_io_debug.cpp ../BCI/bci_c_flasher_io.cpp ../BCI/bci_c_judgment_algorithm.cpp ../BCI/bci_c_rvs.cpp ../BCI/bci_c_serial_comm.cpp ../BCI/bci_c_signal_processing.cpp ../BCI/bci_main.cpp ../BCI/bci_c_eeg_io_emotiv.cpp ../BCI/bci_c_eeg_data.cpp ../BCI/bci_c_xml_parser.cpp ../BCI/bci_c_tm.cpp ../BCI/bci_c_abstract_parser.cpp ../BCI/bci_c_binary_parser.cpp ../BCI/bci_c_textparser.cpp ../BCI/bci_c_telemetrymanager.cpp ../BCI/bci_c_brsh_io_debug.cpp ../BCI/bci_c_brsh_io_serial.cpp ../BCI/bci_c_pcc_io_serial.cpp ../BCI/bci_c_pcc_io_debug.cpp ../BCI/bci_c_brsh_io.cpp ../BCI/bci_c_eeg_io.cpp ../BCI/bci_c_framegenerator.cpp .tmp/BCI1.0.0/ && (cd `dirname .tmp/BCI1.0.0` && $(TAR) BCI1.0.0.tar BCI1.0.0 && $(COMPRESS) BCI1.0.0.tar) && $(MOVE) `dirname .tmp/BCI1.0.0`/BCI1.0.0.tar.gz . && $(DEL_FILE) -r .tmp/BCI1.0.0
 
 
 clean:compiler_clean 
@@ -364,9 +370,9 @@ check: first
 
 compiler_rcc_make_all:
 compiler_rcc_clean:
-compiler_moc_header_make_all: moc_bci_c_bci_package.cpp moc_bci_c_eeg_io.cpp moc_bci_c_eeg_io_debug.cpp moc_bci_c_eeg_io_emotiv.cpp moc_bci_c_eeg_io_nautilus.cpp moc_bci_c_serial_comm.cpp moc_bci_c_signal_processing.cpp moc_bci_c_brsh_io.cpp moc_bci_c_eeg_data.cpp moc_bci_c_telemetrymanager.cpp moc_bci_c_brsh_io_debug.cpp
+compiler_moc_header_make_all: moc_bci_c_bci_package.cpp moc_bci_c_eeg_io.cpp moc_bci_c_eeg_io_debug.cpp moc_bci_c_eeg_io_emotiv.cpp moc_bci_c_eeg_io_nautilus.cpp moc_bci_c_judgment_algorithm.cpp moc_bci_c_serial_comm.cpp moc_bci_c_signal_processing.cpp moc_bci_c_brsh_io.cpp moc_bci_c_eeg_data.cpp moc_bci_c_telemetrymanager.cpp moc_bci_c_brsh_io_debug.cpp moc_bci_c_pcc_io.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_bci_c_bci_package.cpp moc_bci_c_eeg_io.cpp moc_bci_c_eeg_io_debug.cpp moc_bci_c_eeg_io_emotiv.cpp moc_bci_c_eeg_io_nautilus.cpp moc_bci_c_serial_comm.cpp moc_bci_c_signal_processing.cpp moc_bci_c_brsh_io.cpp moc_bci_c_eeg_data.cpp moc_bci_c_telemetrymanager.cpp moc_bci_c_brsh_io_debug.cpp
+	-$(DEL_FILE) moc_bci_c_bci_package.cpp moc_bci_c_eeg_io.cpp moc_bci_c_eeg_io_debug.cpp moc_bci_c_eeg_io_emotiv.cpp moc_bci_c_eeg_io_nautilus.cpp moc_bci_c_judgment_algorithm.cpp moc_bci_c_serial_comm.cpp moc_bci_c_signal_processing.cpp moc_bci_c_brsh_io.cpp moc_bci_c_eeg_data.cpp moc_bci_c_telemetrymanager.cpp moc_bci_c_brsh_io_debug.cpp moc_bci_c_pcc_io.cpp
 moc_bci_c_bci_package.cpp: /usr/include/qt5/QtCore/QTime \
 		/usr/include/qt5/QtCore/qdatetime.h \
 		/usr/include/qt5/QtCore/qstring.h \
@@ -590,18 +596,19 @@ moc_bci_c_bci_package.cpp: /usr/include/qt5/QtCore/QTime \
 		/usr/include/qt5/QtCore/QTimer \
 		../BCI/bci_c_eeg_data.h \
 		/usr/include/qt5/QtCore/QList \
-		../emokit/include/emokit/emokit.h \
-		/usr/include/stdint.h \
 		../BCI/bci_c_eeg_io_debug.h \
-		../BCI/bci_c_eeg_io_emotiv.h \
-		/usr/include/signal.h \
-		/usr/include/time.h \
-		../BCI/bci_c_eeg_io_nautilus.h \
-		../BCI/bci_c_brsh_io_serial.h \
-		../BCI/bci_c_brsh_io.h \
+		../BCI/bci_c_framegenerator.h \
 		../BCI/bci_c_tm.h \
 		../PCC/power_chair_command_constants.h \
 		../BRS/brs_c_sensor_data.h \
+		../BCI/bci_c_eeg_io_emotiv.h \
+		/usr/include/signal.h \
+		/usr/include/time.h \
+		../emokit/include/emokit/emokit.h \
+		/usr/include/stdint.h \
+		../BCI/bci_c_eeg_io_nautilus.h \
+		../BCI/bci_c_brsh_io_serial.h \
+		../BCI/bci_c_brsh_io.h \
 		../BCI/bci_c_serial_comm.h \
 		/usr/include/qt5/QtCore/QFile \
 		/usr/include/qt5/QtCore/QTextStream \
@@ -710,8 +717,6 @@ moc_bci_c_eeg_io.cpp: /usr/include/qt5/QtCore/QThread \
 		../BCI/bci_c_eeg_data.h \
 		/usr/include/qt5/QtCore/QObject \
 		/usr/include/qt5/QtCore/QList \
-		../emokit/include/emokit/emokit.h \
-		/usr/include/stdint.h \
 		../BCI/bci_c_eeg_io.h
 	/usr/lib/x86_64-linux-gnu/qt5/bin/moc $(DEFINES) $(INCPATH) -I/usr/include/c++/4.8 -I/usr/include/x86_64-linux-gnu/c++/4.8 -I/usr/include/c++/4.8/backward -I/usr/lib/gcc/x86_64-linux-gnu/4.8/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ../BCI/bci_c_eeg_io.h -o moc_bci_c_eeg_io.cpp
 
@@ -800,8 +805,18 @@ moc_bci_c_eeg_io_debug.cpp: ../BCI/bci_c_eeg_io.h \
 		../BCI/bci_c_eeg_data.h \
 		/usr/include/qt5/QtCore/QObject \
 		/usr/include/qt5/QtCore/QList \
-		../emokit/include/emokit/emokit.h \
-		/usr/include/stdint.h \
+		../BCI/bci_c_framegenerator.h \
+		../BCI/bci_c_tm.h \
+		../PCC/power_chair_command_constants.h \
+		../BRS/brs_c_sensor_data.h \
+		../BCI/bci_c_rvs.h \
+		/usr/include/qt5/QtCore/QTime \
+		/usr/include/qt5/QtCore/qdatetime.h \
+		/usr/include/qt5/QtCore/qsharedpointer.h \
+		/usr/include/qt5/QtCore/qshareddata.h \
+		/usr/include/qt5/QtCore/qsharedpointer_impl.h \
+		/usr/include/qt5/QtCore/qhash.h \
+		/usr/include/qt5/QtCore/qpair.h \
 		../BCI/bci_c_eeg_io_debug.h
 	/usr/lib/x86_64-linux-gnu/qt5/bin/moc $(DEFINES) $(INCPATH) -I/usr/include/c++/4.8 -I/usr/include/x86_64-linux-gnu/c++/4.8 -I/usr/include/c++/4.8/backward -I/usr/lib/gcc/x86_64-linux-gnu/4.8/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ../BCI/bci_c_eeg_io_debug.h -o moc_bci_c_eeg_io_debug.cpp
 
@@ -982,10 +997,101 @@ moc_bci_c_eeg_io_nautilus.cpp: ../BCI/bci_c_eeg_io.h \
 		../BCI/bci_c_eeg_data.h \
 		/usr/include/qt5/QtCore/QObject \
 		/usr/include/qt5/QtCore/QList \
-		../emokit/include/emokit/emokit.h \
-		/usr/include/stdint.h \
 		../BCI/bci_c_eeg_io_nautilus.h
 	/usr/lib/x86_64-linux-gnu/qt5/bin/moc $(DEFINES) $(INCPATH) -I/usr/include/c++/4.8 -I/usr/include/x86_64-linux-gnu/c++/4.8 -I/usr/include/c++/4.8/backward -I/usr/lib/gcc/x86_64-linux-gnu/4.8/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ../BCI/bci_c_eeg_io_nautilus.h -o moc_bci_c_eeg_io_nautilus.cpp
+
+moc_bci_c_judgment_algorithm.cpp: ../PCC/power_chair_command_constants.h \
+		../smart_config.h \
+		/usr/include/stdio.h \
+		/usr/include/features.h \
+		/usr/include/stdc-predef.h \
+		/usr/include/libio.h \
+		/usr/include/_G_config.h \
+		/usr/include/wchar.h \
+		/usr/include/wctype.h \
+		/usr/include/endian.h \
+		/usr/include/xlocale.h \
+		/usr/include/gconv.h \
+		/usr/include/getopt.h \
+		/usr/include/ctype.h \
+		/usr/include/stdlib.h \
+		/usr/include/alloca.h \
+		../smart_debug_log.h \
+		../BCI/bci_c_singleton.h \
+		../BCI/bci_c_signal_processing.h \
+		../BCI/bci_c_eeg_io.h \
+		/usr/include/qt5/QtCore/QThread \
+		/usr/include/qt5/QtCore/qthread.h \
+		/usr/include/qt5/QtCore/qobject.h \
+		/usr/include/qt5/QtCore/qobjectdefs.h \
+		/usr/include/qt5/QtCore/qnamespace.h \
+		/usr/include/qt5/QtCore/qglobal.h \
+		/usr/include/qt5/QtCore/qconfig.h \
+		/usr/include/qt5/QtCore/qfeatures.h \
+		/usr/include/qt5/QtCore/qsystemdetection.h \
+		/usr/include/qt5/QtCore/qprocessordetection.h \
+		/usr/include/qt5/QtCore/qcompilerdetection.h \
+		/usr/include/qt5/QtCore/qglobalstatic.h \
+		/usr/include/qt5/QtCore/qatomic.h \
+		/usr/include/qt5/QtCore/qbasicatomic.h \
+		/usr/include/qt5/QtCore/qatomic_bootstrap.h \
+		/usr/include/qt5/QtCore/qgenericatomic.h \
+		/usr/include/qt5/QtCore/qatomic_msvc.h \
+		/usr/include/qt5/QtCore/qatomic_integrity.h \
+		/usr/include/qt5/QtCore/qoldbasicatomic.h \
+		/usr/include/qt5/QtCore/qatomic_vxworks.h \
+		/usr/include/qt5/QtCore/qatomic_power.h \
+		/usr/include/qt5/QtCore/qatomic_alpha.h \
+		/usr/include/qt5/QtCore/qatomic_armv7.h \
+		/usr/include/qt5/QtCore/qatomic_armv6.h \
+		/usr/include/qt5/QtCore/qatomic_armv5.h \
+		/usr/include/qt5/QtCore/qatomic_bfin.h \
+		/usr/include/qt5/QtCore/qatomic_ia64.h \
+		/usr/include/qt5/QtCore/qatomic_mips.h \
+		/usr/include/qt5/QtCore/qatomic_s390.h \
+		/usr/include/qt5/QtCore/qatomic_sh4a.h \
+		/usr/include/qt5/QtCore/qatomic_sparc.h \
+		/usr/include/qt5/QtCore/qatomic_gcc.h \
+		/usr/include/qt5/QtCore/qatomic_x86.h \
+		/usr/include/qt5/QtCore/qatomic_cxx11.h \
+		/usr/include/qt5/QtCore/qatomic_unix.h \
+		/usr/include/qt5/QtCore/qmutex.h \
+		/usr/include/qt5/QtCore/qlogging.h \
+		/usr/include/qt5/QtCore/qflags.h \
+		/usr/include/qt5/QtCore/qtypeinfo.h \
+		/usr/include/qt5/QtCore/qtypetraits.h \
+		/usr/include/qt5/QtCore/qsysinfo.h \
+		/usr/include/qt5/QtCore/qobjectdefs_impl.h \
+		/usr/include/qt5/QtCore/qstring.h \
+		/usr/include/qt5/QtCore/qchar.h \
+		/usr/include/qt5/QtCore/qbytearray.h \
+		/usr/include/qt5/QtCore/qrefcount.h \
+		/usr/include/qt5/QtCore/qarraydata.h \
+		/usr/include/string.h \
+		/usr/include/qt5/QtCore/qstringbuilder.h \
+		/usr/include/qt5/QtCore/qlist.h \
+		/usr/include/qt5/QtCore/qalgorithms.h \
+		/usr/include/qt5/QtCore/qiterator.h \
+		/usr/include/limits.h \
+		/usr/include/qt5/QtCore/qcoreevent.h \
+		/usr/include/qt5/QtCore/qscopedpointer.h \
+		/usr/include/qt5/QtCore/qmetatype.h \
+		/usr/include/qt5/QtCore/qvarlengtharray.h \
+		/usr/include/qt5/QtCore/qcontainerfwd.h \
+		/usr/include/qt5/QtCore/qisenum.h \
+		/usr/include/qt5/QtCore/qobject_impl.h \
+		/usr/include/qt5/QtCore/QTimer \
+		/usr/include/qt5/QtCore/qtimer.h \
+		/usr/include/qt5/QtCore/qbasictimer.h \
+		../BCI/bci_c_connected_device.h \
+		../BCI/bci_c_eeg_data.h \
+		/usr/include/qt5/QtCore/QObject \
+		/usr/include/qt5/QtCore/QList \
+		../BCI/bci_c_rvs.h \
+		../BCI/bci_c_tm.h \
+		../BRS/brs_c_sensor_data.h \
+		../BCI/bci_c_judgment_algorithm.h
+	/usr/lib/x86_64-linux-gnu/qt5/bin/moc $(DEFINES) $(INCPATH) -I/usr/include/c++/4.8 -I/usr/include/x86_64-linux-gnu/c++/4.8 -I/usr/include/c++/4.8/backward -I/usr/lib/gcc/x86_64-linux-gnu/4.8/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ../BCI/bci_c_judgment_algorithm.h -o moc_bci_c_judgment_algorithm.cpp
 
 moc_bci_c_serial_comm.cpp: ../smart_config.h \
 		/usr/include/stdio.h \
@@ -1177,8 +1283,6 @@ moc_bci_c_signal_processing.cpp: ../smart_config.h \
 		../BCI/bci_c_eeg_data.h \
 		/usr/include/qt5/QtCore/QObject \
 		/usr/include/qt5/QtCore/QList \
-		../emokit/include/emokit/emokit.h \
-		/usr/include/stdint.h \
 		../BCI/bci_c_signal_processing.h
 	/usr/lib/x86_64-linux-gnu/qt5/bin/moc $(DEFINES) $(INCPATH) -I/usr/include/c++/4.8 -I/usr/include/x86_64-linux-gnu/c++/4.8 -I/usr/include/c++/4.8/backward -I/usr/lib/gcc/x86_64-linux-gnu/4.8/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ../BCI/bci_c_signal_processing.h -o moc_bci_c_signal_processing.cpp
 
@@ -1269,9 +1373,15 @@ moc_bci_c_brsh_io.cpp: /usr/include/qt5/QtCore/QThread \
 		../BRS/brs_c_sensor_data.h \
 		../BCI/bci_c_eeg_data.h \
 		/usr/include/qt5/QtCore/QObject \
-		../emokit/include/emokit/emokit.h \
-		/usr/include/stdint.h \
 		../BCI/bci_c_rvs.h \
+		../BCI/bci_c_framegenerator.h \
+		/usr/include/qt5/QtCore/QTime \
+		/usr/include/qt5/QtCore/qdatetime.h \
+		/usr/include/qt5/QtCore/qsharedpointer.h \
+		/usr/include/qt5/QtCore/qshareddata.h \
+		/usr/include/qt5/QtCore/qsharedpointer_impl.h \
+		/usr/include/qt5/QtCore/qhash.h \
+		/usr/include/qt5/QtCore/qpair.h \
 		../BCI/bci_c_brsh_io.h
 	/usr/lib/x86_64-linux-gnu/qt5/bin/moc $(DEFINES) $(INCPATH) -I/usr/include/c++/4.8 -I/usr/include/x86_64-linux-gnu/c++/4.8 -I/usr/include/c++/4.8/backward -I/usr/lib/gcc/x86_64-linux-gnu/4.8/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ../BCI/bci_c_brsh_io.h -o moc_bci_c_brsh_io.cpp
 
@@ -1350,8 +1460,6 @@ moc_bci_c_eeg_data.cpp: /usr/include/qt5/QtCore/QObject \
 		/usr/include/gconv.h \
 		/usr/include/getopt.h \
 		/usr/include/ctype.h \
-		../emokit/include/emokit/emokit.h \
-		/usr/include/stdint.h \
 		../BCI/bci_c_eeg_data.h
 	/usr/lib/x86_64-linux-gnu/qt5/bin/moc $(DEFINES) $(INCPATH) -I/usr/include/c++/4.8 -I/usr/include/x86_64-linux-gnu/c++/4.8 -I/usr/include/c++/4.8/backward -I/usr/lib/gcc/x86_64-linux-gnu/4.8/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ../BCI/bci_c_eeg_data.h -o moc_bci_c_eeg_data.cpp
 
@@ -1579,18 +1687,19 @@ moc_bci_c_telemetrymanager.cpp: ../BCI/bci_c_bci_package.h \
 		/usr/include/qt5/QtCore/QTimer \
 		../BCI/bci_c_eeg_data.h \
 		/usr/include/qt5/QtCore/QList \
-		../emokit/include/emokit/emokit.h \
-		/usr/include/stdint.h \
 		../BCI/bci_c_eeg_io_debug.h \
-		../BCI/bci_c_eeg_io_emotiv.h \
-		/usr/include/signal.h \
-		/usr/include/time.h \
-		../BCI/bci_c_eeg_io_nautilus.h \
-		../BCI/bci_c_brsh_io_serial.h \
-		../BCI/bci_c_brsh_io.h \
+		../BCI/bci_c_framegenerator.h \
 		../BCI/bci_c_tm.h \
 		../PCC/power_chair_command_constants.h \
 		../BRS/brs_c_sensor_data.h \
+		../BCI/bci_c_eeg_io_emotiv.h \
+		/usr/include/signal.h \
+		/usr/include/time.h \
+		../emokit/include/emokit/emokit.h \
+		/usr/include/stdint.h \
+		../BCI/bci_c_eeg_io_nautilus.h \
+		../BCI/bci_c_brsh_io_serial.h \
+		../BCI/bci_c_brsh_io.h \
 		../BCI/bci_c_serial_comm.h \
 		/usr/include/qt5/QtCore/QFile \
 		/usr/include/qt5/QtCore/QTextStream \
@@ -1702,11 +1811,98 @@ moc_bci_c_brsh_io_debug.cpp: ../BCI/bci_c_brsh_io.h \
 		../BRS/brs_c_sensor_data.h \
 		../BCI/bci_c_eeg_data.h \
 		/usr/include/qt5/QtCore/QObject \
-		../emokit/include/emokit/emokit.h \
-		/usr/include/stdint.h \
 		../BCI/bci_c_rvs.h \
+		../BCI/bci_c_framegenerator.h \
+		/usr/include/qt5/QtCore/QTime \
+		/usr/include/qt5/QtCore/qdatetime.h \
+		/usr/include/qt5/QtCore/qsharedpointer.h \
+		/usr/include/qt5/QtCore/qshareddata.h \
+		/usr/include/qt5/QtCore/qsharedpointer_impl.h \
+		/usr/include/qt5/QtCore/qhash.h \
+		/usr/include/qt5/QtCore/qpair.h \
 		../BCI/bci_c_brsh_io_debug.h
 	/usr/lib/x86_64-linux-gnu/qt5/bin/moc $(DEFINES) $(INCPATH) -I/usr/include/c++/4.8 -I/usr/include/x86_64-linux-gnu/c++/4.8 -I/usr/include/c++/4.8/backward -I/usr/lib/gcc/x86_64-linux-gnu/4.8/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ../BCI/bci_c_brsh_io_debug.h -o moc_bci_c_brsh_io_debug.cpp
+
+moc_bci_c_pcc_io.cpp: /usr/include/qt5/QtCore/QObject \
+		/usr/include/qt5/QtCore/qobject.h \
+		/usr/include/qt5/QtCore/qobjectdefs.h \
+		/usr/include/qt5/QtCore/qnamespace.h \
+		/usr/include/qt5/QtCore/qglobal.h \
+		/usr/include/qt5/QtCore/qconfig.h \
+		/usr/include/qt5/QtCore/qfeatures.h \
+		/usr/include/qt5/QtCore/qsystemdetection.h \
+		/usr/include/qt5/QtCore/qprocessordetection.h \
+		/usr/include/qt5/QtCore/qcompilerdetection.h \
+		/usr/include/qt5/QtCore/qglobalstatic.h \
+		/usr/include/qt5/QtCore/qatomic.h \
+		/usr/include/qt5/QtCore/qbasicatomic.h \
+		/usr/include/qt5/QtCore/qatomic_bootstrap.h \
+		/usr/include/qt5/QtCore/qgenericatomic.h \
+		/usr/include/qt5/QtCore/qatomic_msvc.h \
+		/usr/include/qt5/QtCore/qatomic_integrity.h \
+		/usr/include/qt5/QtCore/qoldbasicatomic.h \
+		/usr/include/qt5/QtCore/qatomic_vxworks.h \
+		/usr/include/qt5/QtCore/qatomic_power.h \
+		/usr/include/qt5/QtCore/qatomic_alpha.h \
+		/usr/include/qt5/QtCore/qatomic_armv7.h \
+		/usr/include/qt5/QtCore/qatomic_armv6.h \
+		/usr/include/qt5/QtCore/qatomic_armv5.h \
+		/usr/include/qt5/QtCore/qatomic_bfin.h \
+		/usr/include/qt5/QtCore/qatomic_ia64.h \
+		/usr/include/qt5/QtCore/qatomic_mips.h \
+		/usr/include/qt5/QtCore/qatomic_s390.h \
+		/usr/include/qt5/QtCore/qatomic_sh4a.h \
+		/usr/include/qt5/QtCore/qatomic_sparc.h \
+		/usr/include/qt5/QtCore/qatomic_gcc.h \
+		/usr/include/qt5/QtCore/qatomic_x86.h \
+		/usr/include/qt5/QtCore/qatomic_cxx11.h \
+		/usr/include/qt5/QtCore/qatomic_unix.h \
+		/usr/include/qt5/QtCore/qmutex.h \
+		/usr/include/qt5/QtCore/qlogging.h \
+		/usr/include/qt5/QtCore/qflags.h \
+		/usr/include/qt5/QtCore/qtypeinfo.h \
+		/usr/include/qt5/QtCore/qtypetraits.h \
+		/usr/include/qt5/QtCore/qsysinfo.h \
+		/usr/include/qt5/QtCore/qobjectdefs_impl.h \
+		/usr/include/qt5/QtCore/qstring.h \
+		/usr/include/qt5/QtCore/qchar.h \
+		/usr/include/qt5/QtCore/qbytearray.h \
+		/usr/include/qt5/QtCore/qrefcount.h \
+		/usr/include/qt5/QtCore/qarraydata.h \
+		/usr/include/string.h \
+		/usr/include/features.h \
+		/usr/include/stdc-predef.h \
+		/usr/include/xlocale.h \
+		/usr/include/stdlib.h \
+		/usr/include/alloca.h \
+		/usr/include/qt5/QtCore/qstringbuilder.h \
+		/usr/include/qt5/QtCore/qlist.h \
+		/usr/include/qt5/QtCore/qalgorithms.h \
+		/usr/include/qt5/QtCore/qiterator.h \
+		/usr/include/limits.h \
+		/usr/include/qt5/QtCore/qcoreevent.h \
+		/usr/include/qt5/QtCore/qscopedpointer.h \
+		/usr/include/qt5/QtCore/qmetatype.h \
+		/usr/include/qt5/QtCore/qvarlengtharray.h \
+		/usr/include/qt5/QtCore/qcontainerfwd.h \
+		/usr/include/qt5/QtCore/qisenum.h \
+		/usr/include/qt5/QtCore/qobject_impl.h \
+		../PCC/power_chair_command_constants.h \
+		../smart_config.h \
+		/usr/include/stdio.h \
+		/usr/include/libio.h \
+		/usr/include/_G_config.h \
+		/usr/include/wchar.h \
+		/usr/include/wctype.h \
+		/usr/include/endian.h \
+		/usr/include/gconv.h \
+		/usr/include/getopt.h \
+		/usr/include/ctype.h \
+		../BCI/bci_c_connected_device.h \
+		../BCI/bci_c_singleton.h \
+		../smart_debug_log.h \
+		../BCI/bci_c_pcc_io.h
+	/usr/lib/x86_64-linux-gnu/qt5/bin/moc $(DEFINES) $(INCPATH) -I/usr/include/c++/4.8 -I/usr/include/x86_64-linux-gnu/c++/4.8 -I/usr/include/c++/4.8/backward -I/usr/lib/gcc/x86_64-linux-gnu/4.8/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ../BCI/bci_c_pcc_io.h -o moc_bci_c_pcc_io.cpp
 
 compiler_moc_source_make_all:
 compiler_moc_source_clean:
@@ -1944,18 +2140,19 @@ bci_c_bci_package.o: ../BCI/bci_c_bci_package.cpp ../BCI/bci_c_bci_package.h \
 		/usr/include/qt5/QtCore/QTimer \
 		../BCI/bci_c_eeg_data.h \
 		/usr/include/qt5/QtCore/QList \
-		../emokit/include/emokit/emokit.h \
-		/usr/include/stdint.h \
 		../BCI/bci_c_eeg_io_debug.h \
-		../BCI/bci_c_eeg_io_emotiv.h \
-		/usr/include/signal.h \
-		/usr/include/time.h \
-		../BCI/bci_c_eeg_io_nautilus.h \
-		../BCI/bci_c_brsh_io_serial.h \
-		../BCI/bci_c_brsh_io.h \
+		../BCI/bci_c_framegenerator.h \
 		../BCI/bci_c_tm.h \
 		../PCC/power_chair_command_constants.h \
 		../BRS/brs_c_sensor_data.h \
+		../BCI/bci_c_eeg_io_emotiv.h \
+		/usr/include/signal.h \
+		/usr/include/time.h \
+		../emokit/include/emokit/emokit.h \
+		/usr/include/stdint.h \
+		../BCI/bci_c_eeg_io_nautilus.h \
+		../BCI/bci_c_brsh_io_serial.h \
+		../BCI/bci_c_brsh_io.h \
 		../BCI/bci_c_serial_comm.h \
 		/usr/include/qt5/QtCore/QFile \
 		/usr/include/qt5/QtCore/QTextStream \
@@ -2064,8 +2261,18 @@ bci_c_eeg_io_debug.o: ../BCI/bci_c_eeg_io_debug.cpp ../BCI/bci_c_eeg_io_debug.h 
 		../BCI/bci_c_eeg_data.h \
 		/usr/include/qt5/QtCore/QObject \
 		/usr/include/qt5/QtCore/QList \
-		../emokit/include/emokit/emokit.h \
-		/usr/include/stdint.h
+		../BCI/bci_c_framegenerator.h \
+		../BCI/bci_c_tm.h \
+		../PCC/power_chair_command_constants.h \
+		../BRS/brs_c_sensor_data.h \
+		../BCI/bci_c_rvs.h \
+		/usr/include/qt5/QtCore/QTime \
+		/usr/include/qt5/QtCore/qdatetime.h \
+		/usr/include/qt5/QtCore/qsharedpointer.h \
+		/usr/include/qt5/QtCore/qshareddata.h \
+		/usr/include/qt5/QtCore/qsharedpointer_impl.h \
+		/usr/include/qt5/QtCore/qhash.h \
+		/usr/include/qt5/QtCore/qpair.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bci_c_eeg_io_debug.o ../BCI/bci_c_eeg_io_debug.cpp
 
 bci_c_flasher_io.o: ../BCI/bci_c_flasher_io.cpp ../BCI/bci_c_flasher_io.h \
@@ -2178,8 +2385,6 @@ bci_c_judgment_algorithm.o: ../BCI/bci_c_judgment_algorithm.cpp ../BCI/bci_c_jud
 		../BCI/bci_c_eeg_data.h \
 		/usr/include/qt5/QtCore/QObject \
 		/usr/include/qt5/QtCore/QList \
-		../emokit/include/emokit/emokit.h \
-		/usr/include/stdint.h \
 		../BCI/bci_c_rvs.h \
 		../BCI/bci_c_tm.h \
 		../BRS/brs_c_sensor_data.h
@@ -2395,9 +2600,7 @@ bci_c_signal_processing.o: ../BCI/bci_c_signal_processing.cpp ../BCI/bci_c_signa
 		../BCI/bci_c_connected_device.h \
 		../BCI/bci_c_eeg_data.h \
 		/usr/include/qt5/QtCore/QObject \
-		/usr/include/qt5/QtCore/QList \
-		../emokit/include/emokit/emokit.h \
-		/usr/include/stdint.h
+		/usr/include/qt5/QtCore/QList
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bci_c_signal_processing.o ../BCI/bci_c_signal_processing.cpp
 
 bci_main.o: ../BCI/bci_main.cpp ../BCI/bci_c_bci_package.h \
@@ -2624,18 +2827,19 @@ bci_main.o: ../BCI/bci_main.cpp ../BCI/bci_c_bci_package.h \
 		/usr/include/qt5/QtCore/QTimer \
 		../BCI/bci_c_eeg_data.h \
 		/usr/include/qt5/QtCore/QList \
-		../emokit/include/emokit/emokit.h \
-		/usr/include/stdint.h \
 		../BCI/bci_c_eeg_io_debug.h \
-		../BCI/bci_c_eeg_io_emotiv.h \
-		/usr/include/signal.h \
-		/usr/include/time.h \
-		../BCI/bci_c_eeg_io_nautilus.h \
-		../BCI/bci_c_brsh_io_serial.h \
-		../BCI/bci_c_brsh_io.h \
+		../BCI/bci_c_framegenerator.h \
 		../BCI/bci_c_tm.h \
 		../PCC/power_chair_command_constants.h \
 		../BRS/brs_c_sensor_data.h \
+		../BCI/bci_c_eeg_io_emotiv.h \
+		/usr/include/signal.h \
+		/usr/include/time.h \
+		../emokit/include/emokit/emokit.h \
+		/usr/include/stdint.h \
+		../BCI/bci_c_eeg_io_nautilus.h \
+		../BCI/bci_c_brsh_io_serial.h \
+		../BCI/bci_c_brsh_io.h \
 		../BCI/bci_c_serial_comm.h \
 		/usr/include/qt5/QtCore/QFile \
 		/usr/include/qt5/QtCore/QTextStream \
@@ -2825,9 +3029,7 @@ bci_c_eeg_data.o: ../BCI/bci_c_eeg_data.cpp ../BCI/bci_c_eeg_data.h \
 		/usr/include/endian.h \
 		/usr/include/gconv.h \
 		/usr/include/getopt.h \
-		/usr/include/ctype.h \
-		../emokit/include/emokit/emokit.h \
-		/usr/include/stdint.h
+		/usr/include/ctype.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bci_c_eeg_data.o ../BCI/bci_c_eeg_data.cpp
 
 bci_c_xml_parser.o: ../BCI/bci_c_xml_parser.cpp ../BCI/bci_c_xml_parser.h \
@@ -2929,8 +3131,6 @@ bci_c_xml_parser.o: ../BCI/bci_c_xml_parser.cpp ../BCI/bci_c_xml_parser.h \
 		../BRS/brs_c_sensor_data.h \
 		../BCI/bci_c_eeg_data.h \
 		/usr/include/qt5/QtCore/QObject \
-		../emokit/include/emokit/emokit.h \
-		/usr/include/stdint.h \
 		../BCI/bci_c_rvs.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bci_c_xml_parser.o ../BCI/bci_c_xml_parser.cpp
 
@@ -3015,8 +3215,6 @@ bci_c_tm.o: ../BCI/bci_c_tm.cpp ../BCI/bci_c_tm.h \
 		/usr/include/qt5/QtCore/qcontainerfwd.h \
 		/usr/include/qt5/QtCore/qisenum.h \
 		/usr/include/qt5/QtCore/qobject_impl.h \
-		../emokit/include/emokit/emokit.h \
-		/usr/include/stdint.h \
 		../BCI/bci_c_rvs.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bci_c_tm.o ../BCI/bci_c_tm.cpp
 
@@ -3113,8 +3311,6 @@ bci_c_abstract_parser.o: ../BCI/bci_c_abstract_parser.cpp ../BCI/bci_c_abstract_
 		../BRS/brs_c_sensor_data.h \
 		../BCI/bci_c_eeg_data.h \
 		/usr/include/qt5/QtCore/QObject \
-		../emokit/include/emokit/emokit.h \
-		/usr/include/stdint.h \
 		../BCI/bci_c_rvs.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bci_c_abstract_parser.o ../BCI/bci_c_abstract_parser.cpp
 
@@ -3213,8 +3409,6 @@ bci_c_binary_parser.o: ../BCI/bci_c_binary_parser.cpp ../BCI/bci_c_binary_parser
 		../BRS/brs_c_sensor_data.h \
 		../BCI/bci_c_eeg_data.h \
 		/usr/include/qt5/QtCore/QObject \
-		../emokit/include/emokit/emokit.h \
-		/usr/include/stdint.h \
 		../BCI/bci_c_rvs.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bci_c_binary_parser.o ../BCI/bci_c_binary_parser.cpp
 
@@ -3324,8 +3518,6 @@ bci_c_textparser.o: ../BCI/bci_c_textparser.cpp ../BCI/bci_c_textparser.h \
 		../BRS/brs_c_sensor_data.h \
 		../BCI/bci_c_eeg_data.h \
 		/usr/include/qt5/QtCore/QObject \
-		../emokit/include/emokit/emokit.h \
-		/usr/include/stdint.h \
 		../BCI/bci_c_rvs.h \
 		../BCI/bci_c_tm_header_names.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bci_c_textparser.o ../BCI/bci_c_textparser.cpp
@@ -3555,18 +3747,19 @@ bci_c_telemetrymanager.o: ../BCI/bci_c_telemetrymanager.cpp ../BCI/bci_c_telemet
 		/usr/include/qt5/QtCore/QTimer \
 		../BCI/bci_c_eeg_data.h \
 		/usr/include/qt5/QtCore/QList \
-		../emokit/include/emokit/emokit.h \
-		/usr/include/stdint.h \
 		../BCI/bci_c_eeg_io_debug.h \
-		../BCI/bci_c_eeg_io_emotiv.h \
-		/usr/include/signal.h \
-		/usr/include/time.h \
-		../BCI/bci_c_eeg_io_nautilus.h \
-		../BCI/bci_c_brsh_io_serial.h \
-		../BCI/bci_c_brsh_io.h \
+		../BCI/bci_c_framegenerator.h \
 		../BCI/bci_c_tm.h \
 		../PCC/power_chair_command_constants.h \
 		../BRS/brs_c_sensor_data.h \
+		../BCI/bci_c_eeg_io_emotiv.h \
+		/usr/include/signal.h \
+		/usr/include/time.h \
+		../emokit/include/emokit/emokit.h \
+		/usr/include/stdint.h \
+		../BCI/bci_c_eeg_io_nautilus.h \
+		../BCI/bci_c_brsh_io_serial.h \
+		../BCI/bci_c_brsh_io.h \
 		../BCI/bci_c_serial_comm.h \
 		/usr/include/qt5/QtCore/QFile \
 		/usr/include/qt5/QtCore/QTextStream \
@@ -3677,9 +3870,15 @@ bci_c_brsh_io_debug.o: ../BCI/bci_c_brsh_io_debug.cpp ../BCI/bci_c_brsh_io_debug
 		../BRS/brs_c_sensor_data.h \
 		../BCI/bci_c_eeg_data.h \
 		/usr/include/qt5/QtCore/QObject \
-		../emokit/include/emokit/emokit.h \
-		/usr/include/stdint.h \
-		../BCI/bci_c_rvs.h
+		../BCI/bci_c_rvs.h \
+		../BCI/bci_c_framegenerator.h \
+		/usr/include/qt5/QtCore/QTime \
+		/usr/include/qt5/QtCore/qdatetime.h \
+		/usr/include/qt5/QtCore/qsharedpointer.h \
+		/usr/include/qt5/QtCore/qshareddata.h \
+		/usr/include/qt5/QtCore/qsharedpointer_impl.h \
+		/usr/include/qt5/QtCore/qhash.h \
+		/usr/include/qt5/QtCore/qpair.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bci_c_brsh_io_debug.o ../BCI/bci_c_brsh_io_debug.cpp
 
 bci_c_brsh_io_serial.o: ../BCI/bci_c_brsh_io_serial.cpp ../BCI/bci_c_brsh_io_serial.h \
@@ -3771,9 +3970,15 @@ bci_c_brsh_io_serial.o: ../BCI/bci_c_brsh_io_serial.cpp ../BCI/bci_c_brsh_io_ser
 		../BRS/brs_c_sensor_data.h \
 		../BCI/bci_c_eeg_data.h \
 		/usr/include/qt5/QtCore/QObject \
-		../emokit/include/emokit/emokit.h \
-		/usr/include/stdint.h \
 		../BCI/bci_c_rvs.h \
+		../BCI/bci_c_framegenerator.h \
+		/usr/include/qt5/QtCore/QTime \
+		/usr/include/qt5/QtCore/qdatetime.h \
+		/usr/include/qt5/QtCore/qsharedpointer.h \
+		/usr/include/qt5/QtCore/qshareddata.h \
+		/usr/include/qt5/QtCore/qsharedpointer_impl.h \
+		/usr/include/qt5/QtCore/qhash.h \
+		/usr/include/qt5/QtCore/qpair.h \
 		../BCI/bci_c_serial_comm.h \
 		/usr/include/qt5/QtCore/QFile \
 		/usr/include/qt5/QtCore/qfile.h \
@@ -3784,9 +3989,7 @@ bci_c_brsh_io_serial.o: ../BCI/bci_c_brsh_io_serial.cpp ../BCI/bci_c_brsh_io_ser
 		/usr/include/qt5/QtCore/qlocale.h \
 		/usr/include/qt5/QtCore/qvariant.h \
 		/usr/include/qt5/QtCore/qmap.h \
-		/usr/include/qt5/QtCore/qpair.h \
 		/usr/include/qt5/QtCore/qdebug.h \
-		/usr/include/qt5/QtCore/qhash.h \
 		/usr/include/qt5/QtCore/qvector.h \
 		/usr/include/qt5/QtCore/qpoint.h \
 		/usr/include/qt5/QtCore/qset.h \
@@ -3795,7 +3998,6 @@ bci_c_brsh_io_serial.o: ../BCI/bci_c_brsh_io_serial.cpp ../BCI/bci_c_brsh_io_ser
 		/usr/include/qt5/QtCore/qdatastream.h \
 		/usr/include/qt5/QtCore/qregexp.h \
 		/usr/include/qt5/QtCore/qstringmatcher.h \
-		/usr/include/qt5/QtCore/qshareddata.h \
 		/usr/include/qt5/QtCore/QDataStream \
 		/usr/include/qt5/QtExtSerialPort/qextserialport.h \
 		/usr/include/qt5/QtCore/QIODevice \
@@ -3910,27 +4112,87 @@ bci_c_pcc_io_serial.o: ../BCI/bci_c_pcc_io_serial.cpp ../BCI/bci_c_pcc_io_serial
 		/usr/include/qt5/QtCore/QtGlobal \
 		/usr/include/termios.h \
 		../BCI/bci_c_pcc_io.h \
+		/usr/include/qt5/QtCore/QObject \
 		../BCI/bci_c_connected_device.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bci_c_pcc_io_serial.o ../BCI/bci_c_pcc_io_serial.cpp
 
 bci_c_pcc_io_debug.o: ../BCI/bci_c_pcc_io_debug.cpp ../BCI/bci_c_pcc_io_debug.h \
 		../BCI/bci_c_pcc_io.h \
+		/usr/include/qt5/QtCore/QObject \
+		/usr/include/qt5/QtCore/qobject.h \
+		/usr/include/qt5/QtCore/qobjectdefs.h \
+		/usr/include/qt5/QtCore/qnamespace.h \
+		/usr/include/qt5/QtCore/qglobal.h \
+		/usr/include/qt5/QtCore/qconfig.h \
+		/usr/include/qt5/QtCore/qfeatures.h \
+		/usr/include/qt5/QtCore/qsystemdetection.h \
+		/usr/include/qt5/QtCore/qprocessordetection.h \
+		/usr/include/qt5/QtCore/qcompilerdetection.h \
+		/usr/include/qt5/QtCore/qglobalstatic.h \
+		/usr/include/qt5/QtCore/qatomic.h \
+		/usr/include/qt5/QtCore/qbasicatomic.h \
+		/usr/include/qt5/QtCore/qatomic_bootstrap.h \
+		/usr/include/qt5/QtCore/qgenericatomic.h \
+		/usr/include/qt5/QtCore/qatomic_msvc.h \
+		/usr/include/qt5/QtCore/qatomic_integrity.h \
+		/usr/include/qt5/QtCore/qoldbasicatomic.h \
+		/usr/include/qt5/QtCore/qatomic_vxworks.h \
+		/usr/include/qt5/QtCore/qatomic_power.h \
+		/usr/include/qt5/QtCore/qatomic_alpha.h \
+		/usr/include/qt5/QtCore/qatomic_armv7.h \
+		/usr/include/qt5/QtCore/qatomic_armv6.h \
+		/usr/include/qt5/QtCore/qatomic_armv5.h \
+		/usr/include/qt5/QtCore/qatomic_bfin.h \
+		/usr/include/qt5/QtCore/qatomic_ia64.h \
+		/usr/include/qt5/QtCore/qatomic_mips.h \
+		/usr/include/qt5/QtCore/qatomic_s390.h \
+		/usr/include/qt5/QtCore/qatomic_sh4a.h \
+		/usr/include/qt5/QtCore/qatomic_sparc.h \
+		/usr/include/qt5/QtCore/qatomic_gcc.h \
+		/usr/include/qt5/QtCore/qatomic_x86.h \
+		/usr/include/qt5/QtCore/qatomic_cxx11.h \
+		/usr/include/qt5/QtCore/qatomic_unix.h \
+		/usr/include/qt5/QtCore/qmutex.h \
+		/usr/include/qt5/QtCore/qlogging.h \
+		/usr/include/qt5/QtCore/qflags.h \
+		/usr/include/qt5/QtCore/qtypeinfo.h \
+		/usr/include/qt5/QtCore/qtypetraits.h \
+		/usr/include/qt5/QtCore/qsysinfo.h \
+		/usr/include/qt5/QtCore/qobjectdefs_impl.h \
+		/usr/include/qt5/QtCore/qstring.h \
+		/usr/include/qt5/QtCore/qchar.h \
+		/usr/include/qt5/QtCore/qbytearray.h \
+		/usr/include/qt5/QtCore/qrefcount.h \
+		/usr/include/qt5/QtCore/qarraydata.h \
+		/usr/include/string.h \
+		/usr/include/features.h \
+		/usr/include/stdc-predef.h \
+		/usr/include/xlocale.h \
+		/usr/include/stdlib.h \
+		/usr/include/alloca.h \
+		/usr/include/qt5/QtCore/qstringbuilder.h \
+		/usr/include/qt5/QtCore/qlist.h \
+		/usr/include/qt5/QtCore/qalgorithms.h \
+		/usr/include/qt5/QtCore/qiterator.h \
+		/usr/include/limits.h \
+		/usr/include/qt5/QtCore/qcoreevent.h \
+		/usr/include/qt5/QtCore/qscopedpointer.h \
+		/usr/include/qt5/QtCore/qmetatype.h \
+		/usr/include/qt5/QtCore/qvarlengtharray.h \
+		/usr/include/qt5/QtCore/qcontainerfwd.h \
+		/usr/include/qt5/QtCore/qisenum.h \
+		/usr/include/qt5/QtCore/qobject_impl.h \
 		../PCC/power_chair_command_constants.h \
 		../smart_config.h \
 		/usr/include/stdio.h \
-		/usr/include/features.h \
-		/usr/include/stdc-predef.h \
 		/usr/include/libio.h \
 		/usr/include/_G_config.h \
 		/usr/include/wchar.h \
 		/usr/include/wctype.h \
 		/usr/include/endian.h \
-		/usr/include/xlocale.h \
 		/usr/include/gconv.h \
 		/usr/include/getopt.h \
 		/usr/include/ctype.h \
-		/usr/include/stdlib.h \
-		/usr/include/alloca.h \
 		../BCI/bci_c_connected_device.h \
 		../BCI/bci_c_singleton.h \
 		../smart_debug_log.h
@@ -4024,9 +4286,15 @@ bci_c_brsh_io.o: ../BCI/bci_c_brsh_io.cpp ../BCI/bci_c_brsh_io.h \
 		../BRS/brs_c_sensor_data.h \
 		../BCI/bci_c_eeg_data.h \
 		/usr/include/qt5/QtCore/QObject \
-		../emokit/include/emokit/emokit.h \
-		/usr/include/stdint.h \
-		../BCI/bci_c_rvs.h
+		../BCI/bci_c_rvs.h \
+		../BCI/bci_c_framegenerator.h \
+		/usr/include/qt5/QtCore/QTime \
+		/usr/include/qt5/QtCore/qdatetime.h \
+		/usr/include/qt5/QtCore/qsharedpointer.h \
+		/usr/include/qt5/QtCore/qshareddata.h \
+		/usr/include/qt5/QtCore/qsharedpointer_impl.h \
+		/usr/include/qt5/QtCore/qhash.h \
+		/usr/include/qt5/QtCore/qpair.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bci_c_brsh_io.o ../BCI/bci_c_brsh_io.cpp
 
 bci_c_eeg_io.o: ../BCI/bci_c_eeg_io.cpp ../BCI/bci_c_eeg_io.h \
@@ -4113,10 +4381,100 @@ bci_c_eeg_io.o: ../BCI/bci_c_eeg_io.cpp ../BCI/bci_c_eeg_io.h \
 		../BCI/bci_c_connected_device.h \
 		../BCI/bci_c_eeg_data.h \
 		/usr/include/qt5/QtCore/QObject \
-		/usr/include/qt5/QtCore/QList \
-		../emokit/include/emokit/emokit.h \
-		/usr/include/stdint.h
+		/usr/include/qt5/QtCore/QList
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bci_c_eeg_io.o ../BCI/bci_c_eeg_io.cpp
+
+bci_c_framegenerator.o: ../BCI/bci_c_framegenerator.cpp ../BCI/bci_c_framegenerator.h \
+		../BCI/bci_c_tm.h \
+		/usr/include/qt5/QtCore/QList \
+		/usr/include/qt5/QtCore/qlist.h \
+		/usr/include/qt5/QtCore/qalgorithms.h \
+		/usr/include/qt5/QtCore/qglobal.h \
+		/usr/include/qt5/QtCore/qconfig.h \
+		/usr/include/qt5/QtCore/qfeatures.h \
+		/usr/include/qt5/QtCore/qsystemdetection.h \
+		/usr/include/qt5/QtCore/qprocessordetection.h \
+		/usr/include/qt5/QtCore/qcompilerdetection.h \
+		/usr/include/qt5/QtCore/qglobalstatic.h \
+		/usr/include/qt5/QtCore/qatomic.h \
+		/usr/include/qt5/QtCore/qbasicatomic.h \
+		/usr/include/qt5/QtCore/qatomic_bootstrap.h \
+		/usr/include/qt5/QtCore/qgenericatomic.h \
+		/usr/include/qt5/QtCore/qatomic_msvc.h \
+		/usr/include/qt5/QtCore/qatomic_integrity.h \
+		/usr/include/qt5/QtCore/qoldbasicatomic.h \
+		/usr/include/qt5/QtCore/qatomic_vxworks.h \
+		/usr/include/qt5/QtCore/qatomic_power.h \
+		/usr/include/qt5/QtCore/qatomic_alpha.h \
+		/usr/include/qt5/QtCore/qatomic_armv7.h \
+		/usr/include/qt5/QtCore/qatomic_armv6.h \
+		/usr/include/qt5/QtCore/qatomic_armv5.h \
+		/usr/include/qt5/QtCore/qatomic_bfin.h \
+		/usr/include/qt5/QtCore/qatomic_ia64.h \
+		/usr/include/qt5/QtCore/qatomic_mips.h \
+		/usr/include/qt5/QtCore/qatomic_s390.h \
+		/usr/include/qt5/QtCore/qatomic_sh4a.h \
+		/usr/include/qt5/QtCore/qatomic_sparc.h \
+		/usr/include/qt5/QtCore/qatomic_gcc.h \
+		/usr/include/qt5/QtCore/qatomic_x86.h \
+		/usr/include/qt5/QtCore/qatomic_cxx11.h \
+		/usr/include/qt5/QtCore/qatomic_unix.h \
+		/usr/include/qt5/QtCore/qmutex.h \
+		/usr/include/qt5/QtCore/qlogging.h \
+		/usr/include/qt5/QtCore/qflags.h \
+		/usr/include/qt5/QtCore/qtypeinfo.h \
+		/usr/include/qt5/QtCore/qtypetraits.h \
+		/usr/include/qt5/QtCore/qsysinfo.h \
+		/usr/include/qt5/QtCore/qiterator.h \
+		/usr/include/qt5/QtCore/qrefcount.h \
+		/usr/include/stdlib.h \
+		/usr/include/features.h \
+		/usr/include/stdc-predef.h \
+		/usr/include/xlocale.h \
+		/usr/include/alloca.h \
+		/usr/include/limits.h \
+		/usr/include/string.h \
+		../smart_config.h \
+		/usr/include/stdio.h \
+		/usr/include/libio.h \
+		/usr/include/_G_config.h \
+		/usr/include/wchar.h \
+		/usr/include/wctype.h \
+		/usr/include/endian.h \
+		/usr/include/gconv.h \
+		/usr/include/getopt.h \
+		/usr/include/ctype.h \
+		../smart_debug_log.h \
+		../BCI/bci_c_singleton.h \
+		../PCC/power_chair_command_constants.h \
+		../BRS/brs_c_sensor_data.h \
+		../BCI/bci_c_eeg_data.h \
+		/usr/include/qt5/QtCore/QObject \
+		/usr/include/qt5/QtCore/qobject.h \
+		/usr/include/qt5/QtCore/qobjectdefs.h \
+		/usr/include/qt5/QtCore/qnamespace.h \
+		/usr/include/qt5/QtCore/qobjectdefs_impl.h \
+		/usr/include/qt5/QtCore/qstring.h \
+		/usr/include/qt5/QtCore/qchar.h \
+		/usr/include/qt5/QtCore/qbytearray.h \
+		/usr/include/qt5/QtCore/qarraydata.h \
+		/usr/include/qt5/QtCore/qstringbuilder.h \
+		/usr/include/qt5/QtCore/qcoreevent.h \
+		/usr/include/qt5/QtCore/qscopedpointer.h \
+		/usr/include/qt5/QtCore/qmetatype.h \
+		/usr/include/qt5/QtCore/qvarlengtharray.h \
+		/usr/include/qt5/QtCore/qcontainerfwd.h \
+		/usr/include/qt5/QtCore/qisenum.h \
+		/usr/include/qt5/QtCore/qobject_impl.h \
+		../BCI/bci_c_rvs.h \
+		/usr/include/qt5/QtCore/QTime \
+		/usr/include/qt5/QtCore/qdatetime.h \
+		/usr/include/qt5/QtCore/qsharedpointer.h \
+		/usr/include/qt5/QtCore/qshareddata.h \
+		/usr/include/qt5/QtCore/qsharedpointer_impl.h \
+		/usr/include/qt5/QtCore/qhash.h \
+		/usr/include/qt5/QtCore/qpair.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bci_c_framegenerator.o ../BCI/bci_c_framegenerator.cpp
 
 moc_bci_c_bci_package.o: moc_bci_c_bci_package.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_bci_c_bci_package.o moc_bci_c_bci_package.cpp
@@ -4132,6 +4490,9 @@ moc_bci_c_eeg_io_emotiv.o: moc_bci_c_eeg_io_emotiv.cpp
 
 moc_bci_c_eeg_io_nautilus.o: moc_bci_c_eeg_io_nautilus.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_bci_c_eeg_io_nautilus.o moc_bci_c_eeg_io_nautilus.cpp
+
+moc_bci_c_judgment_algorithm.o: moc_bci_c_judgment_algorithm.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_bci_c_judgment_algorithm.o moc_bci_c_judgment_algorithm.cpp
 
 moc_bci_c_serial_comm.o: moc_bci_c_serial_comm.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_bci_c_serial_comm.o moc_bci_c_serial_comm.cpp
@@ -4150,6 +4511,9 @@ moc_bci_c_telemetrymanager.o: moc_bci_c_telemetrymanager.cpp
 
 moc_bci_c_brsh_io_debug.o: moc_bci_c_brsh_io_debug.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_bci_c_brsh_io_debug.o moc_bci_c_brsh_io_debug.cpp
+
+moc_bci_c_pcc_io.o: moc_bci_c_pcc_io.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_bci_c_pcc_io.o moc_bci_c_pcc_io.cpp
 
 ####### Install
 

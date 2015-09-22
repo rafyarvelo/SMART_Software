@@ -1,13 +1,16 @@
 #include "bci_c_xml_parser.h"
 
-C_XML_Parser::C_XML_Parser()
+C_XML_Parser::C_XML_Parser(const QString& filename, ReadOrWrite direction)
+    :C_AbstractParser(filename, direction)
 {
-
-    //Initialize Default Input/Output Files
-    SetTMInputFilename(TM_DATA_INPUTFILE_XML);
-    SetTMOutputFilename(TM_DATA_OUTPUTFILE_XML);
-    SetEEGInputFilename(EEG_DATA_INPUTFILE_XML);
-    SetEEGOutputFilename(EEG_DATA_OUTPUTFILE_XML);
+    if (direction == READ)
+    {
+        xmlIn.setDevice(this->fp);
+    }
+    else
+    {
+        xmlOut.setDevice(this->fp);
+    }
 }
 
 C_XML_Parser::~C_XML_Parser()
@@ -15,18 +18,12 @@ C_XML_Parser::~C_XML_Parser()
 }
 
 //Read EEG Data
-C_EEG_Data& C_XML_Parser::readEEGData (const QString& filename)
+C_EEG_Data& C_XML_Parser::readEEGData ()
 {
     //Clear Existing Data
     eegData.clear();
 
-    //Set EEG Filename
-    SetEEGInputFilename(filename);
-
-    //Initialize XML Input
-    xmlIn.setDevice(eegDataIn);
-
-    cout << "Reading EEG Data from File: " << filename.toStdString() << endl;
+    //cout << "Reading EEG Data from File: " << filename.toStdString() << endl;
 
     //Read EEG Data
     while (!xmlIn.atEnd())
@@ -55,15 +52,9 @@ C_EEG_Data& C_XML_Parser::readEEGData (const QString& filename)
 }
 
 //Write EEG Data
-void C_XML_Parser::writeEEGData(const QString& filename)
+void C_XML_Parser::writeEEGData()
 {
-    //Set EEG Filename
-    SetEEGOutputFilename(filename);
-
-    //Initialize XML Output
-    xmlOut.setDevice(eegDataOut);
-
-    cout << "Writing EEG Data to File: " << filename.toStdString() << endl;
+    //cout << "Writing EEG Data to File: " << filename.toStdString() << endl;
     StartDocument();
 
     //Write the Beginning Tag
@@ -81,15 +72,9 @@ void C_XML_Parser::writeEEGData(const QString& filename)
 }
 
 //Read BRS Data
-C_TM& C_XML_Parser::readTMData (const QString& filename)
+C_TM& C_XML_Parser::readTMData ()
 {
-    //Set BRS Filename
-    SetTMInputFilename(filename);
-
-    //Initialize XML Input
-    xmlIn.setDevice(tmDataIn);
-
-    cout << "Reading BRS Data from File: " << filename.toStdString() << endl;
+    //cout << "Reading BRS Data from File: " << filename.toStdString() << endl;
 
     //Read BRS Data
     while (!xmlIn.atEnd())
@@ -118,15 +103,9 @@ C_TM& C_XML_Parser::readTMData (const QString& filename)
 }
 
 //Write BRS Data
-void C_XML_Parser::writeTMData(const QString& filename)
+void C_XML_Parser::writeTMData()
 {
-    //Set BRS Filename
-    SetTMOutputFilename(filename);
-
-    //Initialize XML Output
-    xmlOut.setDevice(tmDataOut);
-
-    cout << "Writing BRS Data to File: " << filename.toStdString() << endl;
+    //cout << "Writing BRS Data to File: " << filename.toStdString() << endl;
     StartDocument();
 
     //Write the Beginning Tag
@@ -142,19 +121,6 @@ void C_XML_Parser::writeTMData(const QString& filename)
     EndElement();
     EndDocument();
 }
-
-
-void C_XML_Parser::writeEEGData(C_EEG_Data& data, const QString& filename)
-{
-    C_AbstractParser::writeEEGData(data, filename);
-}
-
-
-void C_XML_Parser::writeTMData(C_TM& data, const QString& filename)
-{
-    C_AbstractParser::writeTMData(data, filename);
-}
-
 
 EEG_Frame_t* C_XML_Parser::readEEGFrame()
 {

@@ -16,18 +16,18 @@ typedef quint32 TelemetrySyncType;
 class C_BinaryParser : public C_AbstractParser
 {
 public:
-    C_BinaryParser();
+    C_BinaryParser(const QString& filename, ReadOrWrite direction);
     virtual ~C_BinaryParser();
 
     //Read/Write EEG Data
-    virtual C_EEG_Data& readEEGData (const QString& filename = EEG_DATA_INPUTFILE_BIN);
-    virtual void writeEEGData(const QString& filename = EEG_DATA_OUTPUTFILE_BIN);
-    void writeEEGData(C_EEG_Data& data, const QString& filename = EEG_DATA_OUTPUTFILE_BIN);
+    virtual C_EEG_Data& readEEGData ();
+    virtual void writeEEGData();
+    virtual void writeTMData(C_EEG_Data& data) {eegData = data; writeEEGData();}
 
     //Read/Write BRS Data
-    virtual C_TM& readTMData (const QString& filename = TM_DATA_INPUTFILE_BIN);
-    virtual void writeTMData(const QString& filename = TM_DATA_OUTPUTFILE_BIN);
-    void writeTMData(C_TM& data, const QString& filename = TM_DATA_OUTPUTFILE_BIN);
+    virtual C_TM& readTMData ();
+    virtual void writeTMData();
+    virtual void writeTMData(C_TM& data) {tmData = data; writeTMData();}
 
     //Read Individual Frames
     virtual EEG_Frame_t* readEEGFrame();
@@ -50,8 +50,7 @@ public:
 
     //Binary I/O Api
 private:
-    QDataStream dataIn;
-    QDataStream dataOut;
+    QDataStream stream;
 
     static bool eegDataStarted;
     static bool tmDataStarted;

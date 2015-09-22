@@ -18,6 +18,8 @@ public:
 		return new C_SignalProcessing(eegIO);
 	}
 
+    C_EEG_Data& GetProcessedData() { return processedData; }
+
 signals:
     void eegDataProcessed(C_EEG_Data& processedData);
 

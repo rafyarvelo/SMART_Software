@@ -15,7 +15,11 @@ C_TelemetryManager::C_TelemetryManager(C_BCI_Package* pBCI, C_EEG_IO* pEEG_IO,
     recordTM = false;
 
     //Make Connections
-    connect(this, SIGNAL(tmFrameCreated(TM_Frame_t*)), mBRS_IOPtr, SLOT(SendTMFrame(TM_Frame_t*)));
+    connect(mBRS_IOPtr, SIGNAL(BRSFrameReceived(BRS_Frame_t*)),
+            this      , SLOT(onBRSFrameReceived(BRS_Frame_t*)));
+
+    connect(this      , SIGNAL(tmFrameCreated(TM_Frame_t*)),
+            mBRS_IOPtr, SLOT(SendTMFrame(TM_Frame_t*)));
 }
 
 C_TelemetryManager::~C_TelemetryManager()
@@ -61,7 +65,7 @@ TM_Frame_t* C_TelemetryManager::updateTM()
 
 void C_TelemetryManager::OutputFrameToFile(TM_Frame_t* frame)
 {
-    binaryParser.writeTMFrame(frame);
+    tmFile->writeTMFrame(frame);
 }
 
 //Record Telemetry to an output File
@@ -71,5 +75,5 @@ void C_TelemetryManager::RecordTMToFile(const QString& filename)
     debugLog->println(BCI_LOG, temp, true);
 
     recordTM = true;
-    binaryParser.SetTMOutputFilename(filename);
+    tmFile   = new C_BinaryParser(filename, WRITE);
 }

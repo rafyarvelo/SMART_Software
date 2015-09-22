@@ -68,7 +68,8 @@ public:
 private:
     void createConnections();
     bool checkConnections();
-    void standby( int millisecondsToWait );
+    void startThreads();
+    void goToState(BCIState state);
 
     //Factory Constructors for our IO Classes
     C_EEG_IO*  createEEG_IO(eegTypeEnum type=DEFAULT_EEG_TYPE);
@@ -90,10 +91,6 @@ private:
     C_Flasher_IO*        pFlasherIO;
     C_RVS*               pRVS;
     C_TelemetryManager*  pTelemetryManager;
-
-    //Thread Execution
-    C_EEG_IO_Task*       pEEG_IO_Task; //50 Hz
-    C_BRSH_IO_Task*      pBRS_IO_Task; //10 Hz
 
     //Used to control event loop
     BCIState bciState;

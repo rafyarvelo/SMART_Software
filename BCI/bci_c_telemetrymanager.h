@@ -51,7 +51,7 @@ private:
     C_RVS*         mRVSPtr;
 
     //Used to Record TM to File
-    C_BinaryParser binaryParser;
+    C_BinaryParser* tmFile;
 
     //TM Data Buffer
     C_TM mTMData;

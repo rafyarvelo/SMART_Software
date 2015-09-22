@@ -44,32 +44,32 @@ namespace FILE_FORMAT
     const QString CONN_STATUSES[] = {"NOT_CONNECTED", "CONNECTED"};
 };
 
+enum ReadOrWrite
+{
+    READ,
+    WRITE
+};
+
 //Abstract Telemetry File Parser Class
 class C_AbstractParser
 {
 public:
-    C_AbstractParser();
+    C_AbstractParser(const QString& filename, ReadOrWrite direction);
     virtual ~C_AbstractParser();
 
-    //Set Filenames from Outside this Class
-    void SetEEGInputFilename (const QString& filename);
-    void SetTMInputFilename (const QString& filename);
-    void SetEEGOutputFilename(const QString& filename);
-    void SetTMOutputFilename(const QString& filename);
-
     //Read/Write EEG Data
-    virtual C_EEG_Data& readEEGData (const QString& filename) = 0;
+    virtual C_EEG_Data& readEEGData () = 0;
 
     //Write Member data by default
-    virtual void writeEEGData(const QString& filename) = 0;
-    void writeEEGData(C_EEG_Data& data, const QString& filename);
+    virtual void writeEEGData() = 0;
+    void writeEEGData(C_EEG_Data& data);
 
     //Read/Write BRS Data
-    virtual C_TM& readTMData (const QString& filename) = 0;
+    virtual C_TM& readTMData () = 0;
 
     //Write Member Data by default
-    virtual void writeTMData(const QString& filename) = 0;
-    void writeTMData(C_TM& data, const QString& filename);
+    virtual void writeTMData() = 0;
+    void writeTMData(C_TM& data);
 
     //Get Individual Frames
     C_EEG_Data&  GetEEGData(){ return eegData; }
@@ -84,13 +84,8 @@ public:
     virtual void writeTMFrame(TM_Frame_t* frame) = 0;
 
 protected:
-    void SetFileName(QFile*& device, const QString& filename, bool ReadOnly);
-
-    //Input/Output File Pointers
-    QFile* tmDataOut;
-    QFile* tmDataIn;
-    QFile* eegDataOut;
-    QFile* eegDataIn;
+    //Input/Output File Pointer
+    QFile* fp;
 
     //Buffers to Hold Data
     C_EEG_Data eegData;

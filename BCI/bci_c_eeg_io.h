@@ -32,7 +32,13 @@ public:
     virtual eegTypeEnum  getType() = 0;
     virtual ConnectionStatusType connect() = 0;
 
+    //The Rate we will execute the EEG IO Task (50 Hz)
+    static const u_int16_t EXECUTION_RATE;
+
 public slots:
+    //Start Getting Data
+    void start();
+
     //Try to Get an EEG Frame, return true and emit EEG Frame Received if Successful
     virtual bool fetchEEGFrame() = 0;
 
@@ -45,6 +51,7 @@ signals:
 protected:
     SMART_DEBUG_LOG* debugLog;
     C_EEG_Data       eegData;
+    QTimer           timer; //How we will implement our execution
 };
 
 //Class to perform actual thread execution
@@ -54,9 +61,6 @@ public:
     static C_EEG_IO_Task* Instance(C_EEG_IO* ptr);
 
     void run();
-
-    //The Rate we will execute the EEG IO Task (50 Hz)
-    static const u_int16_t EXECUTION_RATE;
 
 private://Private Constructor, Use Singleton Method
     C_EEG_IO_Task(C_EEG_IO* pEEG_IO);
