@@ -54,20 +54,5 @@ protected:
     QTimer           timer; //How we will implement our execution
 };
 
-//Class to perform actual thread execution
-class C_EEG_IO_Task : public QThread
-{
-public:
-    static C_EEG_IO_Task* Instance(C_EEG_IO* ptr);
-
-    void run();
-
-private://Private Constructor, Use Singleton Method
-    C_EEG_IO_Task(C_EEG_IO* pEEG_IO);
-
-private:
-    C_EEG_IO* mEEG_IO_Ptr;
-    QTimer    timer;
-};
 #endif // BCI_C_EEG_IO
 

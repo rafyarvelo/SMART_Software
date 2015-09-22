@@ -50,20 +50,4 @@ protected:
     QTimer           timer;
 };
 
-//Class to perform actual thread execution
-class C_BRSH_IO_Task : public QThread
-{
-public:
-    static C_BRSH_IO_Task* Instance(C_BRSH_IO* ptr);
-
-    void run();
-
-private://Private Constructor, Use Singleton Method
-    C_BRSH_IO_Task(C_BRSH_IO* pBRSH_IO);
-
-private:
-    C_BRSH_IO* mBRSH_IO_Ptr;
-    QTimer     timer;
-};
-
 #endif // C_BRSH_IO_H
