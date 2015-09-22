@@ -38,7 +38,7 @@ C_BCI_Package::C_BCI_Package()
                      this             , SLOT(onEEGDataProcessed(C_EEG_Data&)));
 
     //Listen for Emergency Stop Commands
-    QObject::connect(pBRS_IO , SIGNAL(EmergencyStopRequested()),
+    QObject::connect(pBRS_IO , SIGNAL(RequestEmergencyStop()),
                      this    , SLOT(onEmergencyStopRequested()));
 
     //Listen for Remote Commands

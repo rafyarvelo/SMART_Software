@@ -10,13 +10,14 @@ class C_SignalProcessing : public QObject
 {
     Q_OBJECT
 public:
-	 C_SignalProcessing(C_EEG_IO* eegIO);
-	~C_SignalProcessing();
+
+    C_SignalProcessing(C_EEG_IO* eegIO);
+   ~C_SignalProcessing();
 	
-	static  C_SignalProcessing* Instance(C_EEG_IO* eegIO)
-	{
-		return new C_SignalProcessing(eegIO);
-	}
+    static  C_SignalProcessing* Instance(C_EEG_IO* eegIO)
+    {
+        return new C_SignalProcessing(eegIO);
+    }
 
     C_EEG_Data& GetProcessedData() { return processedData; }
 

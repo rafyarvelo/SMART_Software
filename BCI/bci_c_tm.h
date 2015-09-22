@@ -60,28 +60,29 @@ typedef struct BRS_Frame_t
 //A Single Frame of Telemetry Data
 typedef struct TM_Frame_t
 {
-    int          timeStamp;
-    EEG_Frame_t  eegFrame; //Only the Latest Frame, EEG Telemetry is managed by the C_EEG_IO class
-    BRS_Frame_t  brsFrame;
-    LED_Group**  ledGroups;
+    int           timeStamp;
+    EEG_Frame_t   eegFrame; //Only the Latest Frame, EEG Telemetry is managed by the C_EEG_IO class
+    BRS_Frame_t   brsFrame;
+    LED_Group_Fwd ledForward;
+    LED_Group_Bwd ledBackward;
+    LED_Group_Rgt ledRight;
+    LED_Group_Lft ledLeft;
     ConnectionStatusType eegConnectionStatus;
     ConnectionStatusType pccConnectionStatus;
     ConnectionStatusType brsConnectionStatus;
     ConnectionStatusType flasherConnectionStatus;
 
-    TM_Frame_t(EEG_Frame_t& eegFrame, BRS_Frame_t brsFrame, LED_Group** ledGroups)
+    TM_Frame_t(EEG_Frame_t& eegFrame, BRS_Frame_t brsFrame)
         : TM_Frame_t()
     {
         this->eegFrame  = eegFrame;
         this->brsFrame  = brsFrame;
-        this->ledGroups = ledGroups;
     }
 
     //Defaults
     TM_Frame_t()
     {
         timeStamp = 0;
-        ledGroups = LED_Group::DefaultGroups();
         eegConnectionStatus     = NOT_CONNECTED;
         pccConnectionStatus     = NOT_CONNECTED;
         brsConnectionStatus     = NOT_CONNECTED;
@@ -105,22 +106,15 @@ typedef struct TM_Frame_t
         return new TM_Frame_t(other);
     }
 
-    static TM_Frame_t* createFrame(EEG_Frame_t& eegFrame, BRS_Frame_t brsFrame,
-                                   LED_Group** ledGroups)
+    static TM_Frame_t* createFrame(EEG_Frame_t& eegFrame, BRS_Frame_t brsFrame)
 	{
-        //Protect from Seg Faults
-        if (!ledGroups)
-        {
-            ledGroups = LED_Group::DefaultGroups();
-        }
-
-        return new TM_Frame_t(eegFrame, brsFrame, ledGroups);
+        return new TM_Frame_t(eegFrame, brsFrame);
 	}
 
     //destructor
     ~TM_Frame_t()
     {
-        delete[] ledGroups;
+
         clear();
     }
 
@@ -129,7 +123,7 @@ typedef struct TM_Frame_t
     {
         memset(this, 0, sizeof(TM_Frame_t));
     }
-	
+
 } TM_Frame_t;
 
 class C_TM
@@ -143,7 +137,7 @@ public:
     void addFrame(TM_Frame_t* frame, int index=-1);//back of list by default
     TM_Frame_t* GetFrame(int index=-1);//last frame by default
     TM_Frame_t* popFrame();
-	sizeType size(){ return (sizeType) tmFrames.size();}
+    sizeType size(){ return (sizeType) tmFrames.size();}
 	
     //Clear the TM Data
     void clear();

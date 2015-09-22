@@ -2,10 +2,11 @@
 
 
 
-C_TextParser::C_TextParser(const QString& filename, ReadOrWrite direction)
-    : C_AbstractParser(filename, direction)
+C_TextParser::C_TextParser(const QString& filename, QIODevice::OpenModeFlag openMode)
+    : C_AbstractParser(filename, openMode)
 {
     stream.setDevice(this->fp);
+    delimeter = ","; //Default Delimeter
 }
 
 C_TextParser::~C_TextParser()
@@ -27,6 +28,7 @@ void C_TextParser::writeEEGData()
     for (int i = 0; i < eegData.size(); i++)
     {
         writeEEGFrame(eegData.GetFramePtr(i));
+        stream << endl;
     }
 }
 
@@ -65,16 +67,16 @@ void C_TextParser::writeEEGFrame(EEG_Frame_t* frame)
     stream << frame->eegType << delimeter;
     stream << frame->counter << delimeter;
 
-    //Electrode Data
+    //Electrode Data, Ignore Spares
     for (i = 0; i < MAX_EEG_ELECTRODES; i++)
     {
-        stream << frame->electrodeData[i];
+        stream << frame->electrodeData[i] << delimeter;
     }
 
-    //Contact Quality
+    //Contact Quality, Ignore Spares
     for (i = 0; i < MAX_EEG_ELECTRODES; i++)
     {
-        stream << frame->contactQuality[i];
+        stream << frame->contactQuality[i] << delimeter;
     }
 
     //The Rest of the Crap
@@ -96,10 +98,10 @@ void C_TextParser::writeTMFrame(TM_Frame_t* frame)
     stream << frame->timeStamp << delimeter;
     writeEEGFrame(&frame->eegFrame);
     writeBRSFrame(&frame->brsFrame);
-    stream << frame->ledGroups[LED_FORWARD]->frequency  << delimeter;
-    stream << frame->ledGroups[LED_BACKWARD]->frequency << delimeter;
-    stream << frame->ledGroups[LED_RIGHT]->frequency    << delimeter;
-    stream << frame->ledGroups[LED_LEFT]->frequency     << delimeter;
+    stream << frame->ledForward .frequency   << delimeter;
+    stream << frame->ledBackward.frequency   << delimeter;
+    stream << frame->ledRight   .frequency   << delimeter;
+    stream << frame->ledLeft    .frequency   << delimeter;
     stream << frame->eegConnectionStatus     << delimeter;
     stream << frame->pccConnectionStatus     << delimeter;
     stream << frame->brsConnectionStatus     << delimeter;
@@ -115,7 +117,7 @@ void C_TextParser::writeBRSFrame(BRS_Frame_t* frame)
     stream << frame->gpsData.altitude     << delimeter;
     stream << frame->gpsData.groundSpeed  << delimeter;
     stream << frame->usData.rangeToObject << delimeter;
-    stream << frame->remoteCommand        << delimeter;
+    stream << (char) frame->remoteCommand << delimeter;
 }
 
 void C_TextParser::writeTMHeader()

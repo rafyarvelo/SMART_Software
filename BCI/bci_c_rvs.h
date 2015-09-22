@@ -83,11 +83,48 @@ public:
     void SetFrequency(LED_Group_ID id, unsigned short frequency);
 
     void Generate(); //Creates RVS frequencies
-private:
+
+protected:
 	SMART_DEBUG_LOG* debugLog;
     LED_Group**      ledGroups;
 
 };
 
+class LED_Group_Fwd : public LED_Group
+{
+public:
+    LED_Group_Fwd()
+        :LED_Group(LED_FORWARD, LED_FORWARD_FREQ_DEFAULT)
+    {
+    }
+};
+
+class LED_Group_Bwd : public LED_Group
+{
+public:
+    LED_Group_Bwd()
+        :LED_Group(LED_BACKWARD, LED_BACKWARD_FREQ_DEFAULT)
+    {
+    }
+};
+
+class LED_Group_Rgt : public LED_Group
+{
+public:
+    LED_Group_Rgt()
+        : LED_Group(LED_RIGHT, LED_RIGHT_FREQ_DEFAULT)
+    {
+
+    }
+};
+
+class LED_Group_Lft : public LED_Group
+{
+public:
+    LED_Group_Lft()
+        :LED_Group(LED_LEFT, LED_LEFT_FREQ_DEFAULT)
+    {
+    }
+};
 #endif // BCI_C_RVS
 

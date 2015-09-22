@@ -15,7 +15,7 @@ const QString EEG_DATA_OUTPUTFILE_TXT = "../debug_files/eeg_output_data.txt";
 class C_TextParser : public C_AbstractParser
 {
 public:
-    C_TextParser(const QString& filename, ReadOrWrite direction);
+    C_TextParser(const QString& filename, QIODevice::OpenModeFlag openMode);
     virtual ~C_TextParser();
 
     //Read/Write EEG Data

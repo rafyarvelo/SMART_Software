@@ -43,7 +43,10 @@ TM_Frame_t* C_TelemetryManager::updateTM()
     frame->timeStamp               = mBCIPackagePtr->stopwatch.elapsed();
     frame->brsFrame                = mBRS_IOPtr    ->GetLatestBRSFrame();
     frame->eegFrame                = mEEG_IOPtr    ->GetFramePtr();
-    frame->ledGroups               = mRVSPtr       ->GetAllLEDGroups();
+    frame->ledForward.frequency    = mRVSPtr->GetLEDGroup(LED_FORWARD) ->frequency;
+    frame->ledBackward.frequency   = mRVSPtr->GetLEDGroup(LED_BACKWARD)->frequency;
+    frame->ledRight.frequency      = mRVSPtr->GetLEDGroup(LED_RIGHT)   ->frequency;
+    frame->ledLeft.frequency       = mRVSPtr->GetLEDGroup(LED_LEFT)    ->frequency;
     frame->eegConnectionStatus     = mBCIPackagePtr->eegConnectionStatus;
     frame->brsConnectionStatus     = mBCIPackagePtr->brshConnectionStatus;
     frame->pccConnectionStatus     = mBCIPackagePtr->pccConnectionStatus;
@@ -75,5 +78,5 @@ void C_TelemetryManager::RecordTMToFile(const QString& filename)
     debugLog->println(BCI_LOG, temp, true);
 
     recordTM = true;
-    tmFile   = new C_BinaryParser(filename, WRITE);
+    tmFile   = new C_BinaryParser(filename, QIODevice::WriteOnly);
 }

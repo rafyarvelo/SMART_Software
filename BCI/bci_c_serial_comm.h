@@ -26,7 +26,7 @@ public:
     static C_Serial_Comm* Instance(const QString& portName);
 
     //return true on successful Open/Send
-	bool open();
+    bool open();
     bool sendRawData(const char* pData, sizeType size);
     bool send       (QByteArray& bytes);
 	
@@ -42,7 +42,7 @@ private slots:
 
 private:
     void printPortSettings(ostream& stream);
-	SMART_DEBUG_LOG* debugLog;
+    SMART_DEBUG_LOG* debugLog;
 
     QString         mPortName;
     QextSerialPort* mSerialPort;

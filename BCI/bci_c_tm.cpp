@@ -62,9 +62,10 @@ TM_Frame_t* C_TM::popFrame()
 
 C_TM& C_TM::operator =(C_TM& rhs)
 {
+    int i = 0;
     tmFrames.clear();
 
-    for (int i = 0; i < rhs.size(); i++)
+    for (i = 0; i < rhs.size(); i++)
     {
         //We have access to private variable here
         tmFrames.append(TM_Frame_t::createFrame(rhs.tmFrames.at(i)));

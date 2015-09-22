@@ -2,7 +2,7 @@
 
 C_Flasher_IO::C_Flasher_IO(C_RVS* pRVS)
 {
-	mRVS_Ptr = pRVS;
+    mRVS_Ptr = pRVS;
     connectionStatus = CONNECTED;
 }
 

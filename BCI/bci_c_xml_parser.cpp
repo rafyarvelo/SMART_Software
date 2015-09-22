@@ -1,9 +1,9 @@
 #include "bci_c_xml_parser.h"
 
-C_XML_Parser::C_XML_Parser(const QString& filename, ReadOrWrite direction)
+C_XML_Parser::C_XML_Parser(const QString& filename, QIODevice::OpenModeFlag direction)
     :C_AbstractParser(filename, direction)
 {
-    if (direction == READ)
+    if (direction == READ_ONLY)
     {
         xmlIn.setDevice(this->fp);
     }
@@ -238,13 +238,13 @@ void C_XML_Parser::writeTMFrame(TM_Frame_t* frame)
                        QString(frame->brsFrame.remoteCommand), tabStart + 2);
 
     //LED Groups
-    for (i = 0; i < NUM_LED_GROUPS; i++)
-    {
-        StartElement(FILE_FORMAT::LED_GROUD, tabStart + 1);
-        WriteEntireElement(FILE_FORMAT::NAME, FILE_FORMAT::LED_GROUPS[frame->ledGroups[i]->id], tabStart + 2);
-        WriteEntireElement(FILE_FORMAT::VALUE, QString::number(frame->ledGroups[i]->frequency), tabStart + 2);
-        EndElement(tabStart + 1);
-    }
+//    for (i = 0; i < NUM_LED_GROUPS; i++)
+//    {
+//        StartElement(FILE_FORMAT::LED_GROUD, tabStart + 1);
+//        WriteEntireElement(FILE_FORMAT::NAME, FILE_FORMAT::LED_GROUPS[frame->ledGroups[i]->id], tabStart + 2);
+//        WriteEntireElement(FILE_FORMAT::VALUE, QString::number(frame->ledGroups[i]->frequency), tabStart + 2);
+//        EndElement(tabStart + 1);
+//    }
 
     //EEG Connection Status
     StartElement(FILE_FORMAT::CONN_STATUS, tabStart + 1);

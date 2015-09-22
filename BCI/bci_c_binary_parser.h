@@ -16,7 +16,7 @@ typedef quint32 TelemetrySyncType;
 class C_BinaryParser : public C_AbstractParser
 {
 public:
-    C_BinaryParser(const QString& filename, ReadOrWrite direction);
+    C_BinaryParser(const QString& filename, QIODevice::OpenModeFlag openMode);
     virtual ~C_BinaryParser();
 
     //Read/Write EEG Data

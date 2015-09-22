@@ -16,7 +16,7 @@ const QString EEG_DATA_OUTPUTFILE_XML = "../debug_files/eeg_output_data.xml";
 class C_XML_Parser : public C_AbstractParser
 {
 public:
-     C_XML_Parser(const QString& filename, ReadOrWrite direction);
+     C_XML_Parser(const QString& filename, QIODevice::OpenModeFlag openMode);
     ~C_XML_Parser();
 
     //Read/Write EEG Data

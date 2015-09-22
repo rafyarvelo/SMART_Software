@@ -1,19 +1,12 @@
 #include "bci_c_abstract_parser.h"
 
-C_AbstractParser::C_AbstractParser(const QString& filename, ReadOrWrite direction)
+C_AbstractParser::C_AbstractParser(const QString& filename, QIODevice::OpenModeFlag openMode)
     : fp(0)
 {
     fp = new QFile(filename);
+    fp->open(openMode);
 
-    //Open File
-    if (direction == READ)
-    {
-        fp->open(QIODevice::ReadOnly);
-    }
-    else
-    {
-        fp->open(QIODevice::WriteOnly);
-    }
+    m_filename = filename;
 }
 
 C_AbstractParser::~C_AbstractParser()

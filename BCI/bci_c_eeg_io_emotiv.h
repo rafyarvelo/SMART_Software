@@ -20,8 +20,6 @@ enum EmotivReadStatus
     EMOKIT_READ_SUCCESS
 };
 
-
-
 class C_EEG_IO_EMOTIV : public C_EEG_IO , public C_Singleton<C_EEG_IO_EMOTIV>
 {
     Q_OBJECT
@@ -29,7 +27,7 @@ public:
              C_EEG_IO_EMOTIV();
     virtual ~C_EEG_IO_EMOTIV();
 
-	virtual eegTypeEnum  getType(){ return EEG_TYPE_EMOTIV; }
+    virtual eegTypeEnum  getType(){ return EEG_TYPE_EMOTIV; }
     virtual ConnectionStatusType connect();
 
     //Easy Conversion from Emokit Frames to EEG Frames

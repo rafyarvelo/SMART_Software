@@ -72,6 +72,7 @@ else:unix: LIBS += -L$$PWD/../emokit/lib/ -lemokit
 INCLUDEPATH += $$PWD/../emokit/include/emokit
 DEPENDPATH += $$PWD/../emokit/include/emokit
 
+
 win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../emokit/lib/release/libemokit.a
 else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../emokit/lib/debug/libemokit.a
 else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../emokit/lib/release/emokit.lib

@@ -44,17 +44,11 @@ namespace FILE_FORMAT
     const QString CONN_STATUSES[] = {"NOT_CONNECTED", "CONNECTED"};
 };
 
-enum ReadOrWrite
-{
-    READ,
-    WRITE
-};
-
 //Abstract Telemetry File Parser Class
 class C_AbstractParser
 {
 public:
-    C_AbstractParser(const QString& filename, ReadOrWrite direction);
+    C_AbstractParser(const QString& filename, QIODevice::OpenModeFlag openMode);
     virtual ~C_AbstractParser();
 
     //Read/Write EEG Data
@@ -90,6 +84,8 @@ protected:
     //Buffers to Hold Data
     C_EEG_Data eegData;
     C_TM       tmData;
+
+    QString m_filename;
 };
 
 #endif // BCI_C_FILEPARSER_H

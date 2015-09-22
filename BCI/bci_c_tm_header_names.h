@@ -41,10 +41,10 @@ struct C_HEADER_NAMES
                       << "spare16" << "spare17" << "spare18"
 
                       //Contact Quality
-                      << "F3"  << "FC6" << "P7"  << "T8"
-                      << "F7"  << "F8"  << "T7"  << "P8"
-                      << "AF4" << "F4"  << "AF3" << "02"
-                      << "01"  << "FC5"
+                      << "F3_CQ"  << "FC6_CQ" << "P7_CQ"  << "T8_CQ"
+                      << "F7_CQ"  << "F8_CQ"  << "T7_CQ"  << "P8_CQ"
+                      << "AF4_CQ" << "F4_CQ"  << "AF3_CQ" << "02_CQ"
+                      << "01_CQ"  << "FC5_CQ"
                       << "spare1"  << "spare2"  << "spare3"
                       << "spare4"  << "spare5"  << "spare6"
                       << "spare7"  << "spare8"  << "spare9"

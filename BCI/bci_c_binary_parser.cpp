@@ -14,8 +14,8 @@ const TelemetrySyncType C_BinaryParser::TM_FRAME_END    = 0xBA987654;
 bool C_BinaryParser::eegDataStarted = false;
 bool C_BinaryParser::tmDataStarted  = false;
 
-C_BinaryParser::C_BinaryParser(const QString& filename, ReadOrWrite direction)
-    : C_AbstractParser(filename, direction)
+C_BinaryParser::C_BinaryParser(const QString& filename, QIODevice::OpenModeFlag openMode)
+    : C_AbstractParser(filename, openMode)
 {
     stream.setByteOrder(QDataStream::LittleEndian);
     stream.setDevice(this->fp);

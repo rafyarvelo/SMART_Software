@@ -50,7 +50,7 @@ private:
     PCC_Command_Type ParseEEGData();
     void finalizeCommand(PCC_Command_Type cmd);
 
-	C_SignalProcessing* mSignalProcessingPtr;
+    C_SignalProcessing* mSignalProcessingPtr;
     C_RVS*              mRVS_Ptr;
     TM_Frame_t          mCurrentTMFrame;
 

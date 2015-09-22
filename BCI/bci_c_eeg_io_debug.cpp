@@ -1,10 +1,5 @@
 #include "bci_c_eeg_io_debug.h"
 
-
-
-
-
-
 bool C_EEG_IO_DEBUG::fetchEEGFrame()
 {
 
