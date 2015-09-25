@@ -5,7 +5,7 @@ export BCI_EXECUTABLE="BCI/BCI"
 export TM_EXTRACT_TOOL="BCI/TM_EXTRACT/TelemetryExtractTool"
 
 #Shared Libraries are included in the Build, Not usually a good idea but hey whatever man
-export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/usr/lib:/usr/local/lib:$HOME/SENIOR_DESIGN/SMART_Software/BCI/lib"
+export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/usr/lib:/usr/local/lib:$HOME/SENIOR_DESIGN/SMART_Software/LIB_DESKTOP:$HOME/SENIOR_DESIGN/SMART_Software/LIB_PI"
 
 #Gotta change TOOLpermissions for those stupid serial ports
 deviceName=`dmesg | grep tty | grep USB | cut -d " " -f 4`

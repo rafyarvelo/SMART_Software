@@ -1,3 +1,0 @@
-/home/arvelor/SENIOR_DESIGN/SMART_Software/emokit/examples/contact/CMakeFiles/contact.dir
-/home/arvelor/SENIOR_DESIGN/SMART_Software/emokit/src/CMakeFiles/emokit.dir
-/home/arvelor/SENIOR_DESIGN/SMART_Software/emokit/examples/emokitd/CMakeFiles/emokitd.dir

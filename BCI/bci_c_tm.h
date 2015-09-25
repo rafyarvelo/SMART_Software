@@ -12,7 +12,8 @@
 #define EMERGENCY_STOP_DISTANCE 1 //meters
 #define MAX_TM_FRAMES           25//Only store the latest 25 Frames
 //Data from the BRSH
-typedef struct BRS_Frame_t
+
+struct BRS_Frame_t
 {
     GPS_Data_t    \
     gpsData;
@@ -55,10 +56,10 @@ typedef struct BRS_Frame_t
     }
 
 
-} BRS_Frame_t;
+};
 
 //A Single Frame of Telemetry Data
-typedef struct TM_Frame_t
+struct TM_Frame_t
 {
     int           timeStamp;
     EEG_Frame_t   eegFrame; //Only the Latest Frame, EEG Telemetry is managed by the C_EEG_IO class
@@ -73,8 +74,8 @@ typedef struct TM_Frame_t
     ConnectionStatusType flasherConnectionStatus;
 
     TM_Frame_t(EEG_Frame_t& eegFrame, BRS_Frame_t brsFrame)
-        : TM_Frame_t()
     {
+        TM_Frame_t();
         this->eegFrame  = eegFrame;
         this->brsFrame  = brsFrame;
     }
@@ -124,7 +125,7 @@ typedef struct TM_Frame_t
         memset(this, 0, sizeof(TM_Frame_t));
     }
 
-} TM_Frame_t;
+};
 
 class C_TM
 {

@@ -4,6 +4,7 @@ CONFIG += extserialport
 
 #Referenced Headers from other software sections
 INCLUDEPATH += ..
+INCLUDEPATH += ../../emokit/include/emokit
 
 HEADERS += \
     bci_c_bci_package.h \
@@ -63,21 +64,7 @@ SOURCES += \
     bci_c_eeg_io.cpp \
     bci_c_framegenerator.cpp
 
-#Junk needed for Emokit Libraries
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../emokit/lib/release/ -lemokit
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../emokit/lib/debug/ -lemokit
-else:unix: LIBS += -L$$PWD/../emokit/lib/ -lemokit
-
-INCLUDEPATH += $$PWD/../emokit/include/emokit
-DEPENDPATH += $$PWD/../emokit/include/emokit
-
-
-win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../emokit/lib/release/libemokit.a
-else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../emokit/lib/debug/libemokit.a
-else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../emokit/lib/release/emokit.lib
-else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../emokit/lib/debug/emokit.lib
-else:unix: PRE_TARGETDEPS += $$PWD/../emokit/lib/libemokit.a
-
+#Crap Needed for Emokit libraries
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../../../usr/local/lib/release/ -lhidapi-hidraw
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../../../usr/local/lib/debug/ -lhidapi-hidraw
 else:unix: LIBS += -L$$PWD/../../../../../usr/local/lib/ -lhidapi-hidraw
@@ -104,3 +91,15 @@ else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../../..
 else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../../../../usr/lib/release/mcrypt.lib
 else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../../../../usr/lib/debug/mcrypt.lib
 else:unix: PRE_TARGETDEPS += $$PWD/../../../../../usr/lib/libmcrypt.a
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../emokit/lib/release/ -lemokit
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../emokit/lib/debug/ -lemokit
+else:symbian: LIBS += -lemokit
+else:unix: LIBS += -L$$PWD/../../emokit/lib/ -lemokit
+
+INCLUDEPATH += $$PWD/../../emokit/include
+DEPENDPATH += $$PWD/../../emokit/include
+
+win32:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../emokit/lib/release/emokit.lib
+else:win32:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../emokit/lib/debug/emokit.lib
+else:unix:!symbian: PRE_TARGETDEPS += $$PWD/../../emokit/lib/libemokit.a
