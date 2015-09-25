@@ -7,6 +7,8 @@
 
 #include "brs_c_uart.h"
 
+volatile uint8_t RECEIVE_BUFFER[MAX_BUFFER_SIZE];
+
 //*****************************************************************************
 //
 // The error routine that is called if the driver library encounters an error.
@@ -91,6 +93,7 @@ void UARTIntHandler(void)
 {
     uint32_t ui32Status;
     char c;
+    static uint16_t charsReceived = 0;
 
     //
     // Get the interrrupt status.
@@ -111,14 +114,19 @@ void UARTIntHandler(void)
         // Read the next character from the UART and write it back to the UART.
         //
     	c = ROM_UARTCharGetNonBlocking(UART0_BASE);
-        //ROM_UARTCharPutNonBlocking(UART0_BASE, c);
+        ROM_UARTCharPutNonBlocking(UART0_BASE, c);
 
-        buffer[charsReceived++] = c;
-        if (charsReceived >= 20)
-        {
-        	UARTSend("WE MADE IT!\n", 14);
-        	charsReceived = 0;
-        }
+    	//Buffer Received Character
+    	RECEIVE_BUFFER[charsReceived++] = c;
+
+    	//Check Msg Id every 8 bytes
+    	if (charsReceived > 0 && charsReceived % 8 == 0)
+    	{
+    		CheckMessageID((volatile uint8_t*) &RECEIVE_BUFFER[charsReceived - 8]);
+
+    		//The call to Check Message ID should of read in what we needed, reset the buffer
+    		charsReceived = 0;
+    	}
 
         //Blink the LED for Status
         LED_Blink(1);
@@ -172,7 +180,7 @@ void LED_Blink(uint16_t delay)
 // Retrieve a string from the UART, return bytes actually read
 //
 //*****************************************************************************
-uint16_t UARTReceive(uint8_t *pui8Buffer, uint32_t ui32Count)
+uint16_t UARTReceive(volatile uint8_t *pui8Buffer, uint32_t ui32Count)
 {
 	uint16_t bytesReceived = 0;
     //
@@ -193,4 +201,59 @@ uint16_t UARTReceive(uint8_t *pui8Buffer, uint32_t ui32Count)
     }
 
     return bytesReceived;
+}
+
+//*****************************************************************************
+//
+// Check for Messages coming in from the UART and handle them appropriately.
+// Parameter should be the base address of a received character buffer
+//
+//*****************************************************************************
+void CheckMessageID(volatile uint8_t* addr)
+{
+	//Convert Byte to Word Address
+	volatile uint32_t *pMsgId  = (volatile uint32_t*) addr;
+
+	//We Expect the Msg Id (4 bytes), Msg Size (4 Bytes), then the Message it self
+	uint32_t  MsgId   = *pMsgId;
+	uint32_t  MsgSize = *(pMsgId + sizeof(int));
+
+	switch (MsgId)
+	{
+		case BCI2BRS_MSG_ID:
+			//Read in the Data after the size field
+			ReadBCI2BRSMsg(addr + (sizeof(int) * 2), MsgSize);
+		break;
+
+		case MD2BRS_MSG_ID:
+			//Read in the Data after the size field
+			ReadMD2BRSMsg(addr  + (sizeof(int) * 2), MsgSize);
+		break;
+	}
+}
+
+//*****************************************************************************
+//
+// Read Incoming BCI Message
+//
+//*****************************************************************************
+void ReadBCI2BRSMsg(volatile uint8_t *pui8Buffer, uint32_t ui32Count)
+{
+	//Get the Message
+	UARTReceive(pui8Buffer, ui32Count);
+
+	//TODO: Process the Msg
+}
+
+//*****************************************************************************
+//
+// Read Incoming Mobile Device Message
+//
+//*****************************************************************************
+void ReadMD2BRSMsg(volatile uint8_t *pui8Buffer, uint32_t ui32Count)
+{
+	//Get the Message
+	UARTReceive(pui8Buffer, ui32Count);
+
+	//TODO: Process the Msg
 }
