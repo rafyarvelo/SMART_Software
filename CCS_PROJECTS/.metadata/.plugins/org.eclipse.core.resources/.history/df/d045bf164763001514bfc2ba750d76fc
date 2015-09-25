@@ -1,0 +1,18 @@
+/*
+ * brs_c_message_format.h
+ *
+ *  Created on: Sep 25, 2015
+ *      Author: Rafael
+ */
+
+#ifndef BRS_C_MESSAGE_FORMAT_H_
+#define BRS_C_MESSAGE_FORMAT_H_
+
+#define BRS_MESSAGE_ID 0xDEADBEEF //Because why not
+#define BRS_MESSAGE_ID 0xDEADBEEF //Because why not
+#define BRS_MESSAGE_ID 0xDEADBEEF //Because why not
+#define BRS_MESSAGE_ID 0xDEADBEEF //Because why not
+
+
+
+#endif /* BRS_C_MESSAGE_FORMAT_H_ */

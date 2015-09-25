@@ -1,0 +1,53 @@
+
+**** Build of configuration Debug for project driverlib ****
+
+"C:\\ti\\ccsv6\\utils\\bin\\gmake" -k all 
+'Building file: C:/ti/TivaWare_C_Series-2.1.1.71/driverlib/sysctl.c'
+'Invoking: ARM Compiler'
+"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 --abi=eabi -me -O2 --include_path="C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71" -g --gcc --define=ccs="ccs" --define=PART_TM4C1230C3PM --display_error_number --diag_warning=225 --diag_wrap=off --gen_func_subsections=on --ual --preproc_with_compile --preproc_dependency="sysctl.pp"  "C:/ti/TivaWare_C_Series-2.1.1.71/driverlib/sysctl.c"
+'Finished building: C:/ti/TivaWare_C_Series-2.1.1.71/driverlib/sysctl.c'
+' '
+'Building file: C:/ti/TivaWare_C_Series-2.1.1.71/driverlib/sysexc.c'
+'Invoking: ARM Compiler'
+"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 --abi=eabi -me -O2 --include_path="C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71" -g --gcc --define=ccs="ccs" --define=PART_TM4C1230C3PM --display_error_number --diag_warning=225 --diag_wrap=off --gen_func_subsections=on --ual --preproc_with_compile --preproc_dependency="sysexc.pp"  "C:/ti/TivaWare_C_Series-2.1.1.71/driverlib/sysexc.c"
+'Finished building: C:/ti/TivaWare_C_Series-2.1.1.71/driverlib/sysexc.c'
+' '
+'Building file: C:/ti/TivaWare_C_Series-2.1.1.71/driverlib/systick.c'
+'Invoking: ARM Compiler'
+"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 --abi=eabi -me -O2 --include_path="C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71" -g --gcc --define=ccs="ccs" --define=PART_TM4C1230C3PM --display_error_number --diag_warning=225 --diag_wrap=off --gen_func_subsections=on --ual --preproc_with_compile --preproc_dependency="systick.pp"  "C:/ti/TivaWare_C_Series-2.1.1.71/driverlib/systick.c"
+'Finished building: C:/ti/TivaWare_C_Series-2.1.1.71/driverlib/systick.c'
+' '
+'Building file: C:/ti/TivaWare_C_Series-2.1.1.71/driverlib/timer.c'
+'Invoking: ARM Compiler'
+"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 --abi=eabi -me -O2 --include_path="C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71" -g --gcc --define=ccs="ccs" --define=PART_TM4C1230C3PM --display_error_number --diag_warning=225 --diag_wrap=off --gen_func_subsections=on --ual --preproc_with_compile --preproc_dependency="timer.pp"  "C:/ti/TivaWare_C_Series-2.1.1.71/driverlib/timer.c"
+'Finished building: C:/ti/TivaWare_C_Series-2.1.1.71/driverlib/timer.c'
+' '
+'Building file: C:/ti/TivaWare_C_Series-2.1.1.71/driverlib/uart.c'
+'Invoking: ARM Compiler'
+"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 --abi=eabi -me -O2 --include_path="C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71" -g --gcc --define=ccs="ccs" --define=PART_TM4C1230C3PM --display_error_number --diag_warning=225 --diag_wrap=off --gen_func_subsections=on --ual --preproc_with_compile --preproc_dependency="uart.pp"  "C:/ti/TivaWare_C_Series-2.1.1.71/driverlib/uart.c"
+'Finished building: C:/ti/TivaWare_C_Series-2.1.1.71/driverlib/uart.c'
+' '
+'Building file: C:/ti/TivaWare_C_Series-2.1.1.71/driverlib/udma.c'
+'Invoking: ARM Compiler'
+"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 --abi=eabi -me -O2 --include_path="C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71" -g --gcc --define=ccs="ccs" --define=PART_TM4C1230C3PM --display_error_number --diag_warning=225 --diag_wrap=off --gen_func_subsections=on --ual --preproc_with_compile --preproc_dependency="udma.pp"  "C:/ti/TivaWare_C_Series-2.1.1.71/driverlib/udma.c"
+'Finished building: C:/ti/TivaWare_C_Series-2.1.1.71/driverlib/udma.c'
+' '
+'Building file: C:/ti/TivaWare_C_Series-2.1.1.71/driverlib/usb.c'
+'Invoking: ARM Compiler'
+"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 --abi=eabi -me -O2 --include_path="C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71" -g --gcc --define=ccs="ccs" --define=PART_TM4C1230C3PM --display_error_number --diag_warning=225 --diag_wrap=off --gen_func_subsections=on --ual --preproc_with_compile --preproc_dependency="usb.pp"  "C:/ti/TivaWare_C_Series-2.1.1.71/driverlib/usb.c"
+'Finished building: C:/ti/TivaWare_C_Series-2.1.1.71/driverlib/usb.c'
+' '
+'Building file: C:/ti/TivaWare_C_Series-2.1.1.71/driverlib/watchdog.c'
+'Invoking: ARM Compiler'
+"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 --abi=eabi -me -O2 --include_path="C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71" -g --gcc --define=ccs="ccs" --define=PART_TM4C1230C3PM --display_error_number --diag_warning=225 --diag_wrap=off --gen_func_subsections=on --ual --preproc_with_compile --preproc_dependency="watchdog.pp"  "C:/ti/TivaWare_C_Series-2.1.1.71/driverlib/watchdog.c"
+'Finished building: C:/ti/TivaWare_C_Series-2.1.1.71/driverlib/watchdog.c'
+' '
+'Building target: driverlib.lib'
+'Invoking: ARM Archiver'
+"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/bin/armar" r "driverlib.lib" "./adc.obj" "./aes.obj" "./can.obj" "./comp.obj" "./cpu.obj" "./crc.obj" "./des.obj" "./eeprom.obj" "./emac.obj" "./epi.obj" "./epi_workaround_ccs.obj" "./flash.obj" "./fpu.obj" "./gpio.obj" "./hibernate.obj" "./i2c.obj" "./interrupt.obj" "./lcd.obj" "./mpu.obj" "./onewire.obj" "./pwm.obj" "./qei.obj" "./shamd5.obj" "./ssi.obj" "./sw_crc.obj" "./sysctl.obj" "./sysexc.obj" "./systick.obj" "./timer.obj" "./uart.obj" "./udma.obj" "./usb.obj" "./watchdog.obj"  
+  ==>  new archive 'driverlib.lib'
+  ==>  building archive 'driverlib.lib'
+'Finished building target: driverlib.lib'
+' '
+
+**** Build Finished ****

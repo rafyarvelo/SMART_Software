@@ -1,0 +1,31 @@
+//*****************************************************************************
+// SMART Software - BRS Main Processing
+// 
+//
+//*****************************************************************************
+
+#include "brs_c_uart.h"
+#include "brs_c_sensor_data.h"
+
+//*****************************************************************************
+//
+// This example demonstrates how to send a string of data to the UART.
+//
+//*****************************************************************************
+int main(void)
+{
+
+	//Initialize the UART connection
+	Init_UART();
+
+
+	//Send Prompt String
+    UARTSend((uint8_t *)"Listening for UART Characters...\r\n", 16);
+
+    //
+    // Loop forever echoing data through the UART.
+    //
+    while(1)
+    {
+    }
+}

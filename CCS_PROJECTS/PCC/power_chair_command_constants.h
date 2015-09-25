@@ -11,7 +11,7 @@
 #ifndef POWER_CHAIR_COMMAND_CONSTANTS_H_
 #define POWER_CHAIR_COMMAND_CONSTANTS_H_
 
-#include "../smart_config.h"
+#include "../../smart_config.h"
 
 #define PCC_STOP     0x73 //ASCII 's'
 
