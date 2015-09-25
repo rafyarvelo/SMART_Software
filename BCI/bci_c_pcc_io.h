@@ -2,7 +2,7 @@
 #define BCI_C_PCC_IO_H
 
 #include <QObject>
-#include "../PCC/power_chair_command_constants.h"
+#include "../CCS_PROJECTS/PCC/power_chair_command_constants.h"
 #include "bci_c_connected_device.h"
 #include "bci_c_singleton.h"
 #include "../smart_config.h"

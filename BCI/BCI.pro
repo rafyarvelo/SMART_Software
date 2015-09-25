@@ -4,7 +4,6 @@ CONFIG += extserialport
 
 #Referenced Headers from other software sections
 INCLUDEPATH += ..
-INCLUDEPATH += ../PCC
 
 HEADERS += \
     bci_c_bci_package.h \
@@ -20,12 +19,12 @@ HEADERS += \
     bci_c_tm.h \
     ../smart_config.h \
     ../smart_debug_log.h \
-    ../PCC/power_chair_command_constants.h \
+    ../CCS_PROJECTS/PCC/power_chair_command_constants.h \
     bci_c_connected_device.h \
     bci_c_brsh_io.h \
     bci_c_eeg_data.h \
     bci_c_xml_parser.h \
-    ../BRS/brs_c_sensor_data.h \
+    ../CCS_PROJECTS/BRS/brs_c_sensor_data.h \
     bci_c_abstract_parser.h \
     bci_c_binary_parser.h \
     bci_c_textparser.h \

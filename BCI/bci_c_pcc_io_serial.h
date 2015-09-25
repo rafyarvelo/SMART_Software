@@ -1,7 +1,7 @@
 #ifndef BCI_C_JA2PCC
 #define BCI_C_JA2PCC
 
-#include "../PCC/power_chair_command_constants.h"
+#include "../CCS_PROJECTS/PCC/power_chair_command_constants.h"
 #include "bci_c_serial_comm.h"
 #include "bci_c_pcc_io.h"
 

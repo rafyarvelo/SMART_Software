@@ -1,7 +1,7 @@
 #ifndef BCI_C_JUDGMENT_ALGORITHM_H
 #define BCI_C_JUDGMENT_ALGORITHM_H
 
-#include "../PCC/power_chair_command_constants.h"
+#include "../CCS_PROJECTS/PCC/power_chair_command_constants.h"
 #include "../smart_debug_log.h"
 #include "../smart_config.h"
 #include "bci_c_signal_processing.h"
