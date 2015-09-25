@@ -1,0 +1,66 @@
+################################################################################
+# Automatically-generated file. Do not edit!
+################################################################################
+
+# Add inputs and outputs from these tool invocations to the build variables 
+C_SRCS += \
+C:/ti/TivaWare_C_Series-2.1.1.71/usblib/host/usbhaudio.c \
+C:/ti/TivaWare_C_Series-2.1.1.71/usblib/host/usbhhid.c \
+C:/ti/TivaWare_C_Series-2.1.1.71/usblib/host/usbhhidkeyboard.c \
+C:/ti/TivaWare_C_Series-2.1.1.71/usblib/host/usbhhidmouse.c \
+C:/ti/TivaWare_C_Series-2.1.1.71/usblib/host/usbhhub.c \
+C:/ti/TivaWare_C_Series-2.1.1.71/usblib/host/usbhmsc.c \
+C:/ti/TivaWare_C_Series-2.1.1.71/usblib/host/usbhostenum.c \
+C:/ti/TivaWare_C_Series-2.1.1.71/usblib/host/usbhscsi.c 
+
+OBJS += \
+./host/usbhaudio.obj \
+./host/usbhhid.obj \
+./host/usbhhidkeyboard.obj \
+./host/usbhhidmouse.obj \
+./host/usbhhub.obj \
+./host/usbhmsc.obj \
+./host/usbhostenum.obj \
+./host/usbhscsi.obj 
+
+C_DEPS += \
+./host/usbhaudio.pp \
+./host/usbhhid.pp \
+./host/usbhhidkeyboard.pp \
+./host/usbhhidmouse.pp \
+./host/usbhhub.pp \
+./host/usbhmsc.pp \
+./host/usbhostenum.pp \
+./host/usbhscsi.pp 
+
+C_DEPS__QUOTED += \
+"host\usbhaudio.pp" \
+"host\usbhhid.pp" \
+"host\usbhhidkeyboard.pp" \
+"host\usbhhidmouse.pp" \
+"host\usbhhub.pp" \
+"host\usbhmsc.pp" \
+"host\usbhostenum.pp" \
+"host\usbhscsi.pp" 
+
+OBJS__QUOTED += \
+"host\usbhaudio.obj" \
+"host\usbhhid.obj" \
+"host\usbhhidkeyboard.obj" \
+"host\usbhhidmouse.obj" \
+"host\usbhhub.obj" \
+"host\usbhmsc.obj" \
+"host\usbhostenum.obj" \
+"host\usbhscsi.obj" 
+
+C_SRCS__QUOTED += \
+"C:/ti/TivaWare_C_Series-2.1.1.71/usblib/host/usbhaudio.c" \
+"C:/ti/TivaWare_C_Series-2.1.1.71/usblib/host/usbhhid.c" \
+"C:/ti/TivaWare_C_Series-2.1.1.71/usblib/host/usbhhidkeyboard.c" \
+"C:/ti/TivaWare_C_Series-2.1.1.71/usblib/host/usbhhidmouse.c" \
+"C:/ti/TivaWare_C_Series-2.1.1.71/usblib/host/usbhhub.c" \
+"C:/ti/TivaWare_C_Series-2.1.1.71/usblib/host/usbhmsc.c" \
+"C:/ti/TivaWare_C_Series-2.1.1.71/usblib/host/usbhostenum.c" \
+"C:/ti/TivaWare_C_Series-2.1.1.71/usblib/host/usbhscsi.c" 
+
+

@@ -28,7 +28,13 @@
 		<link>
 			<name>smart_config.h</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/smart_config.h</locationURI>
+			<locationURI>PARENT-1-ORIGINAL_PROJECT_ROOT/smart_config.h</locationURI>
 		</link>
 	</linkedResources>
+	<variableList>
+		<variable>
+			<name>ORIGINAL_PROJECT_ROOT</name>
+			<value>file:/C:/Users/Rafael/SENIOR_DESIGN/SMART_Software/CCS_PROJECTS/PCC</value>
+		</variable>
+	</variableList>
 </projectDescription>
