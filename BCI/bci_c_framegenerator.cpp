@@ -1,10 +1,5 @@
 #include "bci_c_framegenerator.h"
 
-FrameGenerator::FrameGenerator()
-{
-}
-
-
 BRS_Frame_t* FrameGenerator::GenerateBRSFrame()
 {
     return GenerateBRSFrame(GeneratePCC_Command(), GetRandomFloat() / 155.36);
@@ -17,6 +12,8 @@ BRS_Frame_t* FrameGenerator::GenerateBRSFrame(PCC_Command_Type cmd, float rangeT
     frame->gpsData = GenerateGPSData();
     frame->usData.rangeToObject = rangeToObject;
     frame->remoteCommand = cmd;
+
+    return frame;
 }
 
 EEG_Frame_t* FrameGenerator::GenerateEEGFrame()
@@ -39,6 +36,8 @@ EEG_Frame_t* FrameGenerator::GenerateEEGFrame()
     frame->gyroX = GetRandomInt();
     frame->gyroY = GetRandomInt();
     frame->batteryPercentage = GetRandomInt();
+
+    return frame;
 }
 
 TM_Frame_t*  FrameGenerator::GenerateTMFrame()

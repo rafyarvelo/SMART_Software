@@ -11,8 +11,6 @@
 class FrameGenerator
 {
 public:
-    FrameGenerator();
-
     static BRS_Frame_t* GenerateBRSFrame();
     static BRS_Frame_t* GenerateBRSFrame(PCC_Command_Type cmd, float rangeToObject);
     static EEG_Frame_t* GenerateEEGFrame();
