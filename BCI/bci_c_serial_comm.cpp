@@ -1,6 +1,6 @@
 #include "bci_c_serial_comm.h"
 
-C_Serial_Comm::C_Serial_Comm(const QString&      portName)
+C_Serial_Comm::C_Serial_Comm(const QString& portName)
     : mPortName(portName)
 {
     debugLog    = SMART_DEBUG_LOG::Instance();//Get a pointer to the debug log
@@ -25,12 +25,12 @@ C_Serial_Comm::~C_Serial_Comm()
 void C_Serial_Comm::SetDefaultPortSettings()
 {
     //Config Port Setup
-    mSerialPort->setBaudRate(BAUD9600);
+    mSerialPort->setBaudRate   (BAUD9600);
     mSerialPort->setFlowControl(FLOW_OFF);
-    mSerialPort->setParity(PAR_NONE);
-    mSerialPort->setDataBits(DATA_8);
-    mSerialPort->setStopBits(STOP_1);
-    mSerialPort->setTimeout(DEFAULT_TIMEOUT_MS);
+    mSerialPort->setParity     (PAR_NONE);
+    mSerialPort->setDataBits   (DATA_8);
+    mSerialPort->setStopBits   (STOP_1);
+    mSerialPort->setTimeout    (DEFAULT_TIMEOUT_MS);
 }
 
 void C_Serial_Comm::printPortSettings(ostream &stream)
@@ -73,18 +73,35 @@ bool C_Serial_Comm::sendRawData(const char* pData, sizeType size)
 {
     int bytesWritten = -1;
 
-    debugLog->BCI_Log() << "Attempting to Write Data of size: " << size << endl;
+    debugLog->SerialComm_Log() << "Attempting to Write Data of size: " << size << endl;
     bytesWritten = mSerialPort->write(pData, (qint64) size);
-    debugLog->BCI_Log() << "Bytes Written: " << bytesWritten << endl;
+    debugLog->SerialComm_Log() << "Bytes Written: " << bytesWritten << endl;
 
     read();//Hack for now...
 
     return (bytesWritten > -1) ? SUCCESS : FAILURE;
 }
 
+//Overloaded send functions
+
 bool C_Serial_Comm::send(QByteArray& bytes)
 {
     return sendRawData(bytes.data(), bytes.size());
+}
+
+bool C_Serial_Comm::send(unsigned char& byte)
+{
+    return sendRawData(reinterpret_cast<const char*>(byte), sizeof(unsigned char));
+}
+
+bool C_Serial_Comm::send(unsigned short& number)
+{
+    return sendRawData(reinterpret_cast<const char*>(number), sizeof(unsigned short));
+}
+
+bool C_Serial_Comm::send(unsigned int& number)
+{
+    return sendRawData(reinterpret_cast<const char*>(number), sizeof(unsigned int));
 }
 
 //Receive Data

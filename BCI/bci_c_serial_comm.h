@@ -28,8 +28,13 @@ public:
     //return true on successful Open/Send
     bool open();
     bool sendRawData(const char* pData, sizeType size);
-    bool send       (QByteArray& bytes);
-	
+
+    //Overloaded send functions
+    bool send(QByteArray& bytes);
+    bool send(unsigned char &  byte);
+    bool send(unsigned short&  number);
+    bool send(unsigned int  &  number);
+
 	//Receive Data
     void       readRawData(char* pData, sizeType size);
     QByteArray read       (int numBytes=-1);//numBytes < 0 to read all

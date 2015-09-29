@@ -618,6 +618,7 @@ moc_bci_c_bci_package.cpp: /usr/include/qt5/QtCore/QTime \
 		/usr/include/qt5/QtExtSerialPort/qextserialport_global.h \
 		/usr/include/qt5/QtCore/QtGlobal \
 		/usr/include/termios.h \
+		../CCS_PROJECTS/BRS/brs_c_message_constants.h \
 		bci_c_brsh_io_debug.h \
 		bci_c_judgment_algorithm.h \
 		bci_c_telemetrymanager.h \
@@ -1709,6 +1710,7 @@ moc_bci_c_telemetrymanager.cpp: bci_c_bci_package.h \
 		/usr/include/qt5/QtExtSerialPort/qextserialport_global.h \
 		/usr/include/qt5/QtCore/QtGlobal \
 		/usr/include/termios.h \
+		../CCS_PROJECTS/BRS/brs_c_message_constants.h \
 		bci_c_brsh_io_debug.h \
 		bci_c_judgment_algorithm.h \
 		bci_c_telemetrymanager.h \
@@ -2162,6 +2164,7 @@ bci_c_bci_package.o: bci_c_bci_package.cpp bci_c_bci_package.h \
 		/usr/include/qt5/QtExtSerialPort/qextserialport_global.h \
 		/usr/include/qt5/QtCore/QtGlobal \
 		/usr/include/termios.h \
+		../CCS_PROJECTS/BRS/brs_c_message_constants.h \
 		bci_c_brsh_io_debug.h \
 		bci_c_judgment_algorithm.h \
 		bci_c_telemetrymanager.h \
@@ -2849,6 +2852,7 @@ bci_main.o: bci_main.cpp bci_c_bci_package.h \
 		/usr/include/qt5/QtExtSerialPort/qextserialport_global.h \
 		/usr/include/qt5/QtCore/QtGlobal \
 		/usr/include/termios.h \
+		../CCS_PROJECTS/BRS/brs_c_message_constants.h \
 		bci_c_brsh_io_debug.h \
 		bci_c_judgment_algorithm.h \
 		bci_c_telemetrymanager.h \
@@ -3769,6 +3773,7 @@ bci_c_telemetrymanager.o: bci_c_telemetrymanager.cpp bci_c_telemetrymanager.h \
 		/usr/include/qt5/QtExtSerialPort/qextserialport_global.h \
 		/usr/include/qt5/QtCore/QtGlobal \
 		/usr/include/termios.h \
+		../CCS_PROJECTS/BRS/brs_c_message_constants.h \
 		bci_c_brsh_io_debug.h \
 		bci_c_judgment_algorithm.h \
 		bci_c_pcc_io_serial.h \
@@ -4003,7 +4008,8 @@ bci_c_brsh_io_serial.o: bci_c_brsh_io_serial.cpp bci_c_brsh_io_serial.h \
 		/usr/include/qt5/QtCore/QIODevice \
 		/usr/include/qt5/QtExtSerialPort/qextserialport_global.h \
 		/usr/include/qt5/QtCore/QtGlobal \
-		/usr/include/termios.h
+		/usr/include/termios.h \
+		../CCS_PROJECTS/BRS/brs_c_message_constants.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bci_c_brsh_io_serial.o bci_c_brsh_io_serial.cpp
 
 bci_c_pcc_io_serial.o: bci_c_pcc_io_serial.cpp bci_c_pcc_io_serial.h \

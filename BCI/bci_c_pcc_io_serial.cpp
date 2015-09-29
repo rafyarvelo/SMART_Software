@@ -17,24 +17,24 @@ C_PCC_IO_Serial::~C_PCC_IO_Serial()
 
 void C_PCC_IO_Serial::SendCommand()
 {
-    QByteArray bytes;
-    bytes.setRawData((const char*) &currentCommand, 1);
+    QString str = QString("Sending PCC Command: ") + QString(currentCommand);
 
-    debugLog->BCI_Log() << "Attempting to Send PCC Command: " << currentCommand << endl;
-    serialComm->send(bytes);
+    debugLog->println(PCC_LOG, str.toStdString(), true);
+    serialComm->send(currentCommand);
 }
 
 ConnectionStatusType C_PCC_IO_Serial::connect()
 {
-    debugLog->BCI_Log() << "Attempting to Connect to Power Chair Controller..." << endl;
+    debugLog->println(PCC_LOG, "Attempting to Connect to Power Chair Controller...");
+
     if (serialComm->open())
     {
-        debugLog->BCI_Log() << "Connected to Power Chair Controller!" << endl;
+        debugLog->println(PCC_LOG, "Connected to Power Chair Controller!");
         connectionStatus = CONNECTED;
     }
     else
     {
-        debugLog->BCI_Log() << "Could Not Connect to Power Chair Controller:(" << endl;
+        debugLog->println(PCC_LOG, "Could Not Connect to Power Chair Controller:(");
         connectionStatus = NOT_CONNECTED;
     }
 
