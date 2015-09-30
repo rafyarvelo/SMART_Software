@@ -1,0 +1,106 @@
+//*****************************************************************************
+//
+// led_task.c - A simple flashing LED task.
+//
+// Copyright (c) 2012-2015 Texas Instruments Incorporated.  All rights reserved.
+// Software License Agreement
+// 
+// Texas Instruments (TI) is supplying this software for use solely and
+// exclusively on TI's microcontroller products. The software is owned by
+// TI and/or its suppliers, and is protected under applicable copyright
+// laws. You may not combine this software with "viral" open-source
+// software in order to form a larger program.
+// 
+// THIS SOFTWARE IS PROVIDED "AS IS" AND WITH ALL FAULTS.
+// NO WARRANTIES, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING, BUT
+// NOT LIMITED TO, IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+// A PARTICULAR PURPOSE APPLY TO THIS SOFTWARE. TI SHALL NOT, UNDER ANY
+// CIRCUMSTANCES, BE LIABLE FOR SPECIAL, INCIDENTAL, OR CONSEQUENTIAL
+// DAMAGES, FOR ANY REASON WHATSOEVER.
+// 
+// This is part of revision 2.1.1.71 of the EK-TM4C123GXL Firmware Package.
+//
+//*****************************************************************************
+
+#include <stdbool.h>
+#include <stdint.h>
+#include "inc/hw_memmap.h"
+#include "inc/hw_types.h"
+#include "driverlib/gpio.h"
+#include "driverlib/rom.h"
+#include "drivers/rgb.h"
+#include "drivers/buttons.h"
+#include "utils/uartstdio.h"
+#include "brs_c_data_bridge_task.h"
+#include "../../smart_data_types.h"
+#include "priorities.h"
+#include "FreeRTOS.h"
+#include "task.h"
+#include "queue.h"
+#include "semphr.h"
+
+//*****************************************************************************
+//
+// The stack size for the Data Bridge task.
+//
+//*****************************************************************************
+#define DATABRIDGETASKSTACKSIZE        128         // Stack size in words
+#define DATABRIDGE_QUEUE_SIZE          5           // Queue size in messages
+
+//*****************************************************************************
+//
+// Queue Handles Needed
+//
+//*****************************************************************************
+extern xSemaphoreHandle g_pBluetoothReceiveQueue;
+extern xSemaphoreHandle g_pSensorDataQueue;
+extern xSemaphoreHandle g_pUARTSendQueue ;
+
+//*****************************************************************************
+//
+// This task toggles the user selected LED at a user selected frequency. User
+// can make the selections by pressing the left and right buttons.
+//
+//*****************************************************************************
+static void DataBridgeTask(void *pvParameters)
+{
+    portTickType ui32WakeTime;
+    BRS_Frame_t* frameToSend = NULL;;
+
+    //
+    // Get the current tick count.
+    //
+    ui32WakeTime = xTaskGetTickCount();
+
+    //
+    // Loop forever.
+    //
+    while(1)
+    {
+    	//Do Stuff
+    }
+}
+
+//*****************************************************************************
+//
+// Initializes the LED task.
+//
+//*****************************************************************************
+uint32_t DataBridgeTaskInit(void)
+{
+    UARTprintf("Initializing Data Bridge Task...\n");
+
+    //
+    // Create the Data Bridge task.
+    //
+    if(xTaskCreate(DataBridgeTask, (signed portCHAR *)"DataBridge", DATABRIDGETASKSTACKSIZE, NULL,
+                   tskIDLE_PRIORITY + PRIORITY_DATA_BRIDGE_TASK, NULL) != pdTRUE)
+    {
+        return(1);
+    }
+
+    //
+    // Success.
+    //
+    return(0);
+}

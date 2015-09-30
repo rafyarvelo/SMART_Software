@@ -2,92 +2,18 @@
 **** Build of configuration Debug for project BRS ****
 
 "C:\\ti\\ccsv6\\utils\\bin\\gmake" -k all 
-gmake: Nothing to be done for `all'.
-
-**** Build Finished ****
-
-**** Build of configuration Debug for project BRS ****
-
-"C:\\ti\\ccsv6\\utils\\bin\\gmake" -k all 
-gmake: Nothing to be done for `all'.
-
-**** Build Finished ****
-
-**** Build of configuration Debug for project BRS ****
-
-"C:\\ti\\ccsv6\\utils\\bin\\gmake" -k all 
-'Building file: ../main.c'
+'Building file: ../brs_c_led.c'
 'Invoking: ARM Compiler'
-"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 --abi=eabi -me -O2 --include_path="C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71" -g --gcc --define=ccs="ccs" --define=PART_TM4C123GH6PM --define=TARGET_IS_TM4C123_RB1 --display_error_number --diag_warning=225 --diag_wrap=off --gen_func_subsections=on --ual --preproc_with_compile --preproc_dependency="main.pp"  "../main.c"
-'Finished building: ../main.c'
+"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 --abi=eabi -me -O2 --include_path="C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include" --include_path="C:/Users/Rafael/SENIOR_DESIGN/SMART_Software/CCS_PROJECTS/BRS" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71/examples/boards/ek-tm4c123gxl" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71/third_party" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71/third_party/FreeRTOS/Source/include" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71/third_party/FreeRTOS" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71/third_party/FreeRTOS/Source/portable/CCS/ARM_CM4F" -g --gcc --define=ccs="ccs" --define=PART_TM4C123GH6PM --define=TARGET_IS_TM4C123_RB1 --display_error_number --diag_warning=225 --diag_wrap=off --gen_func_subsections=on --ual --preproc_with_compile --preproc_dependency="brs_c_led.pp"  "../brs_c_led.c"
+"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include/stdint.h", line 43: warning #303-D: typedef name has already been declared (with same type)
+"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include/stdint.h", line 45: warning #303-D: typedef name has already been declared (with same type)
+"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include/stdint.h", line 47: warning #303-D: typedef name has already been declared (with same type)
+"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include/stdint.h", line 51: warning #303-D: typedef name has already been declared (with same type)
+'Finished building: ../brs_c_led.c'
 ' '
 'Building target: BRS.out'
 'Invoking: ARM Linker'
-"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 --abi=eabi -me -O2 -g --gcc --define=ccs="ccs" --define=PART_TM4C123GH6PM --define=TARGET_IS_TM4C123_RB1 --display_error_number --diag_warning=225 --diag_wrap=off --gen_func_subsections=on --ual -z -m"uart_echo_ccs.map" --heap_size=0 --stack_size=256 -i"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/lib" -i"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include" --reread_libs --warn_sections --display_error_number --diag_wrap=off --xml_link_info="BRS_linkInfo.xml" --rom_model -o "BRS.out" "./brs_c_uart.obj" "./main.obj" "./startup_ccs.obj" "../uart_echo_ccs.cmd"  -l"libc.a" -l"C:/ti/TivaWare_C_Series-2.1.1.71/examples/boards/ek-tm4c123gxl/uart_echo/ccs/../../../../../driverlib/ccs/Debug/driverlib.lib" 
-<Linking>
-'Finished building target: BRS.out'
-' '
-"C:/ti/ccsv6/utils/tiobj2bin/tiobj2bin" "BRS.out" "BRS.bin" "C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/bin/armofd" "C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/bin/armhex" "C:/ti/ccsv6/utils/tiobj2bin/mkhex4bin"
-' '
-
-**** Build Finished ****
-
-**** Build of configuration Debug for project BRS ****
-
-"C:\\ti\\ccsv6\\utils\\bin\\gmake" -k all 
-'Building file: ../main.c'
-'Invoking: ARM Compiler'
-"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 --abi=eabi -me -O2 --include_path="C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71" -g --gcc --define=ccs="ccs" --define=PART_TM4C123GH6PM --define=TARGET_IS_TM4C123_RB1 --display_error_number --diag_warning=225 --diag_wrap=off --gen_func_subsections=on --ual --preproc_with_compile --preproc_dependency="main.pp"  "../main.c"
-"../main.c", line 18: warning #179-D: variable "msg" was declared but never referenced
-'Finished building: ../main.c'
-' '
-'Building target: BRS.out'
-'Invoking: ARM Linker'
-"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 --abi=eabi -me -O2 -g --gcc --define=ccs="ccs" --define=PART_TM4C123GH6PM --define=TARGET_IS_TM4C123_RB1 --display_error_number --diag_warning=225 --diag_wrap=off --gen_func_subsections=on --ual -z -m"uart_echo_ccs.map" --heap_size=0 --stack_size=256 -i"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/lib" -i"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include" --reread_libs --warn_sections --display_error_number --diag_wrap=off --xml_link_info="BRS_linkInfo.xml" --rom_model -o "BRS.out" "./brs_c_uart.obj" "./main.obj" "./startup_ccs.obj" "../uart_echo_ccs.cmd"  -l"libc.a" -l"C:/ti/TivaWare_C_Series-2.1.1.71/examples/boards/ek-tm4c123gxl/uart_echo/ccs/../../../../../driverlib/ccs/Debug/driverlib.lib" 
-<Linking>
-'Finished building target: BRS.out'
-' '
-"C:/ti/ccsv6/utils/tiobj2bin/tiobj2bin" "BRS.out" "BRS.bin" "C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/bin/armofd" "C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/bin/armhex" "C:/ti/ccsv6/utils/tiobj2bin/mkhex4bin"
-' '
-
-**** Build Finished ****
-
-**** Build of configuration Debug for project BRS ****
-
-"C:\\ti\\ccsv6\\utils\\bin\\gmake" -k all 
-'Building file: ../main.c'
-'Invoking: ARM Compiler'
-"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 --abi=eabi -me -O2 --include_path="C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71" -g --gcc --define=ccs="ccs" --define=PART_TM4C123GH6PM --define=TARGET_IS_TM4C123_RB1 --display_error_number --diag_warning=225 --diag_wrap=off --gen_func_subsections=on --ual --preproc_with_compile --preproc_dependency="main.pp"  "../main.c"
-'Finished building: ../main.c'
-' '
-'Building target: BRS.out'
-'Invoking: ARM Linker'
-"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 --abi=eabi -me -O2 -g --gcc --define=ccs="ccs" --define=PART_TM4C123GH6PM --define=TARGET_IS_TM4C123_RB1 --display_error_number --diag_warning=225 --diag_wrap=off --gen_func_subsections=on --ual -z -m"uart_echo_ccs.map" --heap_size=0 --stack_size=256 -i"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/lib" -i"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include" --reread_libs --warn_sections --display_error_number --diag_wrap=off --xml_link_info="BRS_linkInfo.xml" --rom_model -o "BRS.out" "./brs_c_uart.obj" "./main.obj" "./startup_ccs.obj" "../uart_echo_ccs.cmd"  -l"libc.a" -l"C:/ti/TivaWare_C_Series-2.1.1.71/examples/boards/ek-tm4c123gxl/uart_echo/ccs/../../../../../driverlib/ccs/Debug/driverlib.lib" 
-<Linking>
-'Finished building target: BRS.out'
-' '
-"C:/ti/ccsv6/utils/tiobj2bin/tiobj2bin" "BRS.out" "BRS.bin" "C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/bin/armofd" "C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/bin/armhex" "C:/ti/ccsv6/utils/tiobj2bin/mkhex4bin"
-' '
-
-**** Build Finished ****
-
-**** Build of configuration Debug for project BRS ****
-
-"C:\\ti\\ccsv6\\utils\\bin\\gmake" -k all 
-'Building file: ../brs_c_uart.c'
-'Invoking: ARM Compiler'
-"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 --abi=eabi -me -O2 --include_path="C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71" -g --gcc --define=ccs="ccs" --define=PART_TM4C123GH6PM --define=TARGET_IS_TM4C123_RB1 --display_error_number --diag_warning=225 --diag_wrap=off --gen_func_subsections=on --ual --preproc_with_compile --preproc_dependency="brs_c_uart.pp"  "../brs_c_uart.c"
-"../brs_c_uart.c", line 95: warning #552-D: variable "buffer" was set but never used
-'Finished building: ../brs_c_uart.c'
-' '
-'Building file: ../main.c'
-'Invoking: ARM Compiler'
-"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 --abi=eabi -me -O2 --include_path="C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71" -g --gcc --define=ccs="ccs" --define=PART_TM4C123GH6PM --define=TARGET_IS_TM4C123_RB1 --display_error_number --diag_warning=225 --diag_wrap=off --gen_func_subsections=on --ual --preproc_with_compile --preproc_dependency="main.pp"  "../main.c"
-'Finished building: ../main.c'
-' '
-'Building target: BRS.out'
-'Invoking: ARM Linker'
-"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 --abi=eabi -me -O2 -g --gcc --define=ccs="ccs" --define=PART_TM4C123GH6PM --define=TARGET_IS_TM4C123_RB1 --display_error_number --diag_warning=225 --diag_wrap=off --gen_func_subsections=on --ual -z -m"uart_echo_ccs.map" --heap_size=0 --stack_size=256 -i"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/lib" -i"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include" --reread_libs --warn_sections --display_error_number --diag_wrap=off --xml_link_info="BRS_linkInfo.xml" --rom_model -o "BRS.out" "./brs_c_uart.obj" "./main.obj" "./startup_ccs.obj" "../uart_echo_ccs.cmd"  -l"libc.a" -l"C:/ti/TivaWare_C_Series-2.1.1.71/examples/boards/ek-tm4c123gxl/uart_echo/ccs/../../../../../driverlib/ccs/Debug/driverlib.lib" 
+"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 --abi=eabi -me -O2 -g --gcc --define=ccs="ccs" --define=PART_TM4C123GH6PM --define=TARGET_IS_TM4C123_RB1 --display_error_number --diag_warning=225 --diag_wrap=off --gen_func_subsections=on --ual -z -m"freertos_demo_ccs.map" --heap_size=0 --stack_size=512 -i"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/lib" -i"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include" --reread_libs --warn_sections --display_error_number --diag_wrap=off --xml_link_info="BRS_linkInfo.xml" --rom_model -o "BRS.out" "./brs_c_bluetooth.obj" "./brs_c_bt_task.obj" "./brs_c_data_bridge_task.obj" "./brs_c_led.obj" "./brs_c_sensor_task.obj" "./brs_c_uart.obj" "./brs_c_uart_task.obj" "./brs_main.obj" "./led_task.obj" "./smart_data_types.obj" "./startup_ccs.obj" "./switch_task.obj" "./utils/uartstdio.obj" "./utils/ustdlib.obj" "./third_party/FreeRTOS/Source/list.obj" "./third_party/FreeRTOS/Source/queue.obj" "./third_party/FreeRTOS/Source/tasks.obj" "./third_party/FreeRTOS/Source/portable/MemMang/heap_2.obj" "./third_party/FreeRTOS/Source/portable/CCS/ARM_CM4F/port.obj" "./third_party/FreeRTOS/Source/portable/CCS/ARM_CM4F/portasm.obj" "./drivers/buttons.obj" "./drivers/rgb.obj" "../freertos_demo_ccs.cmd"  -l"libc.a" -l"C:/ti/TivaWare_C_Series-2.1.1.71/examples/boards/ek-tm4c123gxl/freertos_demo/ccs/../../../../../driverlib/ccs/Debug/driverlib.lib" 
 <Linking>
 'Finished building target: BRS.out'
 ' '

@@ -1,0 +1,93 @@
+//*****************************************************************************
+//
+// brs_c_uart_task.c - Implementation for the UART task.
+//
+//*****************************************************************************
+#include <stdbool.h>
+#include <stdint.h>
+#include "inc/hw_memmap.h"
+#include "inc/hw_types.h"
+#include "driverlib/gpio.h"
+#include "driverlib/rom.h"
+#include "drivers/rgb.h"
+#include "drivers/buttons.h"
+#include "utils/uartstdio.h"
+#include "brs_c_uart_task.h"
+#include "../../smart_data_types.h"
+#include "priorities.h"
+#include "FreeRTOS.h"
+#include "task.h"
+#include "queue.h"
+#include "semphr.h"
+
+//*****************************************************************************
+//
+// The stack size for the UART task.
+//
+//*****************************************************************************
+#define UARTTASKSTACKSIZE        128         // Stack size in words
+
+//*****************************************************************************
+//
+// Queue Handles Needed
+//
+//*****************************************************************************
+extern xQueueHandle g_pBluetoothSendQueue;
+       xQueueHandle g_pUARTSendQueue;
+
+//*****************************************************************************
+//
+// This task toggles the user selected LED at a user selected frequency. User
+// can make the selections by pressing the left and right buttons.
+//
+//*****************************************************************************
+static void UARTTask(void *pvParameters)
+{
+    portTickType ui32WakeTime;
+    TM_Frame_t   receivedFrame;
+
+    //
+    // Get the current tick count.
+    //
+    ui32WakeTime = xTaskGetTickCount();
+
+    //
+    // Loop forever.
+    //
+    while(1)
+    {
+    	//Do Stuff
+
+        vTaskDelayUntil(&ui32WakeTime, ui32LEDToggleDelay / portTICK_RATE_MS);
+    }
+}
+
+//*****************************************************************************
+//
+// Initializes the LED task.
+//
+//*****************************************************************************
+uint32_t UARTTaskInit(void)
+{
+    UARTprintf("\nInitializing UART Task...\n");
+    UARTprintf("Led blinking frequency is %d ms.\n", (LED_TOGGLE_DELAY * 2));
+
+    //
+    // Create a queue for sending messages to the LED task.
+    //
+    g_pLEDQueue = xQueueCreate(LED_QUEUE_SIZE, LED_ITEM_SIZE);
+
+    //
+    // Create the LED task.
+    //
+    if(xTaskCreate(LEDTask, (signed portCHAR *)"LED", LEDTASKSTACKSIZE, NULL,
+                   tskIDLE_PRIORITY + PRIORITY_LED_TASK, NULL) != pdTRUE)
+    {
+        return(1);
+    }
+
+    //
+    // Success.
+    //
+    return(0);
+}

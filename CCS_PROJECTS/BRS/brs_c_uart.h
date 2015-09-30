@@ -21,15 +21,7 @@
 #include "driverlib/rom.h"
 #include "driverlib/sysctl.h"
 #include "driverlib/uart.h"
-#include "brs_c_message_constants.h"
-
-//*****************************************************************************
-//
-// Initialize the UART
-//
-//*****************************************************************************
-void Init_UART();
-
+#include "../../smart_data_types.h"
 
 //*****************************************************************************
 //
@@ -38,6 +30,14 @@ void Init_UART();
 //*****************************************************************************
 void LED_Blink(uint16_t delay);
 
+#ifdef UART_INTERRUPT
+//*****************************************************************************
+//
+// Initialize the UART for interrupt enabled responses. This will be our
+// Secondary method of UART Communication if the UART Task is not responsive
+//
+//*****************************************************************************
+void Init_UART();
 
 //*****************************************************************************
 //
@@ -46,6 +46,16 @@ void LED_Blink(uint16_t delay);
 //*****************************************************************************
 void UARTIntHandler(void);
 
+#else //Use FreeRTOS UART Task
+
+//*****************************************************************************
+//
+// Configure the UART and its pins.  This must be called before UARTprintf().
+//
+//*****************************************************************************
+void ConfigureUART(void);
+
+#endif //UART_INTERRUPT
 
 //*****************************************************************************
 //
@@ -54,7 +64,6 @@ void UARTIntHandler(void);
 //*****************************************************************************
 void UARTSend(const uint8_t *pui8Buffer, uint32_t ui32Count);
 
-
 //*****************************************************************************
 //
 // Retrieve a string from the UART, return bytes actually read
@@ -62,29 +71,26 @@ void UARTSend(const uint8_t *pui8Buffer, uint32_t ui32Count);
 //*****************************************************************************
 uint16_t UARTReceive(volatile uint8_t *pui8Buffer, uint32_t ui32Count);
 
+//*****************************************************************************
+//
+// Return true  (1) if there is a BCI Message ready in the UART, otherwise
+// return false (0)
+//
+//*****************************************************************************
+int BCIMessageAvailable();
 
 //*****************************************************************************
 //
-// Check for Messages coming in from the UART and handle them appropriately.
-// Parameter should be the base address of a received character buffer
+// Read Incoming BCI Message from UART
 //
 //*****************************************************************************
-void CheckMessageID(volatile uint8_t* addr);
-
+TM_Frame_t* ReadBCI2BRSMsg();
 
 //*****************************************************************************
 //
-// Read Incoming BCI Message
+// Send a BRS Frame through the UART
 //
 //*****************************************************************************
-void ReadBCI2BRSMsg(volatile uint8_t *pui8Buffer, uint32_t ui32Count);
-
-
-//*****************************************************************************
-//
-// Read Incoming Mobile Device Message
-//
-//*****************************************************************************
-void ReadMD2BRSMsg(volatile uint8_t *pui8Buffer, uint32_t ui32Count);
+void SendBRSFrame(BRS_Frame_t* pFrame);
 
 #endif /* BRS_C_UART_H_ */

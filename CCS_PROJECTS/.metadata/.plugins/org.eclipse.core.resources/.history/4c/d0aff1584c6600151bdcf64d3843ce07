@@ -1,0 +1,169 @@
+#ifndef SMART_DATA_TYPES_H
+#define SMART_DATA_TYPES_H
+
+#include "smart_config.h"
+#include "smart_message_constants.h"
+
+#ifdef __cplusplus
+	extern "C" {
+#endif
+
+#define MAX_RANGE_TO_OBJECT 6 //Meters
+#define MAX_EEG_ELECTRODES  32
+
+//##############SMART Data Types##############
+
+//For Easy access to Emotiv Electrode Data
+typedef enum Emotiv_Electrodes
+{
+    F3=0, FC6, P7, T8 , F7,
+    F8  , T7 , P8, AF4, F4,
+    AF3 , O2 , O1, FC5, NUM_EMOTIV_ELECTRODES
+} Emotiv_Electrodes;
+
+//This struct defines what a single frame of EEG Data looks like
+typedef struct EEG_Frame_t
+{
+    //The type of EEG that the frame belongs to, appended by EEG IO class
+    eegTypeEnum eegType;
+
+    quint32 counter; //Value counter
+
+    //Data from Each electrode, defaults to 0
+    qint32 electrodeData[MAX_EEG_ELECTRODES];
+
+    //Contact Quality from Each electrode, defaults to 0
+    qint16 contactQuality[MAX_EEG_ELECTRODES];
+
+    //Gyro Values
+    qint8 gyroX;
+    qint8 gyroY;
+
+    //Percentage of Full Battery Charge
+    quint8 batteryPercentage;
+} EEG_Frame_t;
+
+typedef struct GPS_Data_t
+{
+    float latitude;
+    float longitude;
+    float altitude;
+    float groundSpeed;
+} GPS_Data_t;
+
+typedef struct US_Data_t
+{
+    float rangeToObject;
+} US_Data_t;
+
+typedef struct SensorData_t
+{
+	GPS_Data_t gpsData;
+	US_Data_t  rangeFinderData;
+} SensorData_t;
+
+// A Frame of BRS Data
+typedef struct BRS_Frame_t
+{
+	MSG_ID_Type      MsgId; //Message Sent from BRS to BCI
+	SensorData_t     sensorData
+    PCC_Command_Type remoteCommand;
+} BRS_Frame_t;
+
+typedef struct TM_Frame_t
+{
+    MSG_ID_Type          MsgId; //Message Sent From BCI -> BRS -> MD
+    int                  timeStamp;
+    EEG_Frame_t          eegFrame; //Only the Latest Frame, EEG Telemetry is managed by the C_EEG_IO class
+    BRS_Frame_t          brsFrame;
+    LED_Group_Fwd        ledForward;
+    LED_Group_Bwd        ledBackward;
+    LED_Group_Rgt        ledRight;
+    LED_Group_Lft        ledLeft;
+    ConnectionStatusType eegConnectionStatus;
+    ConnectionStatusType pccConnectionStatus;
+    ConnectionStatusType brsConnectionStatus;
+    ConnectionStatusType flasherConnectionStatus;
+} TM_Frame_t;
+
+typedef struct BluetoothFrame_t
+{
+	MSG_ID_Type      MsgId;
+	PCC_Command_Type remoteCommand;
+} BluetoothFrame_t;
+
+//############################################
+
+//*****************************************************************************
+//
+// The item size for the messages
+//
+//*****************************************************************************
+#define BRS2BCI_SIZE     sizeof(BRS_Frame_t)
+#define BCI2BRS_SIZE     sizeof(TM_Frame_t)
+#define MD2BRS_SIZE      sizeof(BluetoothFrame_t)
+#define BRS2MD_SIZE      sizeof(TM_Frame_t)
+#define SENSOR_DATA_SIZE sizeof(GPS_Data_t) + sizeof(US_Data_t);
+
+//*****************************************************************************
+//
+// Data Type Creation/Initialization
+//
+//*****************************************************************************
+BRS_Frame_t* createBRSFrame()
+{
+	size_t dataSize = 0;
+	BRS_Frame_t* ptr = NULL;
+
+	//Create Frame
+	dataSize = sizeof(BRS_Frame_t);
+	ptr      = (BRS_Frame_t*) malloc(dataSize);
+	memset(ptr, 0, dataSize);
+
+	//Return new allocated frame
+	return ptr;
+}
+
+EEG_Frame_t* createEEGFrame()
+{
+	size_t dataSize = 0;
+	EEG_Frame_t* ptr = NULL;
+
+	//Create Frame
+	dataSize = sizeof(EEG_Frame_t);
+	ptr      = (EEG_Frame_t*) malloc(dataSize);
+	memset(ptr, 0, dataSize);
+
+	//Initialize Defaults
+	ptr->eegType = DEFAULT_EEG_TYPE;
+
+	//Return new allocated frame
+	return ptr;
+}
+
+TM_Frame_t* createTMFrame()
+{
+	size_t dataSize = 0;
+	TM_Frame_t* ptr = NULL;
+	EEG_Frame_t* tmpEEGFrame = createEEGFrame();
+	BRS_Frame_t* tmpBRSFrame = createBRSFrame();
+
+	//Create Frame
+	dataSize = sizeof(TM_Frame_t);
+	ptr      = (TM_Frame_t*) malloc(dataSize);
+	memset(ptr, 0, dataSize);
+
+	//Initialize Defaults
+	memcpy(&ptr->eegFrame,tmpEEGFrame , sizeof(EEG_Frame_t));
+	memcpy(&ptr->brsFrame,tmpBRSFrame, sizeof(BRS_Frame_t));
+	ptr->pccConnectionStatus     = NOT_CONNECTED;
+	ptr->brsConnectionStatus     = NOT_CONNECTED;
+	ptr->eegConnectionStatus     = NOT_CONNECTED;
+	ptr->flasherConnectionStatus = NOT_CONNECTED;
+
+	//Free Temp Memory Space
+	//Return new allocated frame
+	return ptr;
+}
+#endif // _cplusplus
+#endif //SMART_DATA_TYPES_H

@@ -1,0 +1,51 @@
+################################################################################
+# Automatically-generated file. Do not edit!
+################################################################################
+
+# Add inputs and outputs from these tool invocations to the build variables 
+CMD_SRCS += \
+../freertos_demo_ccs.cmd 
+
+C_SRCS += \
+../brs_c_uart.c \
+../brs_main.c \
+../led_task.c \
+../startup_ccs.c \
+../switch_task.c 
+
+OBJS += \
+./brs_c_uart.obj \
+./brs_main.obj \
+./led_task.obj \
+./startup_ccs.obj \
+./switch_task.obj 
+
+C_DEPS += \
+./brs_c_uart.pp \
+./brs_main.pp \
+./led_task.pp \
+./startup_ccs.pp \
+./switch_task.pp 
+
+C_DEPS__QUOTED += \
+"brs_c_uart.pp" \
+"brs_main.pp" \
+"led_task.pp" \
+"startup_ccs.pp" \
+"switch_task.pp" 
+
+OBJS__QUOTED += \
+"brs_c_uart.obj" \
+"brs_main.obj" \
+"led_task.obj" \
+"startup_ccs.obj" \
+"switch_task.obj" 
+
+C_SRCS__QUOTED += \
+"../brs_c_uart.c" \
+"../brs_main.c" \
+"../led_task.c" \
+"../startup_ccs.c" \
+"../switch_task.c" 
+
+

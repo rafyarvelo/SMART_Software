@@ -15,15 +15,15 @@ volatile uint8_t RECEIVE_BUFFER[MAX_BUFFER_SIZE];
 //
 //*****************************************************************************
 #ifdef DEBUG
-void
-__error__(char *pcFilename, uint32_t ui32Line)
+void __error__(char *pcFilename, uint32_t ui32Line)
 {
 }
 #endif
 
+#ifdef UART_INTERRUPT
 //*****************************************************************************
 //
-// Initialize the UART
+// Initialize the UART for interrupt enabled responses
 //
 //*****************************************************************************
 void Init_UART()
@@ -133,6 +133,45 @@ void UARTIntHandler(void)
     }
 }
 
+#else//FreeRTOS UART Task
+
+//*****************************************************************************
+//
+// Configure the UART and its pins.  This must be called before UARTSend().
+//
+//*****************************************************************************
+void ConfigureUART(void)
+{
+    //
+    // Enable the GPIO Peripheral used by the UART.
+    //
+    ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
+
+    //
+    // Enable UART0
+    //
+    ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
+
+    //
+    // Configure GPIO Pins for UART mode.
+    //
+    ROM_GPIOPinConfigure(GPIO_PA0_U0RX);
+    ROM_GPIOPinConfigure(GPIO_PA1_U0TX);
+    ROM_GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
+
+    //
+    // Use the internal 16MHz oscillator as the UART clock source.
+    //
+    UARTClockSourceSet(UART0_BASE, UART_CLOCK_PIOSC);
+
+    //
+    // Initialize the UART for console I/O.
+    //
+    UARTStdioConfig(0, 115200, 16000000);
+}
+
+#endif //UART_INTERRUPT
+
 //*****************************************************************************
 //
 // Send a string to the UART.
@@ -183,7 +222,8 @@ void LED_Blink(uint16_t delay)
 uint16_t UARTReceive(volatile uint8_t *pui8Buffer, uint32_t ui32Count)
 {
 	uint16_t bytesReceived = 0;
-    //
+
+	//
     // Loop while there are characters in the receive FIFO.
     //
     while(ROM_UARTCharsAvail(UART0_BASE) && ui32Count--)
@@ -205,30 +245,26 @@ uint16_t UARTReceive(volatile uint8_t *pui8Buffer, uint32_t ui32Count)
 
 //*****************************************************************************
 //
-// Check for Messages coming in from the UART and handle them appropriately.
-// Parameter should be the base address of a received character buffer
+// Return true  (1) if there is a BCI Message ready in the UART, otherwise
+// return false (0)
 //
 //*****************************************************************************
-void CheckMessageID(volatile uint8_t* addr)
+int BCIMessageAvailable()
 {
-	//Convert Byte to Word Address
-	volatile uint32_t *pMsgId  = (volatile uint32_t*) addr;
+	uint32_t msgIdSize        = sizeof(MSG_ID_Type);
+	volatile uint8_t *pMsgId  = malloc(msgIdSize);
 
-	//We Expect the Msg Id (4 bytes), Msg Size (4 Bytes), then the Message it self
-	uint32_t  MsgId   = *pMsgId;
-	uint32_t  MsgSize = *(pMsgId + sizeof(int));
+	//Check for a Message ID
+	UARTReceive(pMsgId, msgIdSize);
 
-	switch (MsgId)
+	//Return True if a message Id was found
+	if (pMsgId != NULL && *pMsgId == BRS2BCI_MSG_ID)
 	{
-		case BCI2BRS_MSG_ID:
-			//Read in the Data after the size field
-			ReadBCI2BRSMsg(addr + (sizeof(int) * 2), MsgSize);
-		break;
-
-		case MD2BRS_MSG_ID:
-			//Read in the Data after the size field
-			ReadMD2BRSMsg(addr  + (sizeof(int) * 2), MsgSize);
-		break;
+		return TRUE;
+	}
+	else
+	{
+		return FALSE;
 	}
 }
 
@@ -237,23 +273,23 @@ void CheckMessageID(volatile uint8_t* addr)
 // Read Incoming BCI Message
 //
 //*****************************************************************************
-void ReadBCI2BRSMsg(volatile uint8_t *pui8Buffer, uint32_t ui32Count)
+TM_Frame_t* ReadBCI2BRSMsg()
 {
-	//Get the Message
-	UARTReceive(pui8Buffer, ui32Count);
+	TM_Frame_t* ptr = createTMFrame();
 
-	//TODO: Process the Msg
+	//Get the Message
+	UARTReceive((volatile uint8_t*) ptr, sizeof(TM_Frame_t));
+
+	//return Message
+	return ptr;
 }
 
 //*****************************************************************************
 //
-// Read Incoming Mobile Device Message
+// Send a BRS Frame through the UART
 //
 //*****************************************************************************
-void ReadMD2BRSMsg(volatile uint8_t *pui8Buffer, uint32_t ui32Count)
+void SendBRSFrame(BRS_Frame_t* pFrame)
 {
-	//Get the Message
-	UARTReceive(pui8Buffer, ui32Count);
-
-	//TODO: Process the Msg
+	UARTSend((const uint8_t*) pFrame, sizeof(BRS_Frame_t));
 }
