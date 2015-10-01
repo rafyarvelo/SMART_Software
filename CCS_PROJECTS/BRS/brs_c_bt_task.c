@@ -34,7 +34,6 @@
 xQueueHandle g_pBluetoothSendQueue;
 xQueueHandle g_pBluetoothReceiveQueue;
 
-
 static void BluetoothTask(void *pvParameters)
 {
     portTickType     ui32WakeTime;
@@ -120,6 +119,9 @@ uint32_t BluetoothTaskInit(void)
     //
     g_pBluetoothSendQueue    = xQueueCreate(BLUETOOTH_QUEUE_SIZE,BRS2MD_SIZE);
     g_pBluetoothReceiveQueue = xQueueCreate(BLUETOOTH_QUEUE_SIZE,MD2BRS_SIZE);
+
+    //Seed the Random Number
+    srand(xTaskGetTickCount());
 
     //
     // Create the Bluetooth task.

@@ -90,6 +90,9 @@ uint32_t SensorTaskInit(void)
     //
     g_pSensorDataQueue = xQueueCreate(SENSOR_QUEUE_SIZE, SENSOR_DATA_SIZE);
 
+    //Seed the Random Number
+    srand(xTaskGetTickCount());
+
     //
     // Create the Sensor task.
     //
