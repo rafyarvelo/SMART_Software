@@ -19,18 +19,22 @@
 	using namespace std;
 
 	typedef bool ConnectionStatusType;
+#else
+	typedef int  ConnectionStatusType;
 #endif
 
 //Common Typedefs
-typedef u_int8_t  PCC_Command_Type;
-typedef u_int8_t  byteType;
-typedef u_int16_t shortType;
-typedef u_int32_t wordType;
-typedef u_int32_t sizeType;
-typedef u_int64_t longType;
+typedef unsigned char      PCC_Command_Type;
+typedef unsigned char      uint8_t;
+typedef unsigned short     uint16_t;
+typedef unsigned int       uint32_t;
+typedef unsigned int       sizeType;
+typedef unsigned long long uint64_t;
 
-#define CONNECTED     1
-#define NOT_CONNECTED 0
+#define TRUE          1
+#define FALSE         0
+#define CONNECTED     TRUE
+#define NOT_CONNECTED FALSE
 
 //=====================EEG/BRS IO Declaration======================
 typedef enum
