@@ -1,0 +1,61 @@
+/*
+ * brs_c_led.c
+ *
+ *  Created on: Sep 29, 2015
+ *      Author: Rafael
+ */
+
+#include "brs_c_led.h"
+
+// LED Color Access
+//
+// [G, R, B] range is 0 to 0xFFFF per color.
+//
+static uint32_t g_pui32Colors[NUM_LED_COLORS] = { 0x0000, 0x0000, 0x0000 };
+static uint8_t g_ui8ColorsIndx;
+
+void ConfigureLEDs()
+{
+    //
+    // Initialize the GPIOs and Timers that drive the three LEDs.
+    //
+    RGBInit(1);
+    RGBIntensitySet(0.3f);
+
+    //
+    // Turn on the Green LED
+    //
+    g_ui8ColorsIndx = 0;
+    g_pui32Colors[g_ui8ColorsIndx] = 0x8000;
+}
+
+void ConfigureLEDs();
+
+void BlinkLED(LEDColor ledColor)
+{
+	if (ledColor >= NUM_LED_COLORS)
+	{
+		return;
+	}
+
+	//Set the Applicable LED
+	g_ui8ColorsIndx[ledColor] = LED_ON;
+	RGBColorSet(g_pui32Colors);
+
+    //
+    // Turn on the LED.
+    //
+    RGBEnable();
+
+    //
+    // Wait for the required amount of time.
+    //
+    vTaskDelayUntil(&ui32WakeTime, ui32LEDToggleDelay / portTICK_RATE_MS);
+
+    //
+    // Turn off the LED.
+    //
+    RGBDisable();
+
+}
+void SetLED(LEDColor color, int ledOnOrOff);

@@ -1,0 +1,57 @@
+/*
+ * brs_c_led.h
+ *
+ *  Created on: Sep 29, 2015
+ *      Author: Rafael
+ */
+
+#ifndef BRS_C_LED_H_
+#define BRS_C_LED_H_
+
+//*****************************************************************************
+//
+// Default LED toggle delay value. LED toggling frequency is twice this number.
+//
+//*****************************************************************************
+#define LED_TOGGLE_DELAY 250
+#define LED_ON           0x8000
+#define LED_OFF          0x0000
+
+//Actually a full RGB Range, but this is for Simplicity
+typedef enum LEDColor
+{
+	GREEN=0,
+	RED,
+	BLUE,
+	NUM_LED_COLORS
+}LEDColor;
+
+//*****************************************************************************
+//
+// Configure the LEDs for Full RGB Functionality
+//
+//*****************************************************************************
+void ConfigureLEDs();
+
+//*****************************************************************************
+//
+// Blink an LED
+//
+//*****************************************************************************
+void BlinkLED(LEDColor ledColor, uint8_t numTimes);
+
+//*****************************************************************************
+//
+// Set an LED On or Off
+//
+//*****************************************************************************
+void SetLED(LEDColor color, int ledOnOrOff);
+
+//*****************************************************************************
+//
+// Set LED with full RGB Functionality
+//
+//*****************************************************************************
+void SetLEDRGB();
+
+#endif /* BRS_C_LED_H_ */

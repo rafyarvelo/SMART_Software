@@ -1,0 +1,89 @@
+#include <stdbool.h>
+#include <stdint.h>
+#include "inc/hw_memmap.h"
+#include "inc/hw_types.h"
+#include "driverlib/gpio.h"
+#include "driverlib/rom.h"
+#include "drivers/rgb.h"
+#include "drivers/buttons.h"
+#include "utils/uartstdio.h"
+#include "brs_c_sensor_task.h"
+#include "../../smart_data_types.h"
+#include "priorities.h"
+#include "FreeRTOS.h"
+#include "task.h"
+#include "queue.h"
+#include "semphr.h"
+
+//*****************************************************************************
+//*****************************************************************************
+//
+// The stack size for the UART task.
+//
+//*****************************************************************************
+#define SENSORTASKSTACKSIZE        128         // Stack size in words
+#define SENSOR_QUEUE_SIZE          5           // Queue size in messages
+
+//*****************************************************************************
+//
+// Queue Handles Needed
+//
+//*****************************************************************************
+xQueueHandle g_pSensorDataQueue;
+
+//*****************************************************************************
+//
+// This task toggles the user selected LED at a user selected frequency. User
+// can make the selections by pressing the left and right buttons.
+//
+//*****************************************************************************
+static void SensorTask(void *pvParameters)
+{
+    portTickType     ui32WakeTime;
+    GPS_Data_t       gpsData;
+    US_Data_t        usData;
+
+    //
+    // Get the current tick count.
+    //
+    ui32WakeTime = xTaskGetTickCount();
+
+    //
+    // Loop forever.
+    //
+    while(1)
+    {
+    	//Do Stuff
+
+        vTaskDelayUntil(&ui32WakeTime, ui32LEDToggleDelay / portTICK_RATE_MS);
+    }
+}
+
+//*****************************************************************************
+//
+// Initializes the Bluetooth task.
+//
+//*****************************************************************************
+uint32_t SensorTaskInit(void)
+{
+    UARTprintf("\nInitializing Sensor Task...\n");
+
+    //
+    // Create a queue for sending/receiving messages
+    //
+    g_pSensorDataQueue = xQueueCreate(SENSOR_QUEUE_SIZE,SENSOR_DATA_SIZE);
+
+    //
+    // Create the LED task.
+    //
+    if(xTaskCreate(BluetoothTask, (signed portCHAR *)"Bluetooth", BLUETOOTHTASKSTACKSIZE, NULL,
+                   tskIDLE_PRIORITY + PRIORITY_BT_TASK, NULL) != pdTRUE)
+    {
+        return(1);
+    }
+
+    //
+    // Success.
+    //
+    return(0);
+}
