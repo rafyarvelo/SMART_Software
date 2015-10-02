@@ -13,6 +13,7 @@
 //Basic Common Declarations
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #ifdef __cplusplus
 	#include <iostream>
