@@ -11,7 +11,6 @@
 /*
  * General Message Format:
  * MESSAGE ID - 4 Bytes Unsigned
- * MESSAGE SIZE - 4 Bytes Unsigned
  * ...
  * N Bytes of Data
  *

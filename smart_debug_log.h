@@ -34,28 +34,28 @@ class SMART_DEBUG_LOG : public C_Singleton<SMART_DEBUG_LOG>
 {
 public:
     SMART_DEBUG_LOG()
-	 {
-	 	bciLog.open(BCI_LOG_FILENAME, ofstream::out);
-	 	brsLog.open(BRS_LOG_FILENAME, ofstream::out);
-		pccLog.open(PCC_LOG_FILENAME, ofstream::out);
-	 	flasherLog.open(FLASHER_LOG_FILENAME, ofstream::out);
+     {
+        bciLog.open(BCI_LOG_FILENAME, ofstream::out);
+        brsLog.open(BRS_LOG_FILENAME, ofstream::out);
+        pccLog.open(PCC_LOG_FILENAME, ofstream::out);
+        flasherLog.open(FLASHER_LOG_FILENAME, ofstream::out);
         serialCommLog.open(SERIAL_COMM_LOG_FILENAME, ofstream::out);
-	 }	
+     }
 
     ~SMART_DEBUG_LOG()
-	{
-		bciLog.close();
-		brsLog.close();
-		pccLog.close();
-		flasherLog.close();
+    {
+        bciLog.close();
+        brsLog.close();
+        pccLog.close();
+        flasherLog.close();
         serialCommLog.close();
-	}
+    }
 
-	//return References to file streams when requested
-	ofstream& BCI_Log()    { return bciLog; }
-	ofstream& BRS_Log()    { return brsLog; }
-	ofstream& PCC_Log()    { return pccLog; }
-	ofstream& Flasher_Log(){ return flasherLog; }	
+    //return References to file streams when requested
+    ofstream& BCI_Log()    { return bciLog; }
+    ofstream& BRS_Log()    { return brsLog; }
+    ofstream& PCC_Log()    { return pccLog; }
+    ofstream& Flasher_Log(){ return flasherLog; }
     ofstream& SerialComm_Log(){ return serialCommLog; }
 	
     void println(DebugLogType log,string str, bool printToStdOut=false, bool printToStdErr=false)
@@ -98,11 +98,11 @@ public:
     }
 
 private:
-	//fileStreams
-	ofstream bciLog;
-	ofstream brsLog;
-	ofstream pccLog;
-	ofstream flasherLog;
+    //fileStreams
+    ofstream bciLog;
+    ofstream brsLog;
+    ofstream pccLog;
+    ofstream flasherLog;
     ofstream serialCommLog;
 };
 

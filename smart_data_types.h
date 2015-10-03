@@ -3,14 +3,23 @@
 
 #include "smart_config.h"
 #include "smart_message_constants.h"
+#include "CCS_PROJECTS/PCC/power_chair_command_constants.h"
 
-//Keep this File C Compatible
+////Keep this File C Compatible
 #ifdef __cplusplus
-	extern "C" {
+    extern "C" {
 #endif
 
 
 //##############SMART Data Types##############
+#define EMERGENCY_STOP_DISTANCE   1     //Meters
+#define MAX_RANGE_TO_OBJECT       6     //Meters
+#define MAX_TM_FRAMES             25    //Only store the latest 25 Frames
+#define COMMAND_TIMEOUT           20000 //Wait 20 seconds before killing the System
+#define	LED_FORWARD_FREQ_DEFAULT  10    //Hertz
+#define	LED_BACKWARD_FREQ_DEFAULT 20    //Hertz
+#define	LED_RIGHT_FREQ_DEFAULT    30    //Hertz
+#define	LED_LEFT_FREQ_DEFAULT     40    //Hertz
 
 //====================EEG Types====================
 typedef enum Emotiv_Electrodes
@@ -20,8 +29,11 @@ typedef enum Emotiv_Electrodes
     AF3 , O2 , O1, FC5, NUM_EMOTIV_ELECTRODES
 } Emotiv_Electrodes;
 
-#define MAX_RANGE_TO_OBJECT 6 //Meters
-#define MAX_EEG_ELECTRODES  NUM_EMOTIV_ELECTRODES //32 (Used to be 32 because of Nautilus EEG)
+#if DEFAULT_EEG_TYPE == EEG_TYPE_EMOTIV
+    #define MAX_EEG_ELECTRODES  NUM_EMOTIV_ELECTRODES
+#else
+    #define MAX_EEG_ELECTRODES  32 //(Used to be 32 because of Nautilus EEG)
+#endif
 
 //This struct defines what a single frame of EEG Data looks like
 typedef struct EEG_Frame_t
@@ -57,7 +69,8 @@ typedef struct GPS_Data_t
 
 typedef struct US_Data_t
 {
-    float rangeToObject;
+    float rangeFront;
+    float rangeBack;
 } US_Data_t;
 
 typedef struct SensorData_t
@@ -82,10 +95,6 @@ typedef struct BRS_Frame_t
 //===============================================
 
 //==================Flasher Types==================
-#define	LED_FORWARD_FREQ_DEFAULT  10
-#define	LED_BACKWARD_FREQ_DEFAULT 20
-#define	LED_RIGHT_FREQ_DEFAULT    30
-#define	LED_LEFT_FREQ_DEFAULT     40
 typedef enum
 {
     LED_FORWARD=0,
@@ -100,13 +109,49 @@ typedef struct LED_Group_t
 	LED_Group_ID id;
 	uint16_t     frequency;
 } LED_Group_t;
+
 //=================================================
+
+typedef enum BCIState
+{
+    BCI_OFF=0,
+    /*
+     * 1) Remain in this state until Run() is called
+     * 2) When Run() is called, Move to BCI_INITIALIZATION
+     */
+    BCI_INITIALIZATION,
+    /*
+     * 1) Create Instances of RVS, JA2BRS, BRS2JA, JA2PCC, and EEG IO
+     * 2) Connect to Flasher, EEG, BRSH, and PCC
+     * 3) Generate RVS Frequencies
+     * 4) Send RVS to Flasher
+     * 5) Send TM Packet to BRSH
+     * 6) Move to BCI_STANDBY
+     */
+    BCI_STANDBY,
+    /*
+     * 1) Wait for EEG Data or Remote Commands
+     * 2) Upon Receipt of EEG Data or Remote Commands, move to BCI_PROCESSING
+     */
+    BCI_PROCESSING,
+    /*
+     * 1) Process the data
+     * 2) Generate PCC Command
+     * 3) Move to BCI_READY
+     */
+    BCI_READY
+    /*
+     * 1) Send the Command
+     * 2) Revert to BCI_STANDBY
+     */
+}BCIState;
 
 //Full Telemetry Frame
 typedef struct TM_Frame_t
 {
     MSG_ID_Type          MsgId; //Message Sent From BCI -> BRS -> MD
     int                  timeStamp;
+    BCIState             bciState;
     EEG_Frame_t          eegFrame; //Only the Latest Frame, EEG Telemetry is managed by the C_EEG_IO class
     BRS_Frame_t          brsFrame;
     LED_Group_t          ledForward;
@@ -143,8 +188,8 @@ BRS_Frame_t*      createBRSFrame();
 LED_Group_t*      createLEDGroup(LED_Group_ID id);
 BluetoothFrame_t* createBluetoothFrame();
 
-#ifdef _cplusplus
-	} //extern "C"
+#ifdef __cplusplus
+    } //extern "C"
 #endif
 
 #endif //SMART_DATA_TYPES_H
