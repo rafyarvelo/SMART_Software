@@ -1,9 +1,8 @@
 #include "bci_c_brsh_io_serial.h"
 
 C_BRSH_IO_Serial::C_BRSH_IO_Serial()
+    : C_Serial_Comm(BRS_PORT)
 {
-    //Initialize Serial Communication
-    mSerialCommPtr = C_Serial_Comm::Instance(QString(BRS_PORT));
 }
 
 C_BRSH_IO_Serial::~C_BRSH_IO_Serial()
@@ -14,46 +13,61 @@ C_BRSH_IO_Serial::~C_BRSH_IO_Serial()
 //Send TM to the BRSH
 void C_BRSH_IO_Serial::SendTMFrame(TM_Frame_t* pFrame)
 {
-    sizeType frameSize = (sizeType) sizeof(TM_Frame_t);
     unsigned int msgID = BCI2BRS_MSG_ID;
 
     //Write the TM Frame to the BRS through the UART Serial Port
-    mSerialCommPtr->send(msgID);
-    mSerialCommPtr->send(frameSize);
-    mSerialCommPtr->sendRawData(reinterpret_cast<char*>(pFrame), frameSize);
+    sendToSerialPort(msgID);
+    sendToSerialPort(pFrame);
 }
 
 bool C_BRSH_IO_Serial::fetchBRSFrame()
 {
-    bool received = false;
-    u_int32_t msgID   = 0;
-    sizeType  msgSize = 0;
+    bool received      = false;
+    unsigned int msgID = 0;
+    sizeType  msgSize  = 0;
+    u_int64_t bytesAvailable = mSerialPort->bytesAvailable();
 
-    //Read message ID
-    mSerialCommPtr->readRawData(reinterpret_cast<char*>(&msgID), sizeof(u_int32_t));
-
-    //Try to read BRS Frame
-    if (msgID == BRS2BCI_MSG_ID)
+    //Don't Bother if the data isn't there yet
+    if (bytesAvailable < (sizeof(BRS_Frame_t) + sizeof(msgID)))
     {
-        //Read size first
-        mSerialCommPtr->readRawData(reinterpret_cast<char*>(&msgSize), sizeof(sizeType));
-        mSerialCommPtr->readRawData(reinterpret_cast<char*>(&currentBRSFrame), sizeof(BRS_Frame_t));
+        return false;
+    }
 
-        //Make sure we know what we're reading
-        if (msgSize != sizeof(BRS_Frame_t))
-        {
-            QString msg = QString("\tmsgSize = ") + QString::number(msgSize) +
-                          QString(", sizeof(BRS_Frame_t) = ") + QString::number(sizeof(BRS_Frame_t));
-            debugLog->println(BRS_LOG, "Warning! BRS Frame size differs from Msg Size!");
-            debugLog->println(BRS_LOG, msg.toStdString());
-        }
+    //Flush the Port if we're getting full
+    else if (bytesAvailable >= MAX_BYTES_AVAILABLE)
+    {
+        mSerialPort->readAll();
+    }
 
-        //Message receiving was successful
-        else
+    int i = 0;
+
+    //Look for the Message ID one byte at a time
+    while (bytesAvailable-- >= sizeof(BRS_Frame_t))
+    {
+        unsigned char byte;
+        unsigned int  bitsToShift;
+
+        //Read a Byte from the UART
+        readFromSerialPort(&byte);
+
+        //Overwrite one byte in the current MsgID
+        bitsToShift = (8 * (i++ % sizeof(msgID)));
+        msgID &= ~(0xFF) << bitsToShift;
+        msgID |=   byte  << bitsToShift;
+
+        //Try to read BRS Frame
+        if (msgID == BRS2BCI_MSG_ID)
         {
+            debugLog->println(BRS_LOG, "MSG ID Received: BRS2BCI MSG ID\n");
+
+            //Read in the Frame
+            pBRSFrameMutex->acquire(BRS_FRAME_MUTEX);
+            readFromSerialPort(pLatestBRSFrame);
             received = true;
-            emit BRSFrameReceived(&currentBRSFrame);
+            emit BRSFrameReceived(pLatestBRSFrame);
+            pBRSFrameMutex->release(BRS_FRAME_MUTEX);
         }
+
     }
 
     return received;
@@ -63,7 +77,7 @@ ConnectionStatusType C_BRSH_IO_Serial::connect()
 {
     debugLog->BRS_Log() << "Attempting to Connect to BRSH..." << endl;
 
-    if (mSerialCommPtr->open())
+    if (openSerialPort())
     {
         debugLog->BRS_Log() << "Connected to BRSH!" << endl;
         connectionStatus = CONNECTED;

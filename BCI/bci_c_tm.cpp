@@ -42,7 +42,7 @@ TM_Frame_t* C_TM::GetFrame(int index)
         //Return the default frame if were empty to avoid a seg fault
         if (tmFrames.size() == 0)
         {
-            return TM_Frame_t::createFrame();
+            return createTMFrame();
         }
         else
         {
@@ -65,9 +65,11 @@ C_TM& C_TM::operator =(C_TM& rhs)
     int i = 0;
     tmFrames.clear();
 
+    //Copy Each Frame
     for (i = 0; i < rhs.size(); i++)
     {
-        //We have access to private variable here
-        tmFrames.append(TM_Frame_t::createFrame(rhs.tmFrames.at(i)));
+        TM_Frame_t* pFrame = createTMFrame();
+        memcpy(reinterpret_cast<void*>(pFrame),reinterpret_cast<const void*>(rhs.GetFrame(i)),sizeof(TM_Frame_t));
+        tmFrames.append(pFrame);
     }
 }

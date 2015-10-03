@@ -100,7 +100,7 @@ void C_BinaryParser::writeTMData()
 
 EEG_Frame_t* C_BinaryParser::readEEGFrame()
 {
-    EEG_Frame_t* frame = EEG_Frame_t::create();
+    EEG_Frame_t* frame = createEEGFrame();
 
     //Find the Start of the EEG Frame
     if (findSync(EEG_FRAME_START))
@@ -114,7 +114,7 @@ EEG_Frame_t* C_BinaryParser::readEEGFrame()
 
 TM_Frame_t*  C_BinaryParser::readTMFrame()
 {
-    TM_Frame_t* frame = TM_Frame_t::createFrame();
+    TM_Frame_t* frame = createTMFrame();
 
     //Find the Start of the TM Frame
     if (findSync(TM_FRAME_START))

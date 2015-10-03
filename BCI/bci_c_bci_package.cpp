@@ -38,12 +38,12 @@ C_BCI_Package::C_BCI_Package()
                      this             , SLOT(onEEGDataProcessed(C_EEG_Data&)));
 
     //Listen for Emergency Stop Commands
-    QObject::connect(pBRS_IO , SIGNAL(RequestEmergencyStop()),
-                     this    , SLOT(onEmergencyStopRequested()));
+    QObject::connect(pJA  , SIGNAL(RequestEmergencyStop()),
+                     this , SLOT(onEmergencyStopRequested()));
 
-    //Listen for Remote Commands
-    QObject::connect(pBRS_IO , SIGNAL(remoteCommandReceived(PCC_Command_Type&)),
-                     this    , SLOT(onRemoteCmdReceived(PCC_Command_Type&)));
+    //Listen for the Final PCC Command
+    QObject::connect(pJA  , SIGNAL(commandReady()),
+                     this , SLOT(onCommandReady()));
 
     debugLog->println(BCI_LOG, "BCI Package Instantiated Successfully", true);
 }
@@ -188,83 +188,39 @@ bool C_BCI_Package::checkConnections()
 
 void C_BCI_Package::Run()
 {
-    switch (bciState)
-    {
-    case BCI_OFF:
+    //Initialize the System
+    bciState = BCI_INITIALIZATION;
 
-        //Start initializing!
-        goToState(BCI_INITIALIZATION);
-        break;
+    //Keep Track of the Mission Time
+    stopwatch.start();
 
-    case BCI_INITIALIZATION:
+    //Make Connections to peripherals
+    createConnections();
 
-        //Keep Track of the Mission Time
-        stopwatch.start();
+    //Configure Repetitive Visual Stimulus and send to Flasher
+    pRVS->Generate();
+    pJA->SetRVS(pRVS);
+    pFlasherIO->SendRVS();
 
-        //Make Connections to peripherals
-        createConnections();
+    //Record our TM to an output file
+    pTelemetryManager->RecordTMToFile(TM_DATA_OUTPUTFILE_BIN);
 
-        //Configure Repetitive Visual Stimulus and send to Flasher
-        pRVS->Generate();
-        pJA->SetRVS(pRVS);
-        pFlasherIO->SendRVS();
+    //Begin Thread Execution for EEG and BRS IO
+    startThreads();
 
-        //Record our TM to an output file
-        pTelemetryManager->RecordTMToFile(TM_DATA_OUTPUTFILE_BIN);
+    debugLog->println(BCI_LOG, "Initialization Complete, Moving to STANDBY..." , true );
 
-        //Begin Thread Execution for EEG and BRS IO
-        startThreads();
-
-        debugLog->println(BCI_LOG, "Initialization Complete, Moving to STANDBY..." , true );
-
-        //Wait for Data in Standby
-        goToState(BCI_STANDBY);
-
-        break;
-
-    case BCI_STANDBY:
-
-        //This is all we need to do here, the Signals and Slots will
-        //take care of notifying us for remote commands and Emergency Stops
-        break;
-
-    case BCI_PROCESSING:
-
-        //Update the Judgment Algorithm with the current data
-        pJA->SetTM(pTelemetryManager->GetLatestFramePtr());
-
-        //Decide Final Power Chair Command
-        pJA->computeCommand();
-
-        //Move to Ready to send the command
-        goToState(BCI_READY);
-
-        break;
-
-    case BCI_READY:
-
-        //Send the PCC Command then Revert to STANDBY
-        pPCC_IO->SetCommand(pJA->GetFinalCommand());
-        pPCC_IO->SendCommand();
-
-        goToState(BCI_STANDBY);
-        break;
-    }
+    //Move to Standby
+    bciState = BCI_STANDBY;
+    //This is all we need to do here, the Signals and Slots will
+    //take care of notifying us for remote commands and Emergency Stops
+    return;
 }
 
-//Slots
+//Go Process the Command when the EEG Data is Ready
 void C_BCI_Package::onEEGDataProcessed(C_EEG_Data &eegData)
 {
-    //Go Process the Command
-    goToState(BCI_PROCESSING);
-}
-
-void C_BCI_Package::onRemoteCmdReceived(PCC_Command_Type& cmd)
-{
-    //Update TM with the command, then let the
-    //Judgment Algorithm take care of the rest
-    pTelemetryManager->updateTM();
-    goToState(BCI_PROCESSING);
+    processCommand();
 }
 
 void C_BCI_Package::onEmergencyStopRequested()
@@ -281,18 +237,28 @@ void C_BCI_Package::startThreads()
     pBRS_IO->start();
 }
 
-void C_BCI_Package::goToState(BCIState state)
+//This is the entire routine of the BCI_Processing State
+void C_BCI_Package::processCommand()
 {
-    bciState = state;
-    Run();
+    bciState = BCI_PROCESSING;
+
+    //Update TM and Notify the Judgement Algorithm that it's up to date
+    pTelemetryManager->updateTM();
+    pJA->SetTM(pTelemetryManager->GetLatestFramePtr());
+
+    //Tell the Judgement Algorithm to Compute the Command, it will notify us when it's ready
+    pJA->computeCommand();
 }
 
-////Relax in BCI_Package Standby
-//void C_BCI_Package::standby( int millisecondsToWait )
-//{
-//    QTime dieTime = QTime::currentTime().addMSecs( millisecondsToWait );
-//    while( QTime::currentTime() < dieTime )
-//    {
-//        QCoreApplication::processEvents( QEventLoop::AllEvents, 100 );
-//    }
-//}
+void C_BCI_Package::onCommandReady()
+{
+    //We're Ready to send the command here
+    bciState = BCI_READY;
+
+    //Send the Command to the Power Chair Controller
+    pPCC_IO->SetCommand(pJA->GetFinalCommand());
+    pPCC_IO->SendCommand();
+
+    //Move back to Standby and wait for the next command
+    bciState = BCI_STANDBY;
+}

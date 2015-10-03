@@ -49,14 +49,14 @@ void C_TextParser::writeTMData()
 
 EEG_Frame_t* C_TextParser::readEEGFrame()
 {
-    EEG_Frame_t* buffer = EEG_Frame_t::create();
+    EEG_Frame_t* buffer = createEEGFrame();
 
     return buffer;
 }
 
 TM_Frame_t*  C_TextParser::readTMFrame()
 {
-    TM_Frame_t* buffer = TM_Frame_t::createFrame();
+    TM_Frame_t* buffer = createTMFrame();
 
     return buffer;
 }
@@ -95,7 +95,10 @@ void C_TextParser::writeTMFrame(TM_Frame_t* frame)
         firstFrame = false;
     }
 
+    //Write all the Data to the text File
+    stream << frame->MsgId     << delimeter;
     stream << frame->timeStamp << delimeter;
+    stream << frame->bciState  << delimeter;
     writeEEGFrame(&frame->eegFrame);
     writeBRSFrame(&frame->brsFrame);
     stream << frame->ledForward .frequency   << delimeter;
@@ -112,11 +115,13 @@ void C_TextParser::writeTMFrame(TM_Frame_t* frame)
 
 void C_TextParser::writeBRSFrame(BRS_Frame_t* frame)
 {
-    stream << frame->gpsData.altitude     << delimeter;
-    stream << frame->gpsData.longitude    << delimeter;
-    stream << frame->gpsData.altitude     << delimeter;
-    stream << frame->gpsData.groundSpeed  << delimeter;
-    stream << frame->usData.rangeToObject << delimeter;
+    stream << frame->MsgId                           << delimeter;
+    stream << frame->sensorData.gpsData.altitude     << delimeter;
+    stream << frame->sensorData.gpsData.longitude    << delimeter;
+    stream << frame->sensorData.gpsData.altitude     << delimeter;
+    stream << frame->sensorData.gpsData.groundSpeed  << delimeter;
+    stream << frame->sensorData.rangeFinderData.rangeFront << delimeter;
+    stream << frame->sensorData.rangeFinderData.rangeBack  << delimeter;
     stream << (char) frame->remoteCommand << delimeter;
 }
 

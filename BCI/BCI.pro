@@ -5,6 +5,7 @@ CONFIG += extserialport
 #Referenced Headers from other software sections
 INCLUDEPATH += ..
 INCLUDEPATH += ../../emokit/include/emokit
+INCLUDEPATH += ../CCS_PROJECTS
 
 HEADERS += \
     bci_c_bci_package.h \
@@ -24,8 +25,6 @@ HEADERS += \
     bci_c_connected_device.h \
     bci_c_brsh_io.h \
     bci_c_eeg_data.h \
-    bci_c_xml_parser.h \
-    ../CCS_PROJECTS/BRS/brs_c_sensor_data.h \
     bci_c_abstract_parser.h \
     bci_c_binary_parser.h \
     bci_c_textparser.h \
@@ -37,7 +36,9 @@ HEADERS += \
     bci_c_pcc_io.h \
     bci_c_pcc_io_debug.h \
     bci_c_singleton.h \
-    bci_c_framegenerator.h
+    bci_c_framegenerator.h \
+    ../smart_data_types.h \
+    ../smart_message_constants.h
 
 SOURCES += \
     bci_c_bci_package.cpp \
@@ -50,7 +51,6 @@ SOURCES += \
     bci_main.cpp \
     bci_c_eeg_io_emotiv.cpp \
     bci_c_eeg_data.cpp \
-    bci_c_xml_parser.cpp \
     bci_c_tm.cpp \
     bci_c_abstract_parser.cpp \
     bci_c_binary_parser.cpp \
@@ -62,7 +62,8 @@ SOURCES += \
     bci_c_pcc_io_debug.cpp \
     bci_c_brsh_io.cpp \
     bci_c_eeg_io.cpp \
-    bci_c_framegenerator.cpp
+    bci_c_framegenerator.cpp \
+    ../smart_data_types.c
 
 #Crap Needed for Emokit libraries
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../emokit/lib/release/ -lemokit

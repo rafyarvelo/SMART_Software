@@ -1,65 +1,76 @@
 #include "bci_c_framegenerator.h"
 
-BRS_Frame_t* FrameGenerator::GenerateBRSFrame()
+BRS_Frame_t* FrameGenerator::GenerateBRSFrame(BRS_Frame_t* pFrame)
 {
-    return GenerateBRSFrame(GeneratePCC_Command(), GetRandomFloat() / 155.36);
+    return GenerateBRSFrame(pFrame, GeneratePCC_Command());
 }
 
-BRS_Frame_t* FrameGenerator::GenerateBRSFrame(PCC_Command_Type cmd, float rangeToObject)
+BRS_Frame_t* FrameGenerator::GenerateBRSFrame(BRS_Frame_t* pFrame, PCC_Command_Type cmd)
 {
-    BRS_Frame_t* frame = BRS_Frame_t::create();
+    if (!pFrame)
+    {
+        pFrame = createBRSFrame();
+    }
 
-    frame->gpsData = GenerateGPSData();
-    frame->usData.rangeToObject = rangeToObject;
-    frame->remoteCommand = cmd;
+    GenerateSensorData(&pFrame->sensorData);
+    pFrame->remoteCommand = cmd;
 
-    return frame;
+    return pFrame;
 }
 
-EEG_Frame_t* FrameGenerator::GenerateEEGFrame()
+EEG_Frame_t* FrameGenerator::GenerateEEGFrame(EEG_Frame_t* pFrame)
 {
-    EEG_Frame_t* frame = EEG_Frame_t::create();
+    if (!pFrame)
+    {
+        pFrame = createEEGFrame();
+    }
 
     int signs[] = { 1, -1 };
 
-    frame->eegType = EEG_TYPE_EMOTIV; //We're not going to be ambitious
-    frame->counter = GetRandomInt();
+    pFrame->eegType = EEG_TYPE_EMOTIV; //We're not going to be ambitious
+    pFrame->counter = GetRandomInt();
 
     //Electrode Data and Contact Quality
     for (int i = 0; i < MAX_EEG_ELECTRODES; i++)
     {
-        frame->electrodeData[i]  =  GetRandomInt() * signs[GetRandomInt() % 2];
-        frame->contactQuality[i] = (GetRandomInt() * 500) % 6000;
+        pFrame->electrodeData[i]  =  GetRandomInt() * signs[GetRandomInt() % 2];
+        pFrame->contactQuality[i] = (GetRandomInt() * 500) % 6000;
     }
 
     //The rest of the Crap
-    frame->gyroX = GetRandomInt();
-    frame->gyroY = GetRandomInt();
-    frame->batteryPercentage = GetRandomInt();
+    pFrame->gyroX = GetRandomInt();
+    pFrame->gyroY = GetRandomInt();
+    pFrame->batteryPercentage = GetRandomInt();
 
-    return frame;
+    return pFrame;
 }
 
-TM_Frame_t*  FrameGenerator::GenerateTMFrame()
+TM_Frame_t*  FrameGenerator::GenerateTMFrame(TM_Frame_t* pFrame)
 {
-    return GenerateTMFrame(GeneratePCC_Command(), GetRandomFloat());
+    return GenerateTMFrame(pFrame, GeneratePCC_Command());
 }
 
-TM_Frame_t*  FrameGenerator::GenerateTMFrame(PCC_Command_Type cmd, float rangeToObject)
+TM_Frame_t*  FrameGenerator::GenerateTMFrame(TM_Frame_t* pFrame, PCC_Command_Type cmd)
 {
-    TM_Frame_t* frame = TM_Frame_t::createFrame();
+    if (!pFrame)
+    {
+        pFrame = createTMFrame();
+    }
 
-    frame->timeStamp = GetRandomInt();
-    frame->eegFrame  = GenerateEEGFrame();
-    frame->brsFrame  = GenerateBRSFrame(cmd, rangeToObject);
-    //Leave LED Groups as the Default Groups
+    //Update The TM Frame
+    pFrame->timeStamp = GetRandomInt();
+    pFrame->bciState  = BCI_STANDBY;
+    GenerateEEGFrame(&pFrame->eegFrame);
+    GenerateBRSFrame(&pFrame->brsFrame, cmd);
 
-    frame->eegConnectionStatus     = CONNECTED;
-    frame->pccConnectionStatus     = CONNECTED;
-    frame->brsConnectionStatus     = CONNECTED;
-    frame->flasherConnectionStatus = CONNECTED;
+    /*Leave LED Groups as the Default Groups*/
 
-    return frame;
+    pFrame->eegConnectionStatus     = CONNECTED;
+    pFrame->pccConnectionStatus     = CONNECTED;
+    pFrame->brsConnectionStatus     = CONNECTED;
+    pFrame->flasherConnectionStatus = CONNECTED;
+
+    return pFrame;
 }
 
 int FrameGenerator::GetRandomInt()
@@ -80,16 +91,20 @@ float FrameGenerator::GetRandomFloat()
     return ((float) GetRandomInt() * 3.14159);
 }
 
-GPS_Data_t FrameGenerator::GenerateGPSData()
+SensorData_t* FrameGenerator::GenerateSensorData(SensorData_t* pData)
 {
-    GPS_Data_t gpsData;
+    if (!pData)
+    {
+        pData = new SensorData_t;
+        memset(reinterpret_cast<void*>(pData),0,sizeof(SensorData_t));
+    }
 
-    gpsData.latitude    = GetRandomFloat();
-    gpsData.longitude   = GetRandomFloat();
-    gpsData.altitude    = GetRandomFloat();
-    gpsData.groundSpeed = GetRandomFloat();
+    pData->gpsData.latitude    = GetRandomFloat();
+    pData->gpsData.longitude   = GetRandomFloat();
+    pData->gpsData.altitude    = GetRandomFloat();
+    pData->gpsData.groundSpeed = GetRandomFloat();
 
-    return gpsData;
+    return pData;
 }
 
 PCC_Command_Type FrameGenerator::GeneratePCC_Command()

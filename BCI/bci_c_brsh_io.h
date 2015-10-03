@@ -3,12 +3,15 @@
 
 #include <QThread>
 #include <QTimer>
+#include <QSemaphore>
 #include "../smart_config.h"
 #include "../smart_debug_log.h"
 #include "bci_c_singleton.h"
 #include "bci_c_connected_device.h"
 #include "bci_c_tm.h"
 #include "bci_c_framegenerator.h"
+
+#define BRS_FRAME_MUTEX 1 //Initialize our mutex to have 1 fram available
 
 //Abstract BRS IO Class, essentially just a worker-object
 class C_BRSH_IO : public QObject, public C_ConnectedDevice
@@ -19,10 +22,9 @@ public:
      virtual ~C_BRSH_IO();
 
     //Return the latest BRS Data
-    BRS_Frame_t& GetLatestBRSFrame()    { return  currentBRSFrame; }
-    BRS_Frame_t* GetLatestBRSFramePtr() { return &currentBRSFrame; }
+    BRS_Frame_t* GetLatestBRSFramePtr();
 
-    //Connect to BRSH
+    //Connect to BRSHs
     virtual ConnectionStatusType connect() = 0;
 
     //The Rate we will execute the BRSH IO Task (10 Hz)
@@ -41,13 +43,11 @@ public slots:
 
 signals:
     void BRSFrameReceived(BRS_Frame_t* brsFrame);
-    void remoteCommandReceived(PCC_Command_Type& cmd);
-    void RequestEmergencyStop();
 
 protected:
-    SMART_DEBUG_LOG* debugLog;
-    BRS_Frame_t      currentBRSFrame;
-    QTimer           timer;
+    BRS_Frame_t* pLatestBRSFrame;
+    QSemaphore*  pBRSFrameMutex;
+    QTimer       timer;
 };
 
 #endif // C_BRSH_IO_H

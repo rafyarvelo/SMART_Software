@@ -6,7 +6,6 @@
 #include "bci_c_connected_device.h"
 #include "bci_c_singleton.h"
 #include "../smart_config.h"
-#include "../smart_debug_log.h"
 
 class C_PCC_IO : public QObject , public C_ConnectedDevice
 {
@@ -23,7 +22,6 @@ public slots:
     void SendCommand(PCC_Command_Type& cmd) { SetCommand(cmd); SendCommand(); }
 
 protected:
-    SMART_DEBUG_LOG* debugLog;
     PCC_Command_Type currentCommand;
 };
 

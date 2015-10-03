@@ -19,41 +19,6 @@ class C_TelemetryManager;
 #include "bci_c_pcc_io_serial.h"
 #include "bci_c_pcc_io_debug.h"
 
-#define COMMAND_TIMEOUT 20000 //Wait 20 seconds before killing the System
-
-typedef enum BCIState
-{
-    BCI_OFF=0,
-    /*
-     * 1) Remain in this state until Run() is called
-     * 2) When Run() is called, Move to BCI_INITIALIZATION
-     */
-    BCI_INITIALIZATION,
-    /*
-     * 1) Create Instances of RVS, JA2BRS, BRS2JA, JA2PCC, and EEG IO
-     * 2) Connect to Flasher, EEG, BRSH, and PCC
-     * 3) Generate RVS Frequencies
-     * 4) Send RVS to Flasher
-     * 5) Send TM Packet to BRSH
-     * 6) Move to BCI_STANDBY
-     */
-    BCI_STANDBY,
-    /*
-     * 1) Wait for EEG Data or Remote Commands
-     * 2) Upon Receipt of EEG Data or Remote Commands, move to BCI_PROCESSING
-     */
-    BCI_PROCESSING,
-    /*
-     * 1) Process the data
-     * 2) Generate PCC Command
-     * 3) Move to BCI_READY
-     */
-    BCI_READY
-    /*
-     * 1) Send the Command
-     * 2) Revert to BCI_STANDBY
-     */
-}BCIState;
 
 class C_BCI_Package : public QObject , public C_Singleton<C_BCI_Package>
 {
@@ -78,10 +43,12 @@ private:
 
 private slots:
     void onEEGDataProcessed(C_EEG_Data& data);
-    void onRemoteCmdReceived(PCC_Command_Type& cmd);
+    void onCommandReady();
     void onEmergencyStopRequested();
 
 private:
+    void processCommand();
+
 	SMART_DEBUG_LOG*     debugLog;
     C_SignalProcessing*  pSignalProcessing;
     C_JudgmentAlgorithm* pJA;

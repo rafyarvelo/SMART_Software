@@ -14,10 +14,15 @@ C_TelemetryManager::C_TelemetryManager(C_BCI_Package* pBCI, C_EEG_IO* pEEG_IO,
     //Don't Record TM By Default
     recordTM = false;
 
-    //Make Connections
+    //Mutual Exclusion to our TM Frame
+    pLatestTMFrame = 0;
+    pTMFrameMutex  = new QSemaphore(TM_FRAME_MUTEX);
+
+    //Connect TM Manager to the BRSH IO Thread
     connect(mBRS_IOPtr, SIGNAL(BRSFrameReceived(BRS_Frame_t*)),
             this      , SLOT(onBRSFrameReceived(BRS_Frame_t*)));
 
+    //Send a Frame every time it's Ready
     connect(this      , SIGNAL(tmFrameCreated(TM_Frame_t*)),
             mBRS_IOPtr, SLOT(SendTMFrame(TM_Frame_t*)));
 }
@@ -37,33 +42,44 @@ C_TelemetryManager* C_TelemetryManager::Instance(C_BCI_Package* pBCI, C_EEG_IO* 
 //Create a New TM Frame from the Latest Data
 TM_Frame_t* C_TelemetryManager::updateTM()
 {
-    TM_Frame_t* frame = TM_Frame_t::createFrame();
+    if (!pLatestTMFrame)
+    {
+        pLatestTMFrame = createTMFrame();
+    }
 
     //Update TM from Interfaces
-    frame->timeStamp               = mBCIPackagePtr->stopwatch.elapsed();
-    frame->brsFrame                = mBRS_IOPtr    ->GetLatestBRSFrame();
-    frame->eegFrame                = mEEG_IOPtr    ->GetFramePtr();
-    frame->ledForward.frequency    = mRVSPtr->GetLEDGroup(LED_FORWARD) ->frequency;
-    frame->ledBackward.frequency   = mRVSPtr->GetLEDGroup(LED_BACKWARD)->frequency;
-    frame->ledRight.frequency      = mRVSPtr->GetLEDGroup(LED_RIGHT)   ->frequency;
-    frame->ledLeft.frequency       = mRVSPtr->GetLEDGroup(LED_LEFT)    ->frequency;
-    frame->eegConnectionStatus     = mBCIPackagePtr->eegConnectionStatus;
-    frame->brsConnectionStatus     = mBCIPackagePtr->brshConnectionStatus;
-    frame->pccConnectionStatus     = mBCIPackagePtr->pccConnectionStatus;
-    frame->flasherConnectionStatus = mBCIPackagePtr->flasherConnectionStatus;
+    pLatestTMFrame->timeStamp               = mBCIPackagePtr->stopwatch.elapsed();
+    memcpy(&pLatestTMFrame->brsFrame, mBRS_IOPtr->GetLatestBRSFramePtr(), sizeof(BRS_Frame_t));
+    memcpy(&pLatestTMFrame->eegFrame, mEEG_IOPtr->GetFramePtr(), sizeof(EEG_Frame_t));
+    pLatestTMFrame->ledForward.frequency    = mRVSPtr->GetLEDGroup(LED_FORWARD) ->frequency;
+    pLatestTMFrame->ledBackward.frequency   = mRVSPtr->GetLEDGroup(LED_BACKWARD)->frequency;
+    pLatestTMFrame->ledRight.frequency      = mRVSPtr->GetLEDGroup(LED_RIGHT)   ->frequency;
+    pLatestTMFrame->ledLeft.frequency       = mRVSPtr->GetLEDGroup(LED_LEFT)    ->frequency;
+    pLatestTMFrame->eegConnectionStatus     = mBCIPackagePtr->eegConnectionStatus;
+    pLatestTMFrame->brsConnectionStatus     = mBCIPackagePtr->brshConnectionStatus;
+    pLatestTMFrame->pccConnectionStatus     = mBCIPackagePtr->pccConnectionStatus;
+    pLatestTMFrame->flasherConnectionStatus = mBCIPackagePtr->flasherConnectionStatus;
 
     //Record TM to Output Files if requested
     if (recordTM)
     {
-        OutputFrameToFile(frame);
+        OutputFrameToFile(pLatestTMFrame);
     }
 
     //Notify Listeners that our frame is ready
-    emit tmFrameCreated(frame);
+    emit tmFrameCreated(pLatestTMFrame);
 
-    //Buffer and Return Frame
-    mTMData.addFrame(frame);
-    return frame;
+    return pLatestTMFrame;
+}
+
+TM_Frame_t* C_TelemetryManager::GetLatestFramePtr()
+{
+    if (!pLatestTMFrame)
+    {
+        updateTM();
+    }
+
+    return pLatestTMFrame;
 }
 
 void C_TelemetryManager::OutputFrameToFile(TM_Frame_t* frame)

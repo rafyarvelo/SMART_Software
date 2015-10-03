@@ -3,9 +3,11 @@
 
 #include "bci_c_brsh_io.h"
 #include "bci_c_serial_comm.h"
-#include "../CCS_PROJECTS/BRS/brs_c_message_constants.h"
+#include "smart_data_types.h"
 
-class C_BRSH_IO_Serial : public C_BRSH_IO , public C_Singleton<C_BRSH_IO_Serial>
+class C_BRSH_IO_Serial : public C_BRSH_IO ,
+                         public C_Serial_Comm,
+                         public C_Singleton<C_BRSH_IO_Serial>
 {
 public:
     C_BRSH_IO_Serial();
@@ -16,8 +18,6 @@ public:
     virtual void SendTMFrame(TM_Frame_t* pFrame);
 
     virtual ConnectionStatusType connect();
-private:
-    C_Serial_Comm* mSerialCommPtr;
 };
 
 #endif // BCI_C_BRSH_IO_SERIAL_H

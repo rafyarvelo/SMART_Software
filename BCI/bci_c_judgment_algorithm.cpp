@@ -8,7 +8,6 @@ C_JudgmentAlgorithm::C_JudgmentAlgorithm(C_SignalProcessing* signalProcessing)
       cmdConfidence(UNSURE),
       mSignalProcessingPtr(signalProcessing)
 {
-
 }
 
 C_JudgmentAlgorithm::~C_JudgmentAlgorithm()
@@ -58,45 +57,25 @@ void C_JudgmentAlgorithm::computeCommand()
     }
 
     //Process EEG Data
-    else
-    {
-        finalizeCommand(ParseEEGData());
-    }
+    ParseEEGData();
 }
 
 
 //Check if we are requesting an emergency stop
 bool C_JudgmentAlgorithm::SafeToProceed()
 {
-    return (mCurrentTMFrame.brsFrame.usData.rangeToObject > EMERGENCY_STOP_DISTANCE);
+    return true;
 }
 
 //Parse the EEG Data, Update the Final Command and the Confidence Value
-PCC_Command_Type C_JudgmentAlgorithm::ParseEEGData()
+void C_JudgmentAlgorithm::ParseEEGData()
 {
-    //Let's not change the command unless we're sure
-    if (cmdConfidence > UNSURE && prevCommand != PCC_CMD_NONE)
-    {
-        return prevCommand;
-    }
 
-    else
-    {
-        //LOL
-        if (mSignalProcessingPtr->GetProcessedData().GetFramePtr()->counter % 7 == 0)
-        {
-            return PCC_FORWARD;
-        }
-        else
-        {
-            return PCC_RIGHT;
-        }
-    }
 }
 
 void C_JudgmentAlgorithm::finalizeCommand(PCC_Command_Type cmd)
 {
     finalCommand      = cmd;
     commandFinalized  = true;
-    emit commandReady(finalCommand);
+    emit commandReady();
 }

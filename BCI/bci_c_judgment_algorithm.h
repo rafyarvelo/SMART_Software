@@ -30,7 +30,6 @@ public:
 		return new C_JudgmentAlgorithm(signalProcessing);
 	}
 
-
     PCC_Command_Type GetFinalCommand();
 
     //To be effective, make sure the RVS and TM are set before calling this
@@ -44,22 +43,23 @@ public slots:
     void SetTM (TM_Frame_t* pTMFrame);
 
 signals:
-    void commandReady(PCC_Command_Type& cmd);
+    void RequestEmergencyStop();
+    void commandReady();
 
 private:
-    PCC_Command_Type ParseEEGData();
+    void ParseEEGData();
     void finalizeCommand(PCC_Command_Type cmd);
 
     C_SignalProcessing* mSignalProcessingPtr;
     C_RVS*              mRVS_Ptr;
     TM_Frame_t          mCurrentTMFrame;
 
-
     PCC_Command_Type    finalCommand;
     PCC_Command_Type    prevCommand;
     Confidence_Type     cmdConfidence;
 
     bool commandFinalized; //Just in case user forgets to call computeCommand()
+    bool eegDataReady;
 };
 
 #endif // BCI_C_JUDGMENT_ALGORITHM_H

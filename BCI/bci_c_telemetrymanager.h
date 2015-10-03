@@ -8,11 +8,7 @@ class C_BCI_Package;
 #include "bci_c_binary_parser.h"
 #include "bci_c_textparser.h"
 
-enum FileFormatType
-{
-    BINARY_FILE,
-    TEXT_FILE
-};
+#define TM_FRAME_MUTEX 1 //Keeping only 1 Frame of TM (Latest) for Concurrent Access
 
 //Manage the SMART Telemetry Stream
 class C_TelemetryManager : public QObject
@@ -30,7 +26,7 @@ public:
     TM_Frame_t* updateTM();
 
     //Retrieve the Latest Frame
-    TM_Frame_t* GetLatestFramePtr()    { return mTMData.GetFrame(); }
+    TM_Frame_t* GetLatestFramePtr();
 
     //Record Telemetry to an output File
     void RecordTMToFile(const QString& filename);
@@ -53,8 +49,9 @@ private:
     //Used to Record TM to File
     C_BinaryParser* tmFile;
 
-    //TM Data Buffer
-    C_TM mTMData;
+    //The Latest TM Frame
+    TM_Frame_t*     pLatestTMFrame;
+    QSemaphore*     pTMFrameMutex;
 
     bool recordTM;
 

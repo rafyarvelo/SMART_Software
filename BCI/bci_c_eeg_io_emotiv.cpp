@@ -105,7 +105,7 @@ bool C_EEG_IO_EMOTIV::fetchEEGFrame()
 
 EEG_Frame_t* C_EEG_IO_EMOTIV::fromEmotivFrame(emokit_frame* emotiv_frame)
 {
-    EEG_Frame_t* frame = EEG_Frame_t::create();
+    EEG_Frame_t* frame = createEEGFrame();
 
     if (!emotiv_frame)
     {
