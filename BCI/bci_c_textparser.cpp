@@ -96,7 +96,6 @@ void C_TextParser::writeTMFrame(TM_Frame_t* frame)
     }
 
     //Write all the Data to the text File
-    stream << frame->MsgId     << delimeter;
     stream << frame->timeStamp << delimeter;
     stream << frame->bciState  << delimeter;
     writeEEGFrame(&frame->eegFrame);
@@ -115,7 +114,6 @@ void C_TextParser::writeTMFrame(TM_Frame_t* frame)
 
 void C_TextParser::writeBRSFrame(BRS_Frame_t* frame)
 {
-    stream << frame->MsgId                           << delimeter;
     stream << frame->sensorData.gpsData.altitude     << delimeter;
     stream << frame->sensorData.gpsData.longitude    << delimeter;
     stream << frame->sensorData.gpsData.altitude     << delimeter;

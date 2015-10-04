@@ -23,8 +23,7 @@ struct C_HEADER_NAMES
         usData  << "rangeFront"
                 << "rangeBack";
 
-        brsFrameNames << "MsgId"
-                      << gpsData
+        brsFrameNames << gpsData
                       << usData
                       << "remoteCommand";
 
@@ -68,8 +67,7 @@ struct C_HEADER_NAMES
                       << "gyroY"
                       << "batteryPercentage";
 
-        tmFrameNames  << "MsgId"
-                      << "timeStamp"
+        tmFrameNames  << "timeStamp"
                       << "BCI_State"
                       << eegFrameNames
                       << brsFrameNames

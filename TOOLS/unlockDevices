@@ -1,0 +1,18 @@
+#!/bin/bash
+
+deviceNames=`dmesg | grep tty | grep USB | cut -d " " -f 4 | grep tty | cut -d ":" -f 1`
+user=`whoami`
+
+#Unlock Permissions and change ownership
+for i in $deviceNames
+do
+  device="/dev/$i"
+  echo "sudo chmod 777 $device"
+  sudo chmod 777 $device
+  sudo chown $user $device  
+  ls -l $device
+  
+done
+
+
+
