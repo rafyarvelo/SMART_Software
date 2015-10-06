@@ -20,10 +20,13 @@ void C_JudgmentAlgorithm::SetRVS(C_RVS* pRVS)
     mRVS_Ptr = pRVS;
 }
 
+#include "bci_c_telemetrymanager.h"
 //Remote and Sensor Data contained within TM
 void C_JudgmentAlgorithm::SetTM(TM_Frame_t *pTMFrame)
 {
+    C_TelemetryManager::pTMFrameMutex->acquire();
     memcpy(&mCurrentTMFrame, pTMFrame,sizeof(TM_Frame_t));
+    C_TelemetryManager::pTMFrameMutex->release();
 }
 
 PCC_Command_Type C_JudgmentAlgorithm::GetFinalCommand()
@@ -64,7 +67,18 @@ void C_JudgmentAlgorithm::computeCommand()
 //Check if we are requesting an emergency stop
 bool C_JudgmentAlgorithm::SafeToProceed()
 {
-    return true;
+    US_Data_t rangeData = mCurrentTMFrame.brsFrame.sensorData.rangeFinderData;
+    bool safeToProceed  = true;
+
+    //Request an Emergency Stop if We're Getting too close to an Object
+    if (prevCommand == PCC_FORWARD  && rangeData.rangeFront <= EMERGENCY_STOP_DISTANCE ||
+        prevCommand == PCC_BACKWARD && rangeData.rangeBack  <= EMERGENCY_STOP_DISTANCE)
+    {
+        emit RequestEmergencyStop();
+        safeToProceed = false;
+    }
+
+    return safeToProceed;
 }
 
 //Parse the EEG Data, Update the Final Command and the Confidence Value
@@ -77,5 +91,6 @@ void C_JudgmentAlgorithm::finalizeCommand(PCC_Command_Type cmd)
 {
     finalCommand      = cmd;
     commandFinalized  = true;
+
     emit commandReady();
 }

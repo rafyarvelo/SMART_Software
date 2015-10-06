@@ -33,6 +33,10 @@ C_BCI_Package::C_BCI_Package()
     pccConnectionStatus      = NOT_CONNECTED;
     brshConnectionStatus     = NOT_CONNECTED;
 
+    //Start the EEG/BRS IO when the Threads are ready
+    QObject::connect(pBRS_IO, SIGNAL(BRSFrameReceived(BRS_Frame_t*)),
+                     this   , SLOT(onBRSFrameReceived(BRS_Frame_t*)));
+
     //Listen for Processed EEG Data
     QObject::connect(pSignalProcessing, SIGNAL(eegDataProcessed(C_EEG_Data&)),
                      this             , SLOT(onEEGDataProcessed(C_EEG_Data&)));
@@ -163,7 +167,7 @@ bool C_BCI_Package::checkConnections()
     //Check PCC Connection Status...
     if (!pccConnectionStatus)
     {
-    debugLog->println(BCI_LOG, "PCC Disconnected! Stopping BCI..." , false, true );
+        debugLog->println(BCI_LOG, "PCC Disconnected! Stopping BCI..." , false, true );
         status = NOT_CONNECTED;
     }
 
@@ -203,7 +207,9 @@ void C_BCI_Package::Run()
     pFlasherIO->SendRVS();
 
     //Record our TM to an output file
+    #ifdef DEBUG_ONLY
     pTelemetryManager->RecordTMToFile(TM_DATA_OUTPUTFILE_BIN);
+    #endif
 
     //Begin Thread Execution for EEG and BRS IO
     startThreads();
@@ -233,8 +239,13 @@ void C_BCI_Package::onEmergencyStopRequested()
 //Begin EEG and BRS IO Tasks
 void C_BCI_Package::startThreads()
 {
-    pEEG_IO->start();
-    pBRS_IO->start();
+    pEEG_IO->begin();
+    pBRS_IO->begin();
+}
+
+void C_BCI_Package::onBRSFrameReceived(BRS_Frame_t* pFrame)
+{
+    processCommand();
 }
 
 //This is the entire routine of the BCI_Processing State

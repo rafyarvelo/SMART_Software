@@ -3,14 +3,21 @@
 //Execute BRSH IO at 10 Hertz
 const u_int16_t C_BRSH_IO::EXECUTION_RATE = 100;
 
+//Create a Mutex to block the Current BRS Frame from Concurrent Access
+QSemaphore* C_BRSH_IO::pBRSFrameMutex  = new QSemaphore(BRS_FRAME_MUTEX);
+
 C_BRSH_IO::C_BRSH_IO()
 {
     //Use the timer to control execution rate
-    QObject::connect(&timer, SIGNAL(timeout()), this, SLOT(fetchBRSFrame()));
+    mTimer.setInterval(EXECUTION_RATE);
+    QObject::connect(&mTimer, SIGNAL(timeout()), this, SLOT(fetchBRSFrame()));
+    QObject::connect(&mThread, SIGNAL(started()), &mTimer, SLOT(start()));
 
-    //Create a Mutex to block the Current BRS Frame from Concurrent Access
+    //Execute IO Tasks in a Seperate Thread
+    QObject::moveToThread(&mThread);
+
+    //Initialize the BRS Frame to NULL
     pLatestBRSFrame = 0;
-    pBRSFrameMutex  = new QSemaphore(BRS_FRAME_MUTEX);
 }
 
 C_BRSH_IO::~C_BRSH_IO()
@@ -42,7 +49,7 @@ BRS_Frame_t* C_BRSH_IO::GetLatestBRSFramePtr()
 }
 
 //Thread Execution of BRSH IO Class
-void C_BRSH_IO::start()
+void C_BRSH_IO::begin()
 {
-    timer.start(EXECUTION_RATE);
+    mThread.start();
 }

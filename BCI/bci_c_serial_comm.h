@@ -62,7 +62,7 @@ protected:
     SMART_DEBUG_LOG* debugLog;
 
     QString         mPortName;
-    QextSerialPort* mSerialPort;
+    QextSerialPort* mSerialPortPtr;
 };
 
 #endif

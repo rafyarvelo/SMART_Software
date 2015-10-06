@@ -4,49 +4,49 @@ C_Serial_Comm::C_Serial_Comm(const QString& portName)
     : mPortName(portName)
 {
     debugLog    = SMART_DEBUG_LOG::Instance();//Get a pointer to the debug log
-    mSerialPort = new QextSerialPort(mPortName);
+    mSerialPortPtr = new QextSerialPort(mPortName);
 
     //Config Port Setup
     SetDefaultPortSettings();
 
-    connect(mSerialPort, SIGNAL(dsrChanged(bool)), this, SLOT(onDsrChanged(bool)));
-    connect(mSerialPort, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
+    connect(mSerialPortPtr, SIGNAL(dsrChanged(bool)), this, SLOT(onDsrChanged(bool)));
+    connect(mSerialPortPtr, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
 }
 
 C_Serial_Comm::~C_Serial_Comm()
 {
-    if (mSerialPort)
+    if (mSerialPortPtr)
     {
-        mSerialPort->close();
-        delete mSerialPort;
+        mSerialPortPtr->close();
+        delete mSerialPortPtr;
     }
 }
 
 void C_Serial_Comm::SetDefaultPortSettings()
 {
     //Config Port Setup
-    mSerialPort->setBaudRate   (BAUD9600);
-    mSerialPort->setFlowControl(FLOW_OFF);
-    mSerialPort->setParity     (PAR_NONE);
-    mSerialPort->setDataBits   (DATA_8);
-    mSerialPort->setStopBits   (STOP_1);
-    mSerialPort->setTimeout    (DEFAULT_TIMEOUT_MS);
+    mSerialPortPtr->setBaudRate   (BAUD9600);
+    mSerialPortPtr->setFlowControl(FLOW_OFF);
+    mSerialPortPtr->setParity     (PAR_NONE);
+    mSerialPortPtr->setDataBits   (DATA_8);
+    mSerialPortPtr->setStopBits   (STOP_1);
+    mSerialPortPtr->setTimeout    (DEFAULT_TIMEOUT_MS);
 }
 
 void C_Serial_Comm::printPortSettings(ostream &stream)
 {
     stream << "Port Settings for " << mPortName.toStdString() << ":" << endl;
-    stream << "BAUD Rate:    " << mSerialPort->baudRate()            << endl;
-    stream << "Flow Control: " << mSerialPort->flowControl()         << endl;
-    stream << "Parity:       " << mSerialPort->parity()              << endl;
-    stream << "Data Bits:    " << mSerialPort->dataBits()            << endl;
-    stream << "Stop Bits:    " << mSerialPort->stopBits()            << endl;
+    stream << "BAUD Rate:    " << mSerialPortPtr->baudRate()            << endl;
+    stream << "Flow Control: " << mSerialPortPtr->flowControl()         << endl;
+    stream << "Parity:       " << mSerialPortPtr->parity()              << endl;
+    stream << "Data Bits:    " << mSerialPortPtr->dataBits()            << endl;
+    stream << "Stop Bits:    " << mSerialPortPtr->stopBits()            << endl;
     stream << "Timeout (ms): " << DEFAULT_TIMEOUT_MS                 << endl;
 }
 
 bool C_Serial_Comm::openSerialPort()
 {
-    if (mSerialPort->open(QIODevice::ReadWrite))
+    if (mSerialPortPtr->open(QIODevice::ReadWrite))
     {
         cout                << "Successfully Opened Port: " << mPortName.toStdString() << endl;
         debugLog->BCI_Log() << "Successfully Opened Port: " << mPortName.toStdString() << endl;
@@ -69,7 +69,7 @@ bool C_Serial_Comm::sendRawData(const char* pData, sizeType size)
     int bytesWritten = -1;
 
     debugLog->SerialComm_Log() << "Trying to Write Bytes: " << size << endl;
-    bytesWritten = mSerialPort->write(pData, (qint64) size);
+    bytesWritten = mSerialPortPtr->write(pData, (qint64) size);
     debugLog->SerialComm_Log() << "Bytes Written: " << bytesWritten << endl;
 
     return (bytesWritten > -1) ? SUCCESS : FAILURE;
@@ -110,7 +110,7 @@ bool C_Serial_Comm::sendToSerialPort(const BRS_Frame_t* pFrame)
 //Receive Data and return bytes read
 int C_Serial_Comm::readRawData(char* pData, sizeType size)
 {
-    int bytesAvailable = mSerialPort->bytesAvailable();
+    int bytesAvailable = mSerialPortPtr->bytesAvailable();
     int bytesRead = -1;
 
     if (!pData)//Seriously bro...allocate your shit..
@@ -128,7 +128,7 @@ int C_Serial_Comm::readRawData(char* pData, sizeType size)
 
     //Read Data
     debugLog->SerialComm_Log() << "Bytes Available: " << bytesAvailable << endl;
-    bytesRead = mSerialPort->read(pData, size);
+    bytesRead = mSerialPortPtr->read(pData, size);
     debugLog->SerialComm_Log() << "Bytes Read: "      << bytesRead << endl;
 
     //See what we read
@@ -147,16 +147,16 @@ QByteArray C_Serial_Comm::readFromSerialPort(int numBytes)
     QByteArray bytes;
     int numToRead;
 
-    if (numBytes < 0 || numBytes > mSerialPort->bytesAvailable())
+    if (numBytes < 0 || numBytes > mSerialPortPtr->bytesAvailable())
     {
-        numToRead = mSerialPort->bytesAvailable();
+        numToRead = mSerialPortPtr->bytesAvailable();
     }
     else
     {
         numToRead = numBytes;
     }
 
-    bytes = mSerialPort->read(numBytes);
+    bytes = mSerialPortPtr->read(numBytes);
     return bytes;
 }
 

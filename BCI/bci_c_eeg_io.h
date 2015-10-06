@@ -37,7 +37,7 @@ public:
 
 public slots:
     //Start Getting Data
-    void start();
+    void begin();
 
     //Try to Get an EEG Frame, return true and emit EEG Frame Received if Successful
     virtual bool fetchEEGFrame() = 0;
@@ -51,7 +51,8 @@ signals:
 protected:
     SMART_DEBUG_LOG* debugLog;
     C_EEG_Data       eegData;
-    QTimer           timer; //How we will implement our execution
+    QTimer           mTimer; //How we will implement our execution
+    QThread          mThread;
 };
 
 #endif // BCI_C_EEG_IO

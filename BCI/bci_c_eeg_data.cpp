@@ -1,7 +1,7 @@
 #include "bci_c_eeg_data.h"
 
-C_EEG_Data::C_EEG_Data(QObject *parent) :
-    QObject(parent)
+C_EEG_Data::C_EEG_Data(QObject* parent)
+    : QObject(parent)
 {
 }
 
@@ -29,7 +29,7 @@ void C_EEG_Data::AddFrame(EEG_Frame_t *eegFrame)
 EEG_Frame_t* C_EEG_Data::GetFramePtr(int index)
 {
     //Return a Blank Frame if we're Empty to avoid a seg fault
-    if (index == 0 && frames.size() == 0)
+    if (frames.size() == 0)
     {
         return createEEGFrame();
     }
@@ -77,5 +77,7 @@ C_EEG_Data& C_EEG_Data::operator =(C_EEG_Data& rhs)
         memcpy(reinterpret_cast<void*>(pFrame), reinterpret_cast<const void*>(rhs.GetFramePtr(i)), sizeof(EEG_Frame_t));
         frames.append(pFrame);
     }
+
+    return *this;
 }
 //===============================================
