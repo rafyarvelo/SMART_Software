@@ -13,6 +13,8 @@
 
 #define BRS_FRAME_MUTEX 1 //Initialize our mutex to have 1 fram available
 
+#define MAX_MISS_COUNT 5  //Disconnect after 5 misses
+
 //Abstract BRS IO Class, essentially just a worker-object
 class C_BRSH_IO : public QObject, public C_ConnectedDevice
 {
@@ -30,9 +32,12 @@ public:
     //The Rate we will execute the BRSH IO Task (10 Hz)
     static const u_int16_t EXECUTION_RATE;
 
+    //Protect BRS Frame From Concurrent Access
+    static QSemaphore*  pBRSFrameMutex;
+
 public slots:
     //Start Getting Data
-    void start();
+    void begin();
 
     //Try to Retrieve a Frame, return true and emit BRSFrameReceived() if successful
     virtual bool fetchBRSFrame() = 0;
@@ -40,14 +45,13 @@ public slots:
     //Send a Frame to the BRSH
     virtual void SendTMFrame(TM_Frame_t* pFrame) = 0;
 
-
 signals:
     void BRSFrameReceived(BRS_Frame_t* brsFrame);
 
 protected:
     BRS_Frame_t* pLatestBRSFrame;
-    QSemaphore*  pBRSFrameMutex;
-    QTimer       timer;
+    QTimer       mTimer;
+    QThread      mThread;
 };
 
 #endif // C_BRSH_IO_H

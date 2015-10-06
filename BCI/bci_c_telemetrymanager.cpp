@@ -1,5 +1,8 @@
 #include "bci_c_telemetrymanager.h"
 
+//Mutual Exclusion to our TM Frame
+QSemaphore* C_TelemetryManager::pTMFrameMutex  = new QSemaphore(TM_FRAME_MUTEX);
+
 C_TelemetryManager::C_TelemetryManager(C_BCI_Package* pBCI, C_EEG_IO* pEEG_IO,
                                        C_BRSH_IO* pBRS_IO,  C_RVS* pRVS)
 {
@@ -14,13 +17,8 @@ C_TelemetryManager::C_TelemetryManager(C_BCI_Package* pBCI, C_EEG_IO* pEEG_IO,
     //Don't Record TM By Default
     recordTM = false;
 
-    //Mutual Exclusion to our TM Frame
+    //Initialize Current Frame to NULL
     pLatestTMFrame = 0;
-    pTMFrameMutex  = new QSemaphore(TM_FRAME_MUTEX);
-
-    //Connect TM Manager to the BRSH IO Thread
-    connect(mBRS_IOPtr, SIGNAL(BRSFrameReceived(BRS_Frame_t*)),
-            this      , SLOT(onBRSFrameReceived(BRS_Frame_t*)));
 
     //Send a Frame every time it's Ready
     connect(this      , SIGNAL(tmFrameCreated(TM_Frame_t*)),
@@ -42,14 +40,22 @@ C_TelemetryManager* C_TelemetryManager::Instance(C_BCI_Package* pBCI, C_EEG_IO* 
 //Create a New TM Frame from the Latest Data
 TM_Frame_t* C_TelemetryManager::updateTM()
 {
+    //Lock the TM Frame
+    pTMFrameMutex->acquire(TM_FRAME_MUTEX);
+
     if (!pLatestTMFrame)
     {
         pLatestTMFrame = createTMFrame();
     }
 
     //Update TM from Interfaces
-    pLatestTMFrame->timeStamp               = mBCIPackagePtr->stopwatch.elapsed();
+    pLatestTMFrame->timeStamp = mBCIPackagePtr->stopwatch.elapsed();
+
+    //Make sure the BRS Frame is not Busy
+    C_BRSH_IO::pBRSFrameMutex->acquire(BRS_FRAME_MUTEX);
     memcpy(&pLatestTMFrame->brsFrame, mBRS_IOPtr->GetLatestBRSFramePtr(), sizeof(BRS_Frame_t));
+    C_BRSH_IO::pBRSFrameMutex->release(BRS_FRAME_MUTEX);
+
     memcpy(&pLatestTMFrame->eegFrame, mEEG_IOPtr->GetFramePtr(), sizeof(EEG_Frame_t));
     pLatestTMFrame->ledForward.frequency    = mRVSPtr->GetLEDGroup(LED_FORWARD) ->frequency;
     pLatestTMFrame->ledBackward.frequency   = mRVSPtr->GetLEDGroup(LED_BACKWARD)->frequency;
@@ -68,6 +74,9 @@ TM_Frame_t* C_TelemetryManager::updateTM()
 
     //Notify Listeners that our frame is ready
     emit tmFrameCreated(pLatestTMFrame);
+
+    //Unlock the TM Frame
+    pTMFrameMutex->release(TM_FRAME_MUTEX);
 
     return pLatestTMFrame;
 }

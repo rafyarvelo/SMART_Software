@@ -22,10 +22,25 @@ void C_BRSH_IO_Serial::SendTMFrame(TM_Frame_t* pFrame)
 
 bool C_BRSH_IO_Serial::fetchBRSFrame()
 {
-    bool received      = false;
-    unsigned int msgID = 0;
-    sizeType  msgSize  = 0;
-    u_int64_t bytesAvailable = mSerialPort->bytesAvailable();
+    bool         received       = false;
+    unsigned int msgID          = 0;
+    sizeType     msgSize        = 0;
+    u_int64_t    bytesAvailable = mSerialPortPtr->bytesAvailable();
+    static int   retryCount     = 0;
+
+    //Check if we're Connected
+    if (!mSerialPortPtr->isOpen())
+    {
+        if (++retryCount > MAX_MISS_COUNT)
+        {
+            connectionStatus = false;
+            mSerialPortPtr->close();
+        }
+        else
+        {
+            return false; //Don't Waste time just wait until the next fetch
+        }
+    }
 
     //Don't Bother if the data isn't there yet
     if (bytesAvailable < (sizeof(BRS_Frame_t) + sizeof(msgID)))
@@ -36,7 +51,7 @@ bool C_BRSH_IO_Serial::fetchBRSFrame()
     //Flush the Port if we're getting full
     else if (bytesAvailable >= MAX_BYTES_AVAILABLE)
     {
-        mSerialPort->readAll();
+        mSerialPortPtr->readAll();
     }
 
     int i = 0;
@@ -64,8 +79,8 @@ bool C_BRSH_IO_Serial::fetchBRSFrame()
             pBRSFrameMutex->acquire(BRS_FRAME_MUTEX);
             readFromSerialPort(pLatestBRSFrame);
             received = true;
-            emit BRSFrameReceived(pLatestBRSFrame);
             pBRSFrameMutex->release(BRS_FRAME_MUTEX);
+            emit BRSFrameReceived(pLatestBRSFrame);
         }
 
     }

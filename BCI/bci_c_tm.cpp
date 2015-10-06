@@ -72,4 +72,6 @@ C_TM& C_TM::operator =(C_TM& rhs)
         memcpy(reinterpret_cast<void*>(pFrame),reinterpret_cast<const void*>(rhs.GetFrame(i)),sizeof(TM_Frame_t));
         tmFrames.append(pFrame);
     }
+
+    return *this;
 }

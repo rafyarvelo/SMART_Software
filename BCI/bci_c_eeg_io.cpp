@@ -8,18 +8,22 @@ C_EEG_IO::C_EEG_IO()
     debugLog = SMART_DEBUG_LOG::Instance();
 
     //Use the timer to control execution rate
-    QObject::connect(&timer, SIGNAL(timeout()), this, SLOT(fetchEEGFrame()));
+    mTimer.setInterval(EXECUTION_RATE);
+    QObject::connect(&mTimer, SIGNAL(timeout()), this, SLOT(fetchEEGFrame()));
+    QObject::connect(&mThread, SIGNAL(started()), &mTimer, SLOT(start()));
+
+    //Execute IO Tasks in a Seperate Thread
+    QObject::moveToThread(&mThread);
 }
 
 C_EEG_IO::~C_EEG_IO()
 {
-
 }
 
 //Thread Execution of EEG IO Class
-void C_EEG_IO::start()
+void C_EEG_IO::begin()
 {
-    timer.start(EXECUTION_RATE);
+    mThread.start();
 }
 
 

@@ -31,9 +31,8 @@ public:
     //Record Telemetry to an output File
     void RecordTMToFile(const QString& filename);
 
-public slots:
-    //Update Telemetry when a BRS Frame is Received
-    void onBRSFrameReceived(BRS_Frame_t* frame) { updateTM();}
+    //A Mutex to Protect Concurrent Access to TM Frame
+    static QSemaphore* pTMFrameMutex;
 
 signals:
     void tmFrameCreated(TM_Frame_t* frame);
@@ -51,12 +50,14 @@ private:
 
     //The Latest TM Frame
     TM_Frame_t*     pLatestTMFrame;
-    QSemaphore*     pTMFrameMutex;
 
     bool recordTM;
 
     //Debug Logging
     SMART_DEBUG_LOG* debugLog;
+
+public:
+
 };
 
 #endif // BCI_C_TELEMETRYMANAGER_H

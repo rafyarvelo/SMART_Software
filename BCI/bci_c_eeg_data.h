@@ -13,7 +13,7 @@ class C_EEG_Data : public QObject
 {
     Q_OBJECT
 public:
-     explicit C_EEG_Data(QObject* parent=0);
+     C_EEG_Data(QObject* parent=0);
     ~C_EEG_Data();
 
     //Factory Constructor

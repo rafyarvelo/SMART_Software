@@ -43,12 +43,12 @@ private:
 
 private slots:
     void onEEGDataProcessed(C_EEG_Data& data);
-    void onCommandReady();
+    void onBRSFrameReceived(BRS_Frame_t* pFrame);
     void onEmergencyStopRequested();
-
-private:
+    void onCommandReady();
     void processCommand();
 
+private:
 	SMART_DEBUG_LOG*     debugLog;
     C_SignalProcessing*  pSignalProcessing;
     C_JudgmentAlgorithm* pJA;
