@@ -33,7 +33,7 @@ xQueueHandle g_pSensorDataQueue;
 static void SensorTask(void *pvParameters)
 {
     portTickType ui32WakeTime;
-    SensorData_t* pSensorData = malloc(sizeof(SensorData_t));
+    SensorData_t sensorData;
 
     //
     // Get the current tick count.
@@ -41,7 +41,7 @@ static void SensorTask(void *pvParameters)
     ui32WakeTime = xTaskGetTickCount();
 
     //Initialize sensor data to 0
-    memset(pSensorData, 0, sizeof(SensorData_t));
+    memset(&sensorData, 0, sizeof(SensorData_t));
 
     //
     // Loop forever.
@@ -50,11 +50,12 @@ static void SensorTask(void *pvParameters)
     {
     	//Generate Debug Data
 		#ifdef DEBUG_ONLY
-    		pSensorData->gpsData.altitude              = rand();
-    		pSensorData->gpsData.latitude              = rand();
-    		pSensorData->gpsData.longitude             = rand();
-    		pSensorData->gpsData.groundSpeed           = rand();
-    		pSensorData->rangeFinderData.rangeToObject = rand();
+    		sensorData.gpsData.altitude           = rand() % 100 * 3.14;
+    		sensorData.gpsData.latitude           = rand() % 100 * 3.14;
+    		sensorData.gpsData.longitude          = rand() % 100 * 3.14;
+    		sensorData.gpsData.groundSpeed        = rand() % 100 * 3.14;
+    		sensorData.rangeFinderData.rangeFront = rand() % 100 * 3.14;
+    		sensorData.rangeFinderData.rangeBack  = rand() % 100 * 3.14;
 
     	//Actually Get Data
 		#else
@@ -62,7 +63,7 @@ static void SensorTask(void *pvParameters)
 		#endif
 
     	//Pass to Data Bridge
-        if(xQueueSend(g_pSensorDataQueue, &pSensorData, portMAX_DELAY) != pdPASS)
+        if(xQueueSend(g_pSensorDataQueue, &sensorData, portMAX_DELAY) != pdPASS)
         {
             // Error. The queue should never be full. If so print the
             // error message on UART and wait for ever.

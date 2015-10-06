@@ -40,14 +40,20 @@ extern xQueueHandle g_pBluetoothSendQueue;
 
 //*****************************************************************************
 //
+// The mutex that protects concurrent access of UART from multiple tasks.
+//
+//*****************************************************************************
+extern xSemaphoreHandle g_pUARTSemaphore;
+
+//*****************************************************************************
+//
 // This task communicates with the BCI Processor via UART
 //
 //*****************************************************************************
 static void UARTTask(void *pvParameters)
 {
     portTickType  ui32WakeTime;
-    TM_Frame_t*  pReceivedTMFrame = NULL;
-    BRS_Frame_t* pBRSFrameToSend  = NULL;
+    BRS_Frame_t BRSFrameToSend;
 
     //
     // Get the current tick count.
@@ -64,17 +70,22 @@ static void UARTTask(void *pvParameters)
     	//Receive BCI Message if it is Available
     	if (BCIMessageAvailable())
     	{
-        	//Receive TM Frame from UART
-    		pReceivedTMFrame = ReadBCI2BRSMsg();
-
     		//Send the Frame to the Bluetooth Task
-    		xQueueSend(g_pBluetoothSendQueue,&pReceivedTMFrame, portMAX_DELAY);
+    		xQueueSend(g_pBluetoothSendQueue, ReadBCI2BRSMsg() , portMAX_DELAY);
     	}
 
     	//Send The BRS Message through the UART if it is Available
-    	if (xQueueReceive(g_pUARTSendQueue, &pBRSFrameToSend, 0) == pdPASS)
+    	if (xQueueReceive(g_pUARTSendQueue, &BRSFrameToSend, 0) == pdPASS)
     	{
-    		SendBRSFrame(pBRSFrameToSend);
+    		//Make Sure the Message ID Is Correct
+    		BRSFrameToSend.MsgId = BRS2BCI_MSG_ID;
+
+    		//Send Message and Block concurrent access using semaphore
+            xSemaphoreTake(g_pUARTSemaphore, portMAX_DELAY);
+            SendBRSFrame(&BRSFrameToSend);
+            xSemaphoreGive(g_pUARTSemaphore);
+
+            //Blink Send Status
     		BlinkLED(GREEN_LED, 1);
     	}
 

@@ -291,5 +291,9 @@ TM_Frame_t* ReadBCI2BRSMsg()
 //*****************************************************************************
 void SendBRSFrame(BRS_Frame_t* pFrame)
 {
+	//HACK FOR NOW REMOVE ME
+	pFrame->MsgId = BRS2BCI_MSG_ID;
+	pFrame->remoteCommand = 'f';
+
 	UARTSend((const uint8_t*) pFrame, sizeof(BRS_Frame_t));
 }

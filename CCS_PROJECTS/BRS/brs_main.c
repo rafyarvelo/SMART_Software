@@ -106,6 +106,9 @@ void vApplicationStackOverflowHook(xTaskHandle *pxTask, char *pcTaskName)
 //Begin all the FreeRTOS Tasks
 void StartTasks();
 
+//Remove this Flag when the Tactical Configuration is Ready
+#define DEBUG_ONLY
+
 //*****************************************************************************
 //
 // Initialize FreeRTOS and start the initial set of tasks.
@@ -126,7 +129,7 @@ int main(void)
     ConfigureLEDs();
 
     // Print Introduction.
-    UARTprintf("\n\nWelcome to the SMART Software, BRS Processing Function!\n");
+    //UARTprintf("\n\nWelcome to the SMART Software, BRS Processing Function!\n");
 
     // Create a mutex to guard the UART.
     g_pUARTSemaphore = xSemaphoreCreateMutex();
@@ -147,7 +150,7 @@ int main(void)
 
 void StartTasks()
 {
-    // Create the UART task.
+	// Create the UART task.
     if(UARTTaskInit() != 0)
     {
 

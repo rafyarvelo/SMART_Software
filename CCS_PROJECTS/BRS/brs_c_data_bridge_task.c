@@ -60,67 +60,69 @@ extern xSemaphoreHandle g_pUARTSendQueue ;
 static void DataBridgeTask(void *pvParameters)
 {
     portTickType ui32WakeTime;
-    SensorData_t*     pSensorData  = NULL;
-    BluetoothFrame_t* pBtFrame     = NULL;
-    BRS_Frame_t*      pFrameToSend = createBRSFrame();
+    SensorData_t     sensorData;
+    BluetoothFrame_t btFrame;
+    BRS_Frame_t      BRSFrameToSend;
+    int brsFrameInitialized   = FALSE;
     int sensorDataAvailable   = FALSE;
     int remoteDataAvailable   = FALSE;
 
     // Get the current tick count.
     ui32WakeTime = xTaskGetTickCount();
 
-    //Initialize BRS Frame
-    pFrameToSend = createBRSFrame();
-
     // Loop forever.
     while(1)
     {
     	//Check for Sensor Data
-    	if (xQueueReceive(g_pSensorDataQueue, &pSensorData, 0) == pdPASS)
+    	if (xQueueReceive(g_pSensorDataQueue, &sensorData, 0) == pdPASS)
     	{
     		sensorDataAvailable = TRUE;
     	}
 
     	//Check for Remote Data
-    	if (xQueueReceive(g_pBluetoothReceiveQueue, &pBtFrame, 0) == pdPASS)
+    	if (xQueueReceive(g_pBluetoothReceiveQueue, &btFrame, 0) == pdPASS)
 		{
 			remoteDataAvailable = TRUE;
 		}
 
-    	//Create BRS Frame from Received Data and Reset Pointers/Flags
+    	//Create BRS Frame from Received Data and Reset Flags
     	if (sensorDataAvailable && remoteDataAvailable)
     	{
+    		//Initialize Message ID
+    		BRSFrameToSend.MsgId = BRS2BCI_MSG_ID;
+
     		//Sensor Data
-    		if (pSensorData != NULL)
-    		{
-    			memcpy(&pFrameToSend->sensorData, pSensorData, sizeof(SensorData_t));
-    			pSensorData         = NULL;
-    			sensorDataAvailable = FALSE;
-    		}
+			memcpy(&BRSFrameToSend.sensorData, &sensorData, sizeof(SensorData_t));
+			sensorDataAvailable = FALSE;
 
-    		//Remote Data
-    		if (pBtFrame != NULL)
-    		{
-    			memcpy(&pFrameToSend->remoteCommand, &pBtFrame->remoteCommand, sizeof(PCC_Command_Type));
-    			pBtFrame            = NULL;
-				remoteDataAvailable = FALSE;
-    		}
+			//Remote Data
+			memcpy(&BRSFrameToSend.remoteCommand, &btFrame.remoteCommand, sizeof(PCC_Command_Type));
+			remoteDataAvailable = FALSE;
 
-            // Pass the frame to the UART Task.
-            if(xQueueSend(g_pUARTSendQueue, &pFrameToSend, portMAX_DELAY) != pdPASS)
-            {
-                // Error. The queue should never be full. If so print the
-                // error message on UART and wait for ever.
-                UARTprintf("\nQueue full. This should never happen.\n");
-                while(1)
-                {
-                }
-            }
+			brsFrameInitialized = TRUE;
     	}
+
+    	// Pass the frame to the UART Task.
+		if (brsFrameInitialized == TRUE)
+		{
+			if(xQueueSend(g_pUARTSendQueue, &BRSFrameToSend, portMAX_DELAY) != pdPASS)
+			{
+				// Error. The queue should never be full. If so print the
+				// error message on UART and wait for ever.
+				UARTprintf("\nQueue full. This should never happen.\n");
+				while(1)
+				{
+				}
+			}
+
+			//Grab a new Frame next time
+			brsFrameInitialized = FALSE;
+		}
 
     	//Wait the required amount of time
     	vTaskDelayUntil(&ui32WakeTime, DATA_BRIDGE_TASK_DELAY / portTICK_RATE_MS);//Do Stuff
     }
+
 }
 
 //*****************************************************************************

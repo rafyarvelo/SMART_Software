@@ -25,10 +25,10 @@ typedef unsigned int MSG_ID_Type;
 #define MSG_ID_SIZE 4 //Bytes
 
 //BRS Frame to the BCI
-#define BRS2BCI_MSG_ID 0x123FEDEF
+#define BRS2BCI_MSG_ID 0x66828333 //ASCII "BRS!"
 
 //BCI TM Frame Back to the BRS
-#define BCI2BRS_MSG_ID 0xFEDEF321
+#define BCI2BRS_MSG_ID 0x66767333 //ASCII "BCI!"
 
 //BRS to Mobile Device Communication
 #define BRS2MD_MSG_ID 0x456ABCFD

@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include <stdint.h>
+#include <string.h>
 #include "inc/hw_memmap.h"
 #include "inc/hw_types.h"
 #include "driverlib/gpio.h"
@@ -37,7 +38,7 @@ xQueueHandle g_pBluetoothReceiveQueue;
 static void BluetoothTask(void *pvParameters)
 {
     portTickType     ui32WakeTime;
-    BluetoothFrame_t* pReceivedBTFrame = malloc(sizeof(BluetoothFrame_t));
+    BluetoothFrame_t* pReceivedBTFrame = NULL;
     TM_Frame_t*       pFrameToSend     = NULL;
     int               btFrameReceived  = FALSE;
 
@@ -64,6 +65,7 @@ static void BluetoothTask(void *pvParameters)
     	//=========Get Bluetooth Data==========
     	//Generate Debug Data
 		#ifdef DEBUG_ONLY
+    	    pReceivedBTFrame = createBluetoothFrame();
     		pReceivedBTFrame->remoteCommand = pcc_cmds[rand() % pcc_cmds_SIZE];
     		btFrameReceived = TRUE;
     	//Actually Get Data
@@ -71,9 +73,11 @@ static void BluetoothTask(void *pvParameters)
 
 		#endif
 
-    	if (btFrameReceived == TRUE)
+    	if (btFrameReceived)
     	{
+    		//Status Good
     		BlinkLED(BLUE_LED, 1);
+
 			//Send the Data to the Data Bridge
 			if(xQueueSend(g_pBluetoothReceiveQueue, &pReceivedBTFrame, portMAX_DELAY) != pdPASS)
 			{
@@ -95,6 +99,12 @@ static void BluetoothTask(void *pvParameters)
     	if (xQueueReceive(g_pBluetoothSendQueue, &pFrameToSend, 0) == pdPASS)
     	{
     		SendTMFrame(pFrameToSend);
+
+    		//Save Memory
+    		if (pFrameToSend != NULL)
+    		{
+    			free(pFrameToSend);
+    		}
     	}
 
         //=====================================
