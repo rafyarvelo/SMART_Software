@@ -75,7 +75,7 @@ typedef enum
 //Debug Configuration for testing
 #else
     #define DEFAULT_EEG_TYPE EEG_TYPE_DEBUG
-    #define DEFAULT_BRS_TYPE BRS_TYPE_DEBUG
+    #define DEFAULT_BRS_TYPE BRS_TYPE_TIVA //BRS_TYPE_DEBUG
     #define DEFAULT_PCC_TYPE PCC_TYPE_DEBUG
 #endif
 
@@ -114,7 +114,7 @@ typedef enum
     #define ENDL "/r/n"
 #else
     #define PCC_PORT "/dev/ttyACM0"
-    #define BRS_PORT "/dev/ttyAMA0"
+    #define BRS_PORT "/dev/ttyACM0"
     #define ENDL "/n"
 #endif
 

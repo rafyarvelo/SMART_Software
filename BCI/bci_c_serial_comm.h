@@ -41,8 +41,8 @@ public:
     bool sendToSerialPort(const BRS_Frame_t*     pFrame);
 
     //Receive Data, return numBytes read or ByteArray with Data
-    int        readRawData(char* pData, sizeType size);
-    QByteArray readFromSerialPort(int numBytes=-1);//numBytes < 0 to read all
+    int         readRawData(char* pData, sizeType size);
+    QByteArray& readFromSerialPort(int numBytes=-1);//numBytes < 0 to read all
 
     //Overloaded read functions
     int readFromSerialPort(unsigned char*  pByte);
@@ -53,15 +53,20 @@ public:
 
     void SetDefaultPortSettings();
 
+signals:
+    void dataReceived(const QByteArray& data);
+
 private slots:
     void onDsrChanged(bool status);
-    void onReadyRead();
 
 protected:
     void printPortSettings(ostream& stream);
     SMART_DEBUG_LOG* debugLog;
 
     QString         mPortName;
+    QByteArray      UARTReceiveBuffer;
+
+public:
     QextSerialPort* mSerialPortPtr;
 };
 

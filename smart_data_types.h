@@ -188,6 +188,9 @@ BRS_Frame_t*      createBRSFrame();
 LED_Group_t*      createLEDGroup(LED_Group_ID id);
 BluetoothFrame_t* createBluetoothFrame();
 
+//Diff two Message IDs, Return TRUE if they're equal
+int checkMsgID(MSG_ID_Type id1, MSG_ID_Type id2);
+
 #ifdef __cplusplus
     } //extern "C"
 #endif

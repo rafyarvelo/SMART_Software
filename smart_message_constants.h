@@ -17,23 +17,26 @@
  */
 
 //4 Byte Message ID
-typedef unsigned int MSG_ID_Type;
+//typedef unsigned int MSG_ID_Type;
+
+//5 Byte Message ID
+typedef char* MSG_ID_Type;
+
+//Constants for Communication between Devices
+#define MSG_ID_SIZE 5 //Bytes
 
 #define MAX_BUFFER_SIZE 1024 //How many Bytes we will store at a maximum (1KB)
 
-//Constants for Communication between Devices
-#define MSG_ID_SIZE 4 //Bytes
-
 //BRS Frame to the BCI
-#define BRS2BCI_MSG_ID 0x66828333 //ASCII "BRS!"
+#define BRS2BCI_MSG_ID "BRS!"
 
 //BCI TM Frame Back to the BRS
-#define BCI2BRS_MSG_ID 0x66767333 //ASCII "BCI!"
+#define BCI2BRS_MSG_ID "BCI!"
 
 //BRS to Mobile Device Communication
-#define BRS2MD_MSG_ID 0x456ABCFD
+#define BRS2MD_MSG_ID  "!BLT"
 
 //Mobile Device to BRS Communication
-#define MD2BRS_MSG_ID 0xDFCBA654
+#define MD2BRS_MSG_ID  "TLB!"
 
 #endif /* SMART_MESSAGE_CONSTANTS_H_ */

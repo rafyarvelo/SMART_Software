@@ -3,6 +3,8 @@
 C_BRSH_IO_Serial::C_BRSH_IO_Serial()
     : C_Serial_Comm(BRS_PORT)
 {
+    //Tiva C Uses a different Baud Rate
+    mSerialPortPtr->setBaudRate(BAUD115200);
 }
 
 C_BRSH_IO_Serial::~C_BRSH_IO_Serial()
@@ -13,20 +15,19 @@ C_BRSH_IO_Serial::~C_BRSH_IO_Serial()
 //Send TM to the BRSH
 void C_BRSH_IO_Serial::SendTMFrame(TM_Frame_t* pFrame)
 {
-    unsigned int msgID = BCI2BRS_MSG_ID;
-
     //Write the TM Frame to the BRS through the UART Serial Port
-    sendToSerialPort(msgID);
-    sendToSerialPort(pFrame);
+    sendToSerialPort(reinterpret_cast<const TM_Frame_t*>(pFrame));
 }
 
 bool C_BRSH_IO_Serial::fetchBRSFrame()
 {
-    bool         received       = false;
-    unsigned int msgID          = 0;
-    sizeType     msgSize        = 0;
-    u_int64_t    bytesAvailable = mSerialPortPtr->bytesAvailable();
-    static int   retryCount     = 0;
+    bool       received       = false;
+    u_int64_t  bytesAvailable = mSerialPortPtr->bytesAvailable();
+    static int retryCount     = 0;
+    uint8_t    i              = 0;
+
+    //Message ID Buffer
+    unsigned char msgId[MSG_ID_SIZE];
 
     //Check if we're Connected
     if (!mSerialPortPtr->isOpen())
@@ -43,7 +44,7 @@ bool C_BRSH_IO_Serial::fetchBRSFrame()
     }
 
     //Don't Bother if the data isn't there yet
-    if (bytesAvailable < (sizeof(BRS_Frame_t) + sizeof(msgID)))
+    if (bytesAvailable < (sizeof(BRS_Frame_t)))
     {
         return false;
     }
@@ -54,35 +55,35 @@ bool C_BRSH_IO_Serial::fetchBRSFrame()
         mSerialPortPtr->readAll();
     }
 
-    int i = 0;
+    //Allocate the Frame if it hasn't been done already
+    if (!pLatestBRSFrame)
+    {
+        pLatestBRSFrame = createBRSFrame();
+    }
 
     //Look for the Message ID one byte at a time
     while (bytesAvailable-- >= sizeof(BRS_Frame_t))
     {
-        unsigned char byte;
-        unsigned int  bitsToShift;
-
-        //Read a Byte from the UART
-        readFromSerialPort(&byte);
-
-        //Overwrite one byte in the current MsgID
-        bitsToShift = (8 * (i++ % sizeof(msgID)));
-        msgID &= ~(0xFF) << bitsToShift;
-        msgID |=   byte  << bitsToShift;
+        //Overwrite one byte in our buffer
+        readFromSerialPort(&msgId[i++ % MSG_ID_SIZE]);
 
         //Try to read BRS Frame
-        if (msgID == BRS2BCI_MSG_ID)
+        if (checkMsgID(reinterpret_cast<MSG_ID_Type>(msgId), BRS2BCI_MSG_ID))
         {
             debugLog->println(BRS_LOG, "MSG ID Received: BRS2BCI MSG ID\n");
 
             //Read in the Frame
             pBRSFrameMutex->acquire(BRS_FRAME_MUTEX);
             readFromSerialPort(pLatestBRSFrame);
-            received = true;
             pBRSFrameMutex->release(BRS_FRAME_MUTEX);
-            emit BRSFrameReceived(pLatestBRSFrame);
-        }
 
+            //Notify that it was received
+            received = true;
+            emit BRSFrameReceived(pLatestBRSFrame);
+
+            //Wipe the Message ID Buffer
+            memset(&msgId[0], 0, MSG_ID_SIZE);
+        }
     }
 
     return received;

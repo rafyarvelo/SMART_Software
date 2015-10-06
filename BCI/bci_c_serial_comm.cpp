@@ -10,7 +10,6 @@ C_Serial_Comm::C_Serial_Comm(const QString& portName)
     SetDefaultPortSettings();
 
     connect(mSerialPortPtr, SIGNAL(dsrChanged(bool)), this, SLOT(onDsrChanged(bool)));
-    connect(mSerialPortPtr, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
 }
 
 C_Serial_Comm::~C_Serial_Comm()
@@ -36,11 +35,11 @@ void C_Serial_Comm::SetDefaultPortSettings()
 void C_Serial_Comm::printPortSettings(ostream &stream)
 {
     stream << "Port Settings for " << mPortName.toStdString() << ":" << endl;
-    stream << "BAUD Rate:    " << mSerialPortPtr->baudRate()            << endl;
-    stream << "Flow Control: " << mSerialPortPtr->flowControl()         << endl;
-    stream << "Parity:       " << mSerialPortPtr->parity()              << endl;
-    stream << "Data Bits:    " << mSerialPortPtr->dataBits()            << endl;
-    stream << "Stop Bits:    " << mSerialPortPtr->stopBits()            << endl;
+    stream << "BAUD Rate:    " << mSerialPortPtr->baudRate()         << endl;
+    stream << "Flow Control: " << mSerialPortPtr->flowControl()      << endl;
+    stream << "Parity:       " << mSerialPortPtr->parity()           << endl;
+    stream << "Data Bits:    " << mSerialPortPtr->dataBits()         << endl;
+    stream << "Stop Bits:    " << mSerialPortPtr->stopBits()         << endl;
     stream << "Timeout (ms): " << DEFAULT_TIMEOUT_MS                 << endl;
 }
 
@@ -142,9 +141,8 @@ int C_Serial_Comm::readRawData(char* pData, sizeType size)
     return bytesRead;
 }
 
-QByteArray C_Serial_Comm::readFromSerialPort(int numBytes)
+QByteArray& C_Serial_Comm::readFromSerialPort(int numBytes)
 {
-    QByteArray bytes;
     int numToRead;
 
     if (numBytes < 0 || numBytes > mSerialPortPtr->bytesAvailable())
@@ -156,8 +154,14 @@ QByteArray C_Serial_Comm::readFromSerialPort(int numBytes)
         numToRead = numBytes;
     }
 
-    bytes = mSerialPortPtr->read(numBytes);
-    return bytes;
+    //Return if there are no bytes available
+    if (numBytes <= 0)
+    {
+        return UARTReceiveBuffer;
+    }
+
+    UARTReceiveBuffer = mSerialPortPtr->read(numBytes);
+    return UARTReceiveBuffer;
 }
 
 int C_Serial_Comm::readFromSerialPort(unsigned char* pByte)
@@ -198,9 +202,4 @@ void C_Serial_Comm::onDsrChanged(bool status)
     {
         debugLog->SerialComm_Log() << "Serial Device was turned off" << endl;
     }
-}
-
-void C_Serial_Comm::onReadyRead()
-{
-    //this->readAll();//Read all available data when it's ready
 }
