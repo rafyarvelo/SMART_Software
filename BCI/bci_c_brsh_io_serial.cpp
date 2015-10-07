@@ -24,10 +24,6 @@ bool C_BRSH_IO_Serial::fetchBRSFrame()
     bool       received       = false;
     u_int64_t  bytesAvailable = mSerialPortPtr->bytesAvailable();
     static int retryCount     = 0;
-    uint8_t    i              = 0;
-
-    //Message ID Buffer
-    unsigned char msgId[MSG_ID_SIZE];
 
     //Check if we're Connected
     if (!mSerialPortPtr->isOpen())
@@ -55,36 +51,33 @@ bool C_BRSH_IO_Serial::fetchBRSFrame()
         mSerialPortPtr->readAll();
     }
 
+    //Lock the BRS Frame
+    pBRSFrameMutex->acquire(BRS_FRAME_MUTEX);
+
     //Allocate the Frame if it hasn't been done already
     if (!pLatestBRSFrame)
     {
         pLatestBRSFrame = createBRSFrame();
     }
 
-    //Look for the Message ID one byte at a time
-    while (bytesAvailable-- >= sizeof(BRS_Frame_t))
+    //Read in the Next BRS Message
+    readFromSerialPort(pLatestBRSFrame);
+
+    //Check if the Message was Formatted correctly
+    if (checkMsgID(pLatestBRSFrame->MsgId, BRS2BCI_MSG_ID))
     {
-        //Overwrite one byte in our buffer
-        readFromSerialPort(&msgId[i++ % MSG_ID_SIZE]);
+        debugLog->println(BRS_LOG, "MSG ID Received: BRS2BCI MSG ID\n");
 
-        //Try to read BRS Frame
-        if (checkMsgID(reinterpret_cast<MSG_ID_Type>(msgId), BRS2BCI_MSG_ID))
-        {
-            debugLog->println(BRS_LOG, "MSG ID Received: BRS2BCI MSG ID\n");
+        //Notify that it was received
+        received = true;
+        emit BRSFrameReceived(pLatestBRSFrame);
 
-            //Read in the Frame
-            pBRSFrameMutex->acquire(BRS_FRAME_MUTEX);
-            readFromSerialPort(pLatestBRSFrame);
-            pBRSFrameMutex->release(BRS_FRAME_MUTEX);
-
-            //Notify that it was received
-            received = true;
-            emit BRSFrameReceived(pLatestBRSFrame);
-
-            //Wipe the Message ID Buffer
-            memset(&msgId[0], 0, MSG_ID_SIZE);
-        }
+        //Wipe the Message ID Buffer
+        memset(&msgId, 0, MSG_ID_SIZE);
     }
+
+    //Unlock the BRS frame
+    pBRSFrameMutex->release(BRS_FRAME_MUTEX);
 
     return received;
 }
