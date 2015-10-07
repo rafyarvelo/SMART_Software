@@ -115,8 +115,9 @@ static void BluetoothTask(void *pvParameters)
 //*****************************************************************************
 uint32_t BluetoothTaskInit(void)
 {
+    #ifdef ENABLE_PRINTS
     UARTprintf("Initializing Bluetooth Task...\n");
-
+    #endif
     //
     // Create a queue for sending/receiving messages
     //

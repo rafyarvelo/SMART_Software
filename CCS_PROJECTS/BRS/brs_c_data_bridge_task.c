@@ -132,8 +132,9 @@ static void DataBridgeTask(void *pvParameters)
 //*****************************************************************************
 uint32_t DataBridgeTaskInit(void)
 {
+    #ifdef ENABLE_PRINTS
     UARTprintf("Initializing Data Bridge Task...\n");
-
+    #endif
     //
     // Create the Data Bridge task.
     //

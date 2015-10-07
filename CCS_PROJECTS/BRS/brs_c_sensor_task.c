@@ -84,8 +84,9 @@ static void SensorTask(void *pvParameters)
 //*****************************************************************************
 uint32_t SensorTaskInit(void)
 {
+    #ifdef ENABLE_PRINTS
     UARTprintf("Initializing Sensor Task...\n");
-
+    #endif
     //
     // Create a queue for sending/receiving messages
     //

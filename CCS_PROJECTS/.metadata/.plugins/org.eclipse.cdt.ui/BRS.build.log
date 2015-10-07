@@ -2,14 +2,64 @@
 **** Build of configuration Debug for project BRS ****
 
 "C:\\ti\\ccsv6\\utils\\bin\\gmake" -k all 
-'Building file: ../brs_c_led.c'
+'Building file: ../brs_c_bluetooth.c'
 'Invoking: ARM Compiler'
-"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 --abi=eabi -me -O2 --include_path="C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include" --include_path="C:/Users/Rafael/SENIOR_DESIGN/SMART_Software/CCS_PROJECTS/BRS" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71/examples/boards/ek-tm4c123gxl" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71/third_party" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71/third_party/FreeRTOS/Source/include" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71/third_party/FreeRTOS" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71/third_party/FreeRTOS/Source/portable/CCS/ARM_CM4F" -g --gcc --define=ccs="ccs" --define=PART_TM4C123GH6PM --define=TARGET_IS_TM4C123_RB1 --display_error_number --diag_warning=225 --diag_wrap=off --gen_func_subsections=on --ual --preproc_with_compile --preproc_dependency="brs_c_led.pp"  "../brs_c_led.c"
-"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include/stdint.h", line 43: warning #303-D: typedef name has already been declared (with same type)
-"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include/stdint.h", line 45: warning #303-D: typedef name has already been declared (with same type)
-"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include/stdint.h", line 47: warning #303-D: typedef name has already been declared (with same type)
-"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include/stdint.h", line 51: warning #303-D: typedef name has already been declared (with same type)
-'Finished building: ../brs_c_led.c'
+"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 --abi=eabi -me -O2 --include_path="C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include" --include_path="C:/Users/Rafael/SENIOR_DESIGN/SMART_Software/CCS_PROJECTS/BRS" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71/examples/boards/ek-tm4c123gxl" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71/third_party" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71/third_party/FreeRTOS/Source/include" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71/third_party/FreeRTOS" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71/third_party/FreeRTOS/Source/portable/CCS/ARM_CM4F" -g --gcc --define=ccs="ccs" --define=PART_TM4C123GH6PM --define=TARGET_IS_TM4C123_RB1 --display_error_number --diag_warning=225 --diag_wrap=off --gen_func_subsections=on --ual --preproc_with_compile --preproc_dependency="brs_c_bluetooth.pp"  "../brs_c_bluetooth.c"
+'Finished building: ../brs_c_bluetooth.c'
+' '
+'Building file: ../brs_c_bt_task.c'
+'Invoking: ARM Compiler'
+"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 --abi=eabi -me -O2 --include_path="C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include" --include_path="C:/Users/Rafael/SENIOR_DESIGN/SMART_Software/CCS_PROJECTS/BRS" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71/examples/boards/ek-tm4c123gxl" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71/third_party" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71/third_party/FreeRTOS/Source/include" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71/third_party/FreeRTOS" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71/third_party/FreeRTOS/Source/portable/CCS/ARM_CM4F" -g --gcc --define=ccs="ccs" --define=PART_TM4C123GH6PM --define=TARGET_IS_TM4C123_RB1 --display_error_number --diag_warning=225 --diag_wrap=off --gen_func_subsections=on --ual --preproc_with_compile --preproc_dependency="brs_c_bt_task.pp"  "../brs_c_bt_task.c"
+"..\..\..\smart_config.h", line 29: warning #303-D: typedef name has already been declared (with same type)
+"..\..\..\smart_config.h", line 30: warning #303-D: typedef name has already been declared (with same type)
+"..\..\..\smart_config.h", line 31: warning #303-D: typedef name has already been declared (with same type)
+'Finished building: ../brs_c_bt_task.c'
+' '
+'Building file: ../brs_c_data_bridge_task.c'
+'Invoking: ARM Compiler'
+"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 --abi=eabi -me -O2 --include_path="C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include" --include_path="C:/Users/Rafael/SENIOR_DESIGN/SMART_Software/CCS_PROJECTS/BRS" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71/examples/boards/ek-tm4c123gxl" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71/third_party" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71/third_party/FreeRTOS/Source/include" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71/third_party/FreeRTOS" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71/third_party/FreeRTOS/Source/portable/CCS/ARM_CM4F" -g --gcc --define=ccs="ccs" --define=PART_TM4C123GH6PM --define=TARGET_IS_TM4C123_RB1 --display_error_number --diag_warning=225 --diag_wrap=off --gen_func_subsections=on --ual --preproc_with_compile --preproc_dependency="brs_c_data_bridge_task.pp"  "../brs_c_data_bridge_task.c"
+"..\..\..\smart_config.h", line 29: warning #303-D: typedef name has already been declared (with same type)
+"..\..\..\smart_config.h", line 30: warning #303-D: typedef name has already been declared (with same type)
+"..\..\..\smart_config.h", line 31: warning #303-D: typedef name has already been declared (with same type)
+'Finished building: ../brs_c_data_bridge_task.c'
+' '
+'Building file: ../brs_c_sensor_task.c'
+'Invoking: ARM Compiler'
+"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 --abi=eabi -me -O2 --include_path="C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include" --include_path="C:/Users/Rafael/SENIOR_DESIGN/SMART_Software/CCS_PROJECTS/BRS" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71/examples/boards/ek-tm4c123gxl" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71/third_party" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71/third_party/FreeRTOS/Source/include" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71/third_party/FreeRTOS" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71/third_party/FreeRTOS/Source/portable/CCS/ARM_CM4F" -g --gcc --define=ccs="ccs" --define=PART_TM4C123GH6PM --define=TARGET_IS_TM4C123_RB1 --display_error_number --diag_warning=225 --diag_wrap=off --gen_func_subsections=on --ual --preproc_with_compile --preproc_dependency="brs_c_sensor_task.pp"  "../brs_c_sensor_task.c"
+"..\..\..\smart_config.h", line 29: warning #303-D: typedef name has already been declared (with same type)
+"..\..\..\smart_config.h", line 30: warning #303-D: typedef name has already been declared (with same type)
+"..\..\..\smart_config.h", line 31: warning #303-D: typedef name has already been declared (with same type)
+'Finished building: ../brs_c_sensor_task.c'
+' '
+'Building file: ../brs_c_uart.c'
+'Invoking: ARM Compiler'
+"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 --abi=eabi -me -O2 --include_path="C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include" --include_path="C:/Users/Rafael/SENIOR_DESIGN/SMART_Software/CCS_PROJECTS/BRS" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71/examples/boards/ek-tm4c123gxl" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71/third_party" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71/third_party/FreeRTOS/Source/include" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71/third_party/FreeRTOS" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71/third_party/FreeRTOS/Source/portable/CCS/ARM_CM4F" -g --gcc --define=ccs="ccs" --define=PART_TM4C123GH6PM --define=TARGET_IS_TM4C123_RB1 --display_error_number --diag_warning=225 --diag_wrap=off --gen_func_subsections=on --ual --preproc_with_compile --preproc_dependency="brs_c_uart.pp"  "../brs_c_uart.c"
+"..\..\..\smart_config.h", line 29: warning #303-D: typedef name has already been declared (with same type)
+"..\..\..\smart_config.h", line 30: warning #303-D: typedef name has already been declared (with same type)
+"..\..\..\smart_config.h", line 31: warning #303-D: typedef name has already been declared (with same type)
+"../brs_c_uart.c", line 55: warning #225-D: function "UARTStdioConfig" declared implicitly
+'Finished building: ../brs_c_uart.c'
+' '
+'Building file: ../brs_c_uart_task.c'
+'Invoking: ARM Compiler'
+"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 --abi=eabi -me -O2 --include_path="C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include" --include_path="C:/Users/Rafael/SENIOR_DESIGN/SMART_Software/CCS_PROJECTS/BRS" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71/examples/boards/ek-tm4c123gxl" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71/third_party" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71/third_party/FreeRTOS/Source/include" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71/third_party/FreeRTOS" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71/third_party/FreeRTOS/Source/portable/CCS/ARM_CM4F" -g --gcc --define=ccs="ccs" --define=PART_TM4C123GH6PM --define=TARGET_IS_TM4C123_RB1 --display_error_number --diag_warning=225 --diag_wrap=off --gen_func_subsections=on --ual --preproc_with_compile --preproc_dependency="brs_c_uart_task.pp"  "../brs_c_uart_task.c"
+"..\..\..\smart_config.h", line 29: warning #303-D: typedef name has already been declared (with same type)
+"..\..\..\smart_config.h", line 30: warning #303-D: typedef name has already been declared (with same type)
+"..\..\..\smart_config.h", line 31: warning #303-D: typedef name has already been declared (with same type)
+'Finished building: ../brs_c_uart_task.c'
+' '
+'Building file: ../brs_main.c'
+'Invoking: ARM Compiler'
+"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 --abi=eabi -me -O2 --include_path="C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include" --include_path="C:/Users/Rafael/SENIOR_DESIGN/SMART_Software/CCS_PROJECTS/BRS" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71/examples/boards/ek-tm4c123gxl" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71/third_party" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71/third_party/FreeRTOS/Source/include" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71/third_party/FreeRTOS" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71/third_party/FreeRTOS/Source/portable/CCS/ARM_CM4F" -g --gcc --define=ccs="ccs" --define=PART_TM4C123GH6PM --define=TARGET_IS_TM4C123_RB1 --display_error_number --diag_warning=225 --diag_wrap=off --gen_func_subsections=on --ual --preproc_with_compile --preproc_dependency="brs_main.pp"  "../brs_main.c"
+"..\..\..\smart_config.h", line 29: warning #303-D: typedef name has already been declared (with same type)
+"..\..\..\smart_config.h", line 30: warning #303-D: typedef name has already been declared (with same type)
+"..\..\..\smart_config.h", line 31: warning #303-D: typedef name has already been declared (with same type)
+'Finished building: ../brs_main.c'
+' '
+'Building file: C:/Users/Rafael/SENIOR_DESIGN/SMART_Software/smart_data_types.c'
+'Invoking: ARM Compiler'
+"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 --abi=eabi -me -O2 --include_path="C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include" --include_path="C:/Users/Rafael/SENIOR_DESIGN/SMART_Software/CCS_PROJECTS/BRS" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71/examples/boards/ek-tm4c123gxl" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71/third_party" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71/third_party/FreeRTOS/Source/include" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71/third_party/FreeRTOS" --include_path="C:/ti/TivaWare_C_Series-2.1.1.71/third_party/FreeRTOS/Source/portable/CCS/ARM_CM4F" -g --gcc --define=ccs="ccs" --define=PART_TM4C123GH6PM --define=TARGET_IS_TM4C123_RB1 --display_error_number --diag_warning=225 --diag_wrap=off --gen_func_subsections=on --ual --preproc_with_compile --preproc_dependency="smart_data_types.pp"  "C:/Users/Rafael/SENIOR_DESIGN/SMART_Software/smart_data_types.c"
+'Finished building: C:/Users/Rafael/SENIOR_DESIGN/SMART_Software/smart_data_types.c'
 ' '
 'Building target: BRS.out'
 'Invoking: ARM Linker'

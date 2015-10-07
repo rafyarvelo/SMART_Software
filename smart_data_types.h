@@ -126,8 +126,8 @@ typedef struct BluetoothFrame_t
 typedef struct BRS_Frame_t
 {
 	MsgIdType        MsgId; //Message Sent from BRS to BCI
-	SensorData_t     sensorData;
     PCC_Command_Type remoteCommand;
+	SensorData_t     sensorData;
 } BRS_Frame_t;
 //===============================================
 

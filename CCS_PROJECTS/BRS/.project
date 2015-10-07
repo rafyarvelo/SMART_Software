@@ -41,11 +41,6 @@
 			<locationURI>PARENT-2-PROJECT_LOC/smart_data_types.h</locationURI>
 		</link>
 		<link>
-			<name>smart_message_constants.h</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/smart_message_constants.h</locationURI>
-		</link>
-		<link>
 			<name>drivers/buttons.c</name>
 			<type>1</type>
 			<locationURI>SW_ROOT/examples/boards/ek-tm4c123gxl/drivers/buttons.c</locationURI>

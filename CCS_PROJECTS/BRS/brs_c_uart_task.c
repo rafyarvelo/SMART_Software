@@ -109,8 +109,9 @@ static void UARTTask(void *pvParameters)
 //*****************************************************************************
 uint32_t UARTTaskInit(void)
 {
+    #ifdef ENABLE_PRINTS
     UARTprintf("\nInitializing UART Task...\n");
-
+    #endif
     //
     // Create a queue for sending messages to the LED task.
     //
