@@ -37,8 +37,7 @@ HEADERS += \
     bci_c_pcc_io_debug.h \
     bci_c_singleton.h \
     bci_c_framegenerator.h \
-    ../smart_data_types.h \
-    ../smart_message_constants.h
+    ../smart_data_types.h
 
 SOURCES += \
     bci_c_bci_package.cpp \
