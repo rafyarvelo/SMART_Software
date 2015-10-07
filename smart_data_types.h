@@ -2,7 +2,6 @@
 #define SMART_DATA_TYPES_H
 
 #include "smart_config.h"
-#include "smart_message_constants.h"
 #include "CCS_PROJECTS/PCC/power_chair_command_constants.h"
 
 ////Keep this File C Compatible
@@ -34,6 +33,44 @@ typedef enum Emotiv_Electrodes
 #else
     #define MAX_EEG_ELECTRODES  32 //(Used to be 32 because of Nautilus EEG)
 #endif
+
+//*****************************************************************************
+//
+// Message IDs for Communication Between Hardware
+//
+//*****************************************************************************
+
+/*
+ * General Message Format:
+ * MESSAGE ID - 5 Bytes Unsigned (4 Characters and a Null terminator (0x00) '\0')
+ * ...
+ * N Bytes of Data
+ *
+ */
+
+//5 Byte Message ID
+#define MSG_ID_SIZE 5 //Bytes
+typedef struct MsgIdType { uint8_t id[MSG_ID_SIZE]; } MsgIdType;
+
+#define MAX_BUFFER_SIZE 1024 //How many Bytes we will store at a maximum (1KB)
+
+//BRS Frame to the BCI
+#define BRS2BCI_MSG_ID "BRS!"
+
+//BCI TM Frame Back to the BRS
+#define BCI2BRS_MSG_ID "BCI!"
+
+//BRS to Mobile Device Communication
+#define BRS2MD_MSG_ID  "BLT!"
+
+//Mobile Device to BRS Communication
+#define MD2BRS_MSG_ID  "TLB!"
+
+//*****************************************************************************
+//
+// Frame Types
+//
+//*****************************************************************************
 
 //This struct defines what a single frame of EEG Data looks like
 typedef struct EEG_Frame_t
@@ -88,7 +125,7 @@ typedef struct BluetoothFrame_t
 // A Frame of BRS Data
 typedef struct BRS_Frame_t
 {
-	MSG_ID_Type      MsgId; //Message Sent from BRS to BCI
+	MsgIdType        MsgId; //Message Sent from BRS to BCI
 	SensorData_t     sensorData;
     PCC_Command_Type remoteCommand;
 } BRS_Frame_t;
@@ -149,7 +186,7 @@ typedef enum BCIState
 //Full Telemetry Frame
 typedef struct TM_Frame_t
 {
-    MSG_ID_Type          MsgId; //Message Sent From BCI -> BRS -> MD
+    MsgIdType          MsgId; //Message Sent From BCI -> BRS -> MD
     int                  timeStamp;
     BCIState             bciState;
     EEG_Frame_t          eegFrame; //Only the Latest Frame, EEG Telemetry is managed by the C_EEG_IO class
@@ -168,14 +205,14 @@ typedef struct TM_Frame_t
 
 //*****************************************************************************
 //
-// The item size for the messages, pass by pointer for speed
+// The item size for the messages
 //
 //*****************************************************************************
-#define BRS2BCI_SIZE     sizeof(BRS_Frame_t*)
-#define BCI2BRS_SIZE     sizeof(TM_Frame_t*)
-#define MD2BRS_SIZE      sizeof(BluetoothFrame_t*)
-#define BRS2MD_SIZE      sizeof(TM_Frame_t*)
-#define SENSOR_DATA_SIZE sizeof(SensorData_t*)
+#define BRS2BCI_SIZE     sizeof(BRS_Frame_t)
+#define BCI2BRS_SIZE     sizeof(TM_Frame_t)
+#define MD2BRS_SIZE      sizeof(BluetoothFrame_t)
+#define BRS2MD_SIZE      sizeof(TM_Frame_t)
+#define SENSOR_DATA_SIZE sizeof(SensorData_t)
 
 //*****************************************************************************
 //
@@ -189,7 +226,7 @@ LED_Group_t*      createLEDGroup(LED_Group_ID id);
 BluetoothFrame_t* createBluetoothFrame();
 
 //Diff two Message IDs, Return TRUE if they're equal
-int checkMsgID(MSG_ID_Type id1, MSG_ID_Type id2);
+int checkMsgID(MsgIdType id1, char* id2);
 
 #ifdef __cplusplus
     } //extern "C"

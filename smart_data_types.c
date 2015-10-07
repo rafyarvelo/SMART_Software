@@ -14,7 +14,7 @@ BRS_Frame_t* createBRSFrame()
 	memset(ptr, 0, dataSize);
 
 	//Set Defaults
-	ptr->MsgId = BRS2BCI_MSG_ID;
+	memcpy(&ptr->MsgId, BRS2BCI_MSG_ID, MSG_ID_SIZE);
 	ptr->remoteCommand = PCC_CMD_NONE;
 
 	//Return new allocated frame
@@ -72,13 +72,13 @@ TM_Frame_t* createTMFrame()
 	memset(ptr, 0, dataSize);
 
 	//Initialize Defaults
-	ptr->MsgId = BCI2BRS_MSG_ID;
-    memcpy(&ptr->eegFrame   , tmpEEGFrame, sizeof(EEG_Frame_t));
-    memcpy(&ptr->brsFrame   , tmpBRSFrame, sizeof(BRS_Frame_t));
-    memcpy(&ptr->ledForward , tmpGroupFwd, sizeof(LED_Group_t));
-    memcpy(&ptr->ledBackward, tmpGroupBwd, sizeof(LED_Group_t));
-    memcpy(&ptr->ledRight   , tmpGroupRgt, sizeof(LED_Group_t));
-    memcpy(&ptr->ledLeft    , tmpGroupLft, sizeof(LED_Group_t));
+    memcpy(&ptr->MsgId       , BCI2BRS_MSG_ID, sizeof(MsgIdType)  );
+    memcpy(&ptr->eegFrame   , tmpEEGFrame   , sizeof(EEG_Frame_t));
+    memcpy(&ptr->brsFrame   , tmpBRSFrame   , sizeof(BRS_Frame_t));
+    memcpy(&ptr->ledForward , tmpGroupFwd   , sizeof(LED_Group_t));
+    memcpy(&ptr->ledBackward, tmpGroupBwd   , sizeof(LED_Group_t));
+    memcpy(&ptr->ledRight   , tmpGroupRgt   , sizeof(LED_Group_t));
+    memcpy(&ptr->ledLeft    , tmpGroupLft   , sizeof(LED_Group_t));
 	ptr->pccConnectionStatus     = NOT_CONNECTED;
 	ptr->brsConnectionStatus     = NOT_CONNECTED;
 	ptr->eegConnectionStatus     = NOT_CONNECTED;
@@ -132,14 +132,17 @@ LED_Group_t* createLEDGroup(LED_Group_ID id)
 }
 
 //Check if two Message IDs are equal
-int checkMsgID(MSG_ID_Type id1, MSG_ID_Type id2)
+int checkMsgID(MsgIdType id1, char* id2)
 {
-    if (id1 == NULL || id2 == NULL)
+    char* str1 = (char*) &id1;
+    char* str2 = (char*) id2;
+
+    if (str1 == NULL || str2 == NULL)
     {
         return FALSE;
     }
     else
     {
-        return (strcmp(id1, id2) == 0);
+        return (strcmp(str1, str2) == 0);
     } 
 }

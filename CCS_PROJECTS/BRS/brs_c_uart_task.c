@@ -54,6 +54,7 @@ static void UARTTask(void *pvParameters)
 {
     portTickType  ui32WakeTime;
     BRS_Frame_t BRSFrameToSend;
+    int         frameReadyToSend = FALSE;
 
     //
     // Get the current tick count.
@@ -75,10 +76,15 @@ static void UARTTask(void *pvParameters)
     	}
 
     	//Send The BRS Message through the UART if it is Available
-    	if (xQueueReceive(g_pUARTSendQueue, &BRSFrameToSend, 0) == pdPASS)
+    	if (!frameReadyToSend && xQueueReceive(g_pUARTSendQueue, &BRSFrameToSend, 0) == pdPASS)
+    	{
+    		frameReadyToSend = TRUE;
+    	}
+
+    	if (frameReadyToSend)
     	{
     		//Make Sure the Message ID Is Correct
-    		BRSFrameToSend.MsgId = BRS2BCI_MSG_ID;
+            memcpy(&BRSFrameToSend.MsgId, BRS2BCI_MSG_ID, MSG_ID_SIZE);
 
     		//Send Message and Block concurrent access using semaphore
             xSemaphoreTake(g_pUARTSemaphore, portMAX_DELAY);
@@ -87,6 +93,9 @@ static void UARTTask(void *pvParameters)
 
             //Blink Send Status
     		BlinkLED(GREEN_LED, 1);
+
+    		//Reset Frame Ready Flag
+    		frameReadyToSend = FALSE;
     	}
 
     	vTaskDelayUntil(&ui32WakeTime, UART_TASK_DELAY / portTICK_RATE_MS);

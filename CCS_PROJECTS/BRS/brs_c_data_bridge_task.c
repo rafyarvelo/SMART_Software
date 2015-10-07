@@ -89,7 +89,7 @@ static void DataBridgeTask(void *pvParameters)
     	if (sensorDataAvailable && remoteDataAvailable)
     	{
     		//Initialize Message ID
-    		BRSFrameToSend.MsgId = BRS2BCI_MSG_ID;
+    		memcpy(&BRSFrameToSend.MsgId, BRS2BCI_MSG_ID, MSG_ID_SIZE);
 
     		//Sensor Data
 			memcpy(&BRSFrameToSend.sensorData, &sensorData, sizeof(SensorData_t));

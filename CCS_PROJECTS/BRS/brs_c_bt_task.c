@@ -38,9 +38,9 @@ xQueueHandle g_pBluetoothReceiveQueue;
 static void BluetoothTask(void *pvParameters)
 {
     portTickType     ui32WakeTime;
-    BluetoothFrame_t* pReceivedBTFrame = NULL;
-    TM_Frame_t*       pFrameToSend     = NULL;
-    int               btFrameReceived  = FALSE;
+    BluetoothFrame_t receivedBTFrame;
+    TM_Frame_t       frameToSend;
+    int              btFrameReceived  = FALSE;
 
     const uint16_t pcc_cmds_SIZE = 4;
     PCC_Command_Type pcc_cmds[] =
@@ -57,7 +57,7 @@ static void BluetoothTask(void *pvParameters)
     ui32WakeTime = xTaskGetTickCount();
 
     //Initialize the Receive Frame and TM Frame
-    memset(pReceivedBTFrame, 0, sizeof(BluetoothFrame_t));
+    memset(&receivedBTFrame, 0, sizeof(BluetoothFrame_t));
 
     // Loop forever.
     while(1)
@@ -65,8 +65,7 @@ static void BluetoothTask(void *pvParameters)
     	//=========Get Bluetooth Data==========
     	//Generate Debug Data
 		#ifdef DEBUG_ONLY
-    	    pReceivedBTFrame = createBluetoothFrame();
-    		pReceivedBTFrame->remoteCommand = pcc_cmds[rand() % pcc_cmds_SIZE];
+    		receivedBTFrame.remoteCommand = pcc_cmds[rand() % pcc_cmds_SIZE];
     		btFrameReceived = TRUE;
     	//Actually Get Data
 		#else
@@ -79,7 +78,7 @@ static void BluetoothTask(void *pvParameters)
     		BlinkLED(BLUE_LED, 1);
 
 			//Send the Data to the Data Bridge
-			if(xQueueSend(g_pBluetoothReceiveQueue, &pReceivedBTFrame, portMAX_DELAY) != pdPASS)
+			if(xQueueSend(g_pBluetoothReceiveQueue, &receivedBTFrame, portMAX_DELAY) != pdPASS)
 			{
 				// Error. The queue should never be full. If so print the
 				// error message on UART and wait for ever.
@@ -96,15 +95,9 @@ static void BluetoothTask(void *pvParameters)
 		//========Send Bluetooth Data==========
 
 		//Get the TM Frame from the UART Task and Send it
-    	if (xQueueReceive(g_pBluetoothSendQueue, &pFrameToSend, 0) == pdPASS)
+    	if (xQueueReceive(g_pBluetoothSendQueue, &frameToSend, 0) == pdPASS)
     	{
-    		SendTMFrame(pFrameToSend);
-
-    		//Save Memory
-    		if (pFrameToSend != NULL)
-    		{
-    			free(pFrameToSend);
-    		}
+    		SendTMFrame(&frameToSend);
     	}
 
         //=====================================
