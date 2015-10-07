@@ -71,9 +71,6 @@ bool C_BRSH_IO_Serial::fetchBRSFrame()
         //Notify that it was received
         received = true;
         emit BRSFrameReceived(pLatestBRSFrame);
-
-        //Wipe the Message ID Buffer
-        memset(&msgId, 0, MSG_ID_SIZE);
     }
 
     //Unlock the BRS frame
