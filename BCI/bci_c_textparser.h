@@ -6,11 +6,17 @@
 #include "bci_c_tm_header_names.h"
 
 //Default Input/Output Filenames
-const QString TM_DATA_INPUTFILE_TXT  = "../debug_files/brs_input_data.txt";
-const QString TM_DATA_OUTPUTFILE_TXT = "../debug_files/brs_output_data.txt";
-
-const QString EEG_DATA_INPUTFILE_TXT  = "../debug_files/eeg_input_data.txt";
-const QString EEG_DATA_OUTPUTFILE_TXT = "../debug_files/eeg_output_data.txt";
+#ifdef WIN32
+    const QString TM_DATA_INPUTFILE_TXT   = ".\\debug_files\\tm_input_data.txt";
+    const QString TM_DATA_OUTPUTFILE_TXT  = ".\\debug_files\\tm_output_data.txt";
+    const QString EEG_DATA_INPUTFILE_TXT  = ".\\debug_files\\eeg_input_data.txt";
+    const QString EEG_DATA_OUTPUTFILE_TXT = ".\\debug_files\\eeg_output_data.txt";
+#else
+    const QString TM_DATA_INPUTFILE_TXT   = "./debug_files/tm_input_data.txt";
+    const QString TM_DATA_OUTPUTFILE_TXT  = "./debug_files/tm_output_data.txt";
+    const QString EEG_DATA_INPUTFILE_TXT  = "./debug_files/eeg_input_data.txt";
+    const QString EEG_DATA_OUTPUTFILE_TXT = "./debug_files/eeg_output_data.txt";
+#endif
 
 class C_TextParser : public C_AbstractParser
 {

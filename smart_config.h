@@ -25,11 +25,11 @@
 #endif
 
 //Common Typedefs
-typedef unsigned char      PCC_Command_Type;
-typedef unsigned char      uint8_t;
-typedef unsigned short     uint16_t;
-typedef unsigned int       uint32_t;
-typedef unsigned int       sizeType;
+typedef unsigned char  PCC_Command_Type;
+typedef unsigned char  uint8_t;
+typedef unsigned short uint16_t;
+typedef unsigned int   uint32_t;
+typedef unsigned int   sizeType;
 
 #define TRUE          1
 #define FALSE         0
@@ -71,12 +71,11 @@ typedef enum
     #define DEFAULT_EEG_TYPE EEG_TYPE_EMOTIV
     #define DEFAULT_BRS_TYPE BRS_TYPE_TIVA
     #define DEFAULT_PCC_TYPE PCC_TYPE_MSP
-
 //Debug Configuration for testing
 #else
     #define DEFAULT_EEG_TYPE EEG_TYPE_DEBUG
-    #define DEFAULT_BRS_TYPE BRS_TYPE_TIVA //BRS_TYPE_DEBUG
-    #define DEFAULT_PCC_TYPE PCC_TYPE_DEBUG
+    #define DEFAULT_BRS_TYPE BRS_TYPE_DEBUG //BRS_TYPE_TIVA  
+    #define DEFAULT_PCC_TYPE PCC_TYPE_DEBUG //PCC_TYPE_MSP  
 #endif
 
 //==========================================================
@@ -112,10 +111,13 @@ typedef enum
     #define PCC_PORT "COM5"
     #define BRS_PORT "COM7"
     #define ENDL "/r/n"
+    #define WINDOWS
 #else
-    #define PCC_PORT "/dev/ttyACM0"
     #define BRS_PORT "/dev/ttyACM0"
+    #define PCC_PORT "/dev/ttyACM1"
     #define ENDL "/n"
+    #define UNIX
+    #define EMOTIV //Emotiv Only Compiles on Unix Machines
 #endif
 
 #endif /* SMART_CONFIG_H_ */
