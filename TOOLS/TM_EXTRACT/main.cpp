@@ -1,8 +1,8 @@
 #include "bci_c_binary_parser.h"
 #include "bci_c_textparser.h"
 
-#define DEFAULT_INPUT_NAME  QString("../../debug_files/tm_output_data.bin")
-#define DEFAULT_OUTPUT_NAME QString("../../debug_files/extracted_telemetry.csv")
+#define DEFAULT_INPUT_NAME  QString("tm_output_data.bin")
+#define DEFAULT_OUTPUT_NAME QString("extracted_telemetry.csv")
 
 int main(int argc, char** argv)
 {
