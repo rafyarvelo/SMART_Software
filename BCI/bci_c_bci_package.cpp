@@ -101,13 +101,14 @@ C_EEG_IO* C_BCI_Package::createEEG_IO(eegTypeEnum type)
             ptr = C_EEG_IO_NAUTILUS::Instance();
         break;
 
-        case EEG_TYPE_DEBUG:
-            ptr = C_EEG_IO_DEBUG::Instance();
-        break;
-
-        //Emotiv is the default
-        default:
+        #ifdef EMOTIV
+        case EEG_TYPE_EMOTIV:
             ptr = C_EEG_IO_EMOTIV::Instance();
+        break;
+        #endif
+
+        default:
+            ptr = C_EEG_IO_DEBUG::Instance();
         break;
 	}
 	

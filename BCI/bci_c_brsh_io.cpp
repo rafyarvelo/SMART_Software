@@ -1,7 +1,7 @@
 #include "bci_c_brsh_io.h"
 
 //Execute BRSH IO at 10 Hertz
-const u_int16_t C_BRSH_IO::EXECUTION_RATE = 100;
+const uint16_t C_BRSH_IO::EXECUTION_RATE = 100;
 
 //Create a Mutex to block the Current BRS Frame from Concurrent Access
 QSemaphore* C_BRSH_IO::pBRSFrameMutex  = new QSemaphore(BRS_FRAME_MUTEX);
@@ -14,7 +14,7 @@ C_BRSH_IO::C_BRSH_IO()
     QObject::connect(&mThread, SIGNAL(started()), &mTimer, SLOT(start()));
 
     //Execute IO Tasks in a Seperate Thread
-    QObject::moveToThread(&mThread);
+    moveToThread(&mThread);
 
     //Initialize the BRS Frame to NULL
     pLatestBRSFrame = 0;

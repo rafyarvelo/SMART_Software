@@ -33,7 +33,7 @@ public:
     virtual ConnectionStatusType connect() = 0;
 
     //The Rate we will execute the EEG IO Task (50 Hz)
-    static const u_int16_t EXECUTION_RATE;
+    static const uint16_t EXECUTION_RATE;
 
 public slots:
     //Start Getting Data

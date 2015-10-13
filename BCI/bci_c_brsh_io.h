@@ -30,7 +30,7 @@ public:
     virtual ConnectionStatusType connect() = 0;
 
     //The Rate we will execute the BRSH IO Task (10 Hz)
-    static const u_int16_t EXECUTION_RATE;
+    static const uint16_t EXECUTION_RATE;
 
     //Protect BRS Frame From Concurrent Access
     static QSemaphore*  pBRSFrameMutex;

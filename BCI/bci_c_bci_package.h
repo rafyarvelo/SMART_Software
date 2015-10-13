@@ -10,7 +10,11 @@ class C_TelemetryManager;
 #include "bci_c_flasher_io.h"
 #include "bci_c_signal_processing.h"
 #include "bci_c_eeg_io_debug.h"
-#include "bci_c_eeg_io_emotiv.h"
+
+#ifdef EMOTIV
+    #include "bci_c_eeg_io_emotiv.h"
+#endif
+
 #include "bci_c_eeg_io_nautilus.h"
 #include "bci_c_brsh_io_serial.h"
 #include "bci_c_brsh_io_debug.h"

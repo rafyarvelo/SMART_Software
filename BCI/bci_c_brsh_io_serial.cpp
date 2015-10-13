@@ -22,7 +22,7 @@ void C_BRSH_IO_Serial::SendTMFrame(TM_Frame_t* pFrame)
 bool C_BRSH_IO_Serial::fetchBRSFrame()
 {
     bool       received       = false;
-    u_int64_t  bytesAvailable = mSerialPortPtr->bytesAvailable();
+    uint32_t   bytesAvailable = mSerialPortPtr->bytesAvailable();
     static int retryCount     = 0;
 
     //Check if we're Connected

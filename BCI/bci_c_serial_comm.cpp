@@ -134,7 +134,7 @@ int C_Serial_Comm::readRawData(char* pData, sizeType size)
     debugLog->SerialComm_Log() << "START: ";
     for (int i = 0; i < bytesRead/4; i++)
     {
-        debugLog->SerialComm_Log() << "0x" << hex << *reinterpret_cast<u_int32_t*>(pData) << dec << " ";
+        debugLog->SerialComm_Log() << "0x" << hex << *reinterpret_cast<uint32_t*>(pData) << dec << " ";
     }
     debugLog->SerialComm_Log() << " :STOP" << endl;
 

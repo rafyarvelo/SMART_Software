@@ -1,7 +1,7 @@
 #include "bci_c_eeg_io.h"
 
-//Execute the EEG IO Task at 50Hz
-const u_int16_t C_EEG_IO::EXECUTION_RATE = 20;
+//Execute the EEG IO Task at 5Hz
+const uint16_t C_EEG_IO::EXECUTION_RATE = 200;
 
 C_EEG_IO::C_EEG_IO()
 {
@@ -13,7 +13,7 @@ C_EEG_IO::C_EEG_IO()
     QObject::connect(&mThread, SIGNAL(started()), &mTimer, SLOT(start()));
 
     //Execute IO Tasks in a Seperate Thread
-    QObject::moveToThread(&mThread);
+    moveToThread(&mThread);
 }
 
 C_EEG_IO::~C_EEG_IO()
