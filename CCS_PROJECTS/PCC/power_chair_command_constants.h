@@ -29,6 +29,12 @@
 
 #define PCC_CMD_NONE 0x6E //ASCII 'n' , Means "None"
 
+//For Easy Array indexing
+#define FORWARD            0
+#define BACKWARD           1
+#define RIGHT              2
+#define LEFT               3
+#define NUM_PCC_DIRECTIONS 4
 
 //===================SERVO CONFIGURATION================
 //Servo Output Type

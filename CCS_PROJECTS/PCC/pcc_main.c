@@ -44,6 +44,18 @@ void main(int argc, char** argv)
 	}
 }
 
+//int main(void)
+//{
+//    Init_UART();
+//
+//    while (1)
+//    {
+//        OUTCHAR_UART(INCHAR_UART());
+//    }
+//
+//    return 0;
+//}
+
 //Initialize Power Chair Controller Software
 void Initialize_PCC()
 {
