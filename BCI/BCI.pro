@@ -12,6 +12,7 @@ INCLUDEPATH += ../../emokit/include/emokit
 
 HEADERS += \
     bci_c_bci_package.h \
+    bci_c_safequeue.h \
     bci_c_eeg_io.h \
     bci_c_eeg_io_debug.h \
     bci_c_eeg_io_nautilus.h \
@@ -20,7 +21,6 @@ HEADERS += \
     bci_c_rvs.h \
     bci_c_serial_comm.h \
     bci_c_signal_processing.h \
-    bci_c_tm.h \
     ../smart_config.h \
     ../smart_debug_log.h \
     ../CCS_PROJECTS/PCC/power_chair_command_constants.h \
@@ -39,7 +39,8 @@ HEADERS += \
     bci_c_pcc_io_debug.h \
     bci_c_singleton.h \
     bci_c_framegenerator.h \
-    ../smart_data_types.h
+    ../smart_data_types.h \
+    bci_c_tm.h
 
     unix{
     HEADERS += bci_c_eeg_io_emotiv.h
@@ -56,7 +57,6 @@ SOURCES += \
     bci_c_signal_processing.cpp \
     bci_main.cpp \
     bci_c_eeg_data.cpp \
-    bci_c_tm.cpp \
     bci_c_abstract_parser.cpp \
     bci_c_binary_parser.cpp \
     bci_c_textparser.cpp \
@@ -68,7 +68,9 @@ SOURCES += \
     bci_c_brsh_io.cpp \
     bci_c_eeg_io.cpp \
     bci_c_framegenerator.cpp \
-    ../smart_data_types.c
+    ../smart_data_types.c \
+    bci_c_pcc_io.cpp \
+    bci_c_tm.cpp
 
     unix{
     SOURCES += bci_c_eeg_io_emotiv.cpp

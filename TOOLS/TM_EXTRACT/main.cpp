@@ -1,42 +1,74 @@
 #include "bci_c_binary_parser.h"
 #include "bci_c_textparser.h"
 
-#define DEFAULT_INPUT_NAME  QString("tm_output_data.bin")
-#define DEFAULT_OUTPUT_NAME QString("extracted_telemetry.csv")
+#define DEFAULT_TM_INPUT_NAME  QString("../../debug_files/tm_output_data.bin")
+#define DEFAULT_TM_OUTPUT_NAME QString("../../debug_files/extracted_telemetry.csv")
+
+#define DEFAULT_EEG_INPUT_NAME  QString("../../debug_files/eeg_output_data.bin")
+#define DEFAULT_EEG_OUTPUT_NAME QString("../../debug_files/extracted_eeg_telemetry.csv")
 
 int main(int argc, char** argv)
 {
-    QString inputfilename, outputfilename;
+    QString tmInFile, tmOutFile;
+    QString eegInFile, eegOutFile;
+
     C_BinaryParser* binaryParser = 0;
     C_TextParser*   textParser   = 0;
-    TM_Frame_t*     frame        = 0;
+    TM_Frame_t*     tmFrame      = 0;
+    EEG_Frame_t*    eegFrame     = 0;
 
+    cout <<"TM FRAME SIZE: " << sizeof(TM_Frame_t) << endl;
     //Get input/output filename from command line or use default
-    if (argc < 3)
+    if (argc < 5)
     {
-        inputfilename  = DEFAULT_INPUT_NAME;
-        outputfilename = DEFAULT_OUTPUT_NAME;
+        tmInFile   = DEFAULT_TM_INPUT_NAME;
+        tmOutFile  = DEFAULT_TM_OUTPUT_NAME;
+        eegInFile  = DEFAULT_EEG_INPUT_NAME;
+        eegOutFile = DEFAULT_EEG_OUTPUT_NAME;
     }
     else
     {
-        inputfilename = QString(argv[1]);
-        outputfilename = QString(argv[2]);
+        tmInFile   = QString(argv[1]);
+        tmOutFile  = QString(argv[2]);
+        eegInFile  = QString(argv[3]);
+        eegOutFile = QString(argv[4]);
     }
 
-    binaryParser = new C_BinaryParser(inputfilename, QIODevice::ReadOnly);
-    textParser   = new C_TextParser(outputfilename, QIODevice::WriteOnly);
+    //Extract TM Data
+    binaryParser = new C_BinaryParser(tmInFile, QIODevice::ReadOnly);
+    textParser   = new C_TextParser(tmOutFile, QIODevice::WriteOnly);
 
-    cout << "Reading TM from inputfile: " << inputfilename.toStdString() << endl;
-    cout << "Outputting TM to File: "     << outputfilename.toStdString() << endl;
+    cout << "Reading TM from inputfile: " << tmInFile.toStdString() << endl;
+    cout << "Outputting TM to File: "     << tmOutFile.toStdString() << endl;
 
-    frame = createTMFrame();
-    frame->timeStamp = 1; //to get into the while loop
+    tmFrame = binaryParser->readTMFrame();
 
     //Write all of the Frames in the File
-    while (frame && frame->timeStamp)
+    while (tmFrame)
     {
-        frame = binaryParser->readTMFrame();
-        textParser->writeTMFrame(frame);
+        textParser->writeTMFrame(tmFrame);
+        tmFrame = binaryParser->readTMFrame();
+    }
+
+    //Clean up
+    delete binaryParser;
+    delete textParser;
+    cout << endl;
+
+    //Extract EEG Data
+    binaryParser = new C_BinaryParser(eegInFile, QIODevice::ReadOnly);
+    textParser   = new C_TextParser(eegOutFile, QIODevice::WriteOnly);
+
+    cout << "Reading EEG TM from inputfile: " << eegInFile.toStdString() << endl;
+    cout << "Outputting EEG TM to File: "     << eegOutFile.toStdString() << endl;
+
+    eegFrame = binaryParser->readEEGFrame();
+
+    //Write all of the Frames in the File
+    while (eegFrame)
+    {
+        textParser->writeEEGFrame(eegFrame);
+        eegFrame = binaryParser->readEEGFrame();
     }
 
     return 0;
