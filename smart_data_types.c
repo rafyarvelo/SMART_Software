@@ -3,6 +3,24 @@
 
 //Default SMART Data Type Values
 
+ProcessingResult_t* createProcessingResult()
+{
+    size_t dataSize = 0;
+    ProcessingResult_t* ptr = NULL;
+
+    //Create Frame
+    dataSize = sizeof(ProcessingResult_t);
+    ptr      = (ProcessingResult_t*) malloc(dataSize);
+    memset(ptr, 0, dataSize);
+
+    //Set Defaults
+    ptr->command    = PCC_CMD_NONE;
+    ptr->confidence = UNSURE;
+
+    //Return new allocated frame
+    return ptr;
+}
+
 BRS_Frame_t* createBRSFrame()
 {
 	size_t dataSize = 0;
@@ -72,8 +90,11 @@ TM_Frame_t* createTMFrame()
 	memset(ptr, 0, dataSize);
 
 	//Initialize Defaults
-    memcpy(&ptr->MsgId       , BCI2BRS_MSG_ID, sizeof(MsgIdType)  );
-    memcpy(&ptr->eegFrame   , tmpEEGFrame   , sizeof(EEG_Frame_t));
+    ptr->lastCommand                 = PCC_CMD_NONE;
+    ptr->lastConfidence              = UNSURE;
+    ptr->processingResult.command    = PCC_CMD_NONE;
+    ptr->processingResult.confidence = UNSURE;
+    memcpy(&ptr->MsgId      , BCI2BRS_MSG_ID, sizeof(MsgIdType));
     memcpy(&ptr->brsFrame   , tmpBRSFrame   , sizeof(BRS_Frame_t));
     memcpy(&ptr->ledForward , tmpGroupFwd   , sizeof(LED_Group_t));
     memcpy(&ptr->ledBackward, tmpGroupBwd   , sizeof(LED_Group_t));
@@ -91,7 +112,6 @@ TM_Frame_t* createTMFrame()
     free(tmpGroupBwd);
     free(tmpGroupRgt);
     free(tmpGroupLft);
-
 
 	//Return new allocated frame
 	return ptr;

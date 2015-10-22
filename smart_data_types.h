@@ -72,6 +72,24 @@ typedef struct MsgIdType { uint8_t id[MSG_ID_SIZE]; } MsgIdType;
 //
 //*****************************************************************************
 
+//Use to see how sure we are that the command is correct
+typedef enum Confidence_Type
+{
+    UNSURE=0,
+    MODERATE,
+    LIKELY,
+    ABSOLUTE,
+    NUM_CONFIDENCE_TYPES
+}Confidence_Type;
+
+//The Final Result of our EEG Processing
+typedef struct ProcessingResult_t
+{
+    PCC_Command_Type command;
+    Confidence_Type  confidence;
+
+} ProcessingResult_t;
+
 //This struct defines what a single frame of EEG Data looks like
 typedef struct EEG_Frame_t
 {
@@ -186,10 +204,12 @@ typedef enum BCIState
 //Full Telemetry Frame
 typedef struct TM_Frame_t
 {
-    MsgIdType          MsgId; //Message Sent From BCI -> BRS -> MD
+    MsgIdType            MsgId; //Message Sent From BCI -> BRS -> MD
     int                  timeStamp;
     BCIState             bciState;
-    EEG_Frame_t          eegFrame; //Only the Latest Frame, EEG Telemetry is managed by the C_EEG_IO class
+    PCC_Command_Type     lastCommand;
+    Confidence_Type      lastConfidence;
+    ProcessingResult_t   processingResult;
     BRS_Frame_t          brsFrame;
     LED_Group_t          ledForward;
     LED_Group_t          ledBackward;
@@ -219,11 +239,12 @@ typedef struct TM_Frame_t
 // Data Type Creation/Initialization
 //
 //*****************************************************************************
-TM_Frame_t*       createTMFrame();
-EEG_Frame_t*      createEEGFrame();
-BRS_Frame_t*      createBRSFrame();
-LED_Group_t*      createLEDGroup(LED_Group_ID id);
-BluetoothFrame_t* createBluetoothFrame();
+TM_Frame_t*         createTMFrame();
+EEG_Frame_t*        createEEGFrame();
+BRS_Frame_t*        createBRSFrame();
+LED_Group_t*        createLEDGroup(LED_Group_ID id);
+BluetoothFrame_t*   createBluetoothFrame();
+ProcessingResult_t* createProcessingResult();
 
 //Diff two Message IDs, Return TRUE if they're equal
 int checkMsgID(MsgIdType id1, char* id2);
