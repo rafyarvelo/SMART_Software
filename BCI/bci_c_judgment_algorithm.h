@@ -5,30 +5,20 @@
 #include "../smart_debug_log.h"
 #include "../smart_config.h"
 #include "bci_c_signal_processing.h"
+#include "bci_c_telemetrymanager.h"
 #include "bci_c_rvs.h"
 #include "bci_c_tm.h"
 
-//Use to see how sure we are that the command is correct
-typedef enum Confidence_Type
-{
-    UNSURE=0,
-    MODERATE,
-    LIKELY,
-    ABSOLUTE
-}Confidence_Type;
+//Forward Declaration of Telemetry Manager Class
+class C_TelemetryManager;
 
-class C_JudgmentAlgorithm : public QObject
+class C_JudgmentAlgorithm : public QObject, public C_Singleton<C_JudgmentAlgorithm>
 {
     Q_OBJECT
 public:
 	//The Signal Processing class with deliver the processed data to the JA
-	 C_JudgmentAlgorithm(C_SignalProcessing* signalProcessing);
+     C_JudgmentAlgorithm();
 	~C_JudgmentAlgorithm();
-	
-	static C_JudgmentAlgorithm* Instance(C_SignalProcessing* signalProcessing)
-	{
-		return new C_JudgmentAlgorithm(signalProcessing);
-	}
 
     PCC_Command_Type GetFinalCommand();
 
@@ -38,9 +28,12 @@ public:
     //Check for an Emergency Stop
     bool SafeToProceed();
 
+    //Give the Telemetry Manager Private Access to our Variables
+    friend class C_TelemetryManager;
+
 public slots:
-    void SetRVS(C_RVS* pRVS);
-    void SetTM (TM_Frame_t* pTMFrame);
+    void SetCurrentTMFrame(TM_Frame_t* pTMFrame);
+    void SetCurrentProcessingResult(ProcessingResult_t& result);
 
 signals:
     void RequestEmergencyStop();
@@ -50,16 +43,16 @@ private:
     void ParseEEGData();
     void finalizeCommand(PCC_Command_Type cmd);
 
-    C_SignalProcessing* mSignalProcessingPtr;
-    C_RVS*              mRVS_Ptr;
+    //We Maintain our own local copies of the TM
+    //Frame and the Signal Processing Result so they can be updated independently
     TM_Frame_t          mCurrentTMFrame;
+    ProcessingResult_t  mCurrentProcessingResult;
 
     PCC_Command_Type    finalCommand;
     PCC_Command_Type    prevCommand;
     Confidence_Type     cmdConfidence;
 
     bool commandFinalized; //Just in case user forgets to call computeCommand()
-    bool eegDataReady;
 };
 
 #endif // BCI_C_JUDGMENT_ALGORITHM_H

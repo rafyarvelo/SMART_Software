@@ -1,10 +1,7 @@
 #include "bci_c_telemetrymanager.h"
 
-//Mutual Exclusion to our TM Frame
-QSemaphore* C_TelemetryManager::pTMFrameMutex  = new QSemaphore(TM_FRAME_MUTEX);
-
-C_TelemetryManager::C_TelemetryManager(C_BCI_Package* pBCI, C_EEG_IO* pEEG_IO,
-                                       C_BRSH_IO* pBRS_IO,  C_RVS* pRVS)
+C_TelemetryManager::C_TelemetryManager(C_BCI_Package* pBCI, C_EEG_IO* pEEG_IO, C_BRSH_IO* pBRS_IO,
+                                       C_RVS*         pRVS, C_JudgmentAlgorithm* pJA)
 {
     debugLog = SMART_DEBUG_LOG::Instance();
 
@@ -13,6 +10,7 @@ C_TelemetryManager::C_TelemetryManager(C_BCI_Package* pBCI, C_EEG_IO* pEEG_IO,
     mEEG_IOPtr     = pEEG_IO;
     mBRS_IOPtr     = pBRS_IO;
     mRVSPtr        = pRVS;
+    mJA_Ptr        = pJA;
 
     //Don't Record TM By Default
     recordTM = false;
@@ -30,33 +28,40 @@ C_TelemetryManager::~C_TelemetryManager()
 }
 
 //Factory Constructor
-C_TelemetryManager* C_TelemetryManager::Instance(C_BCI_Package* pBCI, C_EEG_IO* pEEG_IO,
-                                                 C_BRSH_IO* pBRS_IO, C_RVS* pRVS)
+C_TelemetryManager* C_TelemetryManager::Instance(C_BCI_Package* pBCI, C_EEG_IO* pEEG_IO, C_BRSH_IO* pBRS_IO,
+                                                 C_RVS*         pRVS, C_JudgmentAlgorithm* pJA)
 {
-    return new C_TelemetryManager(pBCI, pEEG_IO, pBRS_IO, pRVS);
+    return new C_TelemetryManager(pBCI, pEEG_IO, pBRS_IO, pRVS, pJA);
 }
 
 
 //Create a New TM Frame from the Latest Data
-TM_Frame_t* C_TelemetryManager::updateTM()
+TM_Frame_t* C_TelemetryManager::updateTM(BRS_Frame_t* pBRSFrame)
 {
-    //Lock the TM Frame
-    pTMFrameMutex->acquire(TM_FRAME_MUTEX);
-
+    //Make default frames if pointers are invalid
     if (!pLatestTMFrame)
     {
         pLatestTMFrame = createTMFrame();
     }
+    else if (!pBRSFrame)
+    {
+        pBRSFrame = createBRSFrame();
+    }
 
     //Update TM from Interfaces
-    pLatestTMFrame->timeStamp = mBCIPackagePtr->stopwatch.elapsed();
+    pLatestTMFrame->timeStamp        = mBCIPackagePtr->stopwatch.elapsed();
+    pLatestTMFrame->bciState         = mBCIPackagePtr->bciState;
+    pLatestTMFrame->lastCommand      = mJA_Ptr->finalCommand;
+    pLatestTMFrame->lastConfidence   = mJA_Ptr->cmdConfidence;
 
-    //Make sure the BRS Frame is not Busy
-    C_BRSH_IO::pBRSFrameMutex->acquire(BRS_FRAME_MUTEX);
-    memcpy(&pLatestTMFrame->brsFrame, mBRS_IOPtr->GetLatestBRSFramePtr(), sizeof(BRS_Frame_t));
-    C_BRSH_IO::pBRSFrameMutex->release(BRS_FRAME_MUTEX);
+    //The Processing Result that the Judgment Algorithm is using
+    pLatestTMFrame->processingResult.command    = mJA_Ptr->mCurrentProcessingResult.command;
+    pLatestTMFrame->processingResult.confidence = mJA_Ptr->mCurrentProcessingResult.confidence;
 
-    memcpy(&pLatestTMFrame->eegFrame, mEEG_IOPtr->GetFramePtr(), sizeof(EEG_Frame_t));
+    //Update BRS Frame
+    memcpy(&pLatestTMFrame->brsFrame, pBRSFrame, sizeof(BRS_Frame_t));
+
+    //Update the Rest of the Data
     pLatestTMFrame->ledForward.frequency    = mRVSPtr->GetLEDGroup(LED_FORWARD) ->frequency;
     pLatestTMFrame->ledBackward.frequency   = mRVSPtr->GetLEDGroup(LED_BACKWARD)->frequency;
     pLatestTMFrame->ledRight.frequency      = mRVSPtr->GetLEDGroup(LED_RIGHT)   ->frequency;
@@ -75,17 +80,15 @@ TM_Frame_t* C_TelemetryManager::updateTM()
     //Notify Listeners that our frame is ready
     emit tmFrameCreated(pLatestTMFrame);
 
-    //Unlock the TM Frame
-    pTMFrameMutex->release(TM_FRAME_MUTEX);
-
     return pLatestTMFrame;
 }
 
 TM_Frame_t* C_TelemetryManager::GetLatestFramePtr()
 {
+    //Don't return a null frame
     if (!pLatestTMFrame)
     {
-        updateTM();
+        updateTM(createBRSFrame());
     }
 
     return pLatestTMFrame;

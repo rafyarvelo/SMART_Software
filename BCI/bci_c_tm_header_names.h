@@ -10,6 +10,7 @@ struct C_HEADER_NAMES
     QStringList tmFrameNames;
     QStringList eegFrameNames;
     QStringList brsFrameNames;
+    QStringList processingResultNames;
     QStringList gpsData;
     QStringList usData;
 
@@ -67,9 +68,15 @@ struct C_HEADER_NAMES
                       << "gyroY"
                       << "batteryPercentage";
 
+        processingResultNames
+                      << "processingResult_Command"
+                      << "processingResult_Confidence";
+
         tmFrameNames  << "timeStamp"
                       << "BCI_State"
-                      << eegFrameNames
+                      << "lastPCC_Command"
+                      << "lastConfidence"
+                      << processingResultNames
                       << brsFrameNames
                       << "LED_Freq_Forward"
                       << "LED_Freq_Backward"

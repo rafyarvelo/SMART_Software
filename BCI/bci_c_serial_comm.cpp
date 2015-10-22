@@ -3,7 +3,7 @@
 C_Serial_Comm::C_Serial_Comm(const QString& portName)
     : mPortName(portName)
 {
-    debugLog    = SMART_DEBUG_LOG::Instance();//Get a pointer to the debug log
+    debugLogPtr    = SMART_DEBUG_LOG::Instance();//Get a pointer to the debug log
     mSerialPortPtr = new QextSerialPort(mPortName);
 
     //Config Port Setup
@@ -48,15 +48,15 @@ bool C_Serial_Comm::openSerialPort()
     if (mSerialPortPtr->open(QIODevice::ReadWrite))
     {
         cout                << "Successfully Opened Port: " << mPortName.toStdString() << endl;
-        debugLog->BCI_Log() << "Successfully Opened Port: " << mPortName.toStdString() << endl;
+        debugLogPtr->BCI_Log() << "Successfully Opened Port: " << mPortName.toStdString() << endl;
 
-        printPortSettings(debugLog->SerialComm_Log());
+        printPortSettings(debugLogPtr->SerialComm_Log());
     }
     else
     {
         cout                << "Could Not Open Port: " << mPortName.toStdString() << endl;
-        debugLog->BCI_Log() << "Could Not Open Port: " << mPortName.toStdString() << endl;
-        printPortSettings(debugLog->BCI_Log());
+        debugLogPtr->BCI_Log() << "Could Not Open Port: " << mPortName.toStdString() << endl;
+        printPortSettings(debugLogPtr->BCI_Log());
         return FAILURE;
     }
 	
@@ -67,9 +67,9 @@ bool C_Serial_Comm::sendRawData(const char* pData, sizeType size)
 {
     int bytesWritten = -1;
 
-    debugLog->SerialComm_Log() << "Trying to Write Bytes: " << size << endl;
+    debugLogPtr->SerialComm_Log() << "Trying to Write Bytes: " << size << endl;
     bytesWritten = mSerialPortPtr->write(pData, (qint64) size);
-    debugLog->SerialComm_Log() << "Bytes Written: " << bytesWritten << endl;
+    debugLogPtr->SerialComm_Log() << "Bytes Written: " << bytesWritten << endl;
 
     return (bytesWritten > -1) ? SUCCESS : FAILURE;
 }
@@ -114,29 +114,29 @@ int C_Serial_Comm::readRawData(char* pData, sizeType size)
 
     if (!pData)//Seriously bro...allocate your shit..
     {
-        debugLog->SerialComm_Log() << "Unallocated Buffer Passed to Read! Nothing will be read." << endl;
+        debugLogPtr->SerialComm_Log() << "Unallocated Buffer Passed to Read! Nothing will be read." << endl;
         return bytesRead;
     }
 
     //Only read how much we can
     if (size > bytesAvailable)
     {
-        debugLog->SerialComm_Log() << "Request for " << size << " Bytes, Available: " << bytesAvailable << endl;
+        debugLogPtr->SerialComm_Log() << "Request for " << size << " Bytes, Available: " << bytesAvailable << endl;
         size = bytesAvailable;
     }
 
     //Read Data
-    debugLog->SerialComm_Log() << "Bytes Available: " << bytesAvailable << endl;
+    debugLogPtr->SerialComm_Log() << "Bytes Available: " << bytesAvailable << endl;
     bytesRead = mSerialPortPtr->read(pData, size);
-    debugLog->SerialComm_Log() << "Bytes Read: "      << bytesRead << endl;
+    debugLogPtr->SerialComm_Log() << "Bytes Read: "      << bytesRead << endl;
 
     //See what we read
-    debugLog->SerialComm_Log() << "START: ";
+    debugLogPtr->SerialComm_Log() << "START: ";
     for (int i = 0; i < bytesRead/4; i++)
     {
-        debugLog->SerialComm_Log() << "0x" << hex << *reinterpret_cast<uint32_t*>(pData) << dec << " ";
+        debugLogPtr->SerialComm_Log() << "0x" << hex << *reinterpret_cast<uint32_t*>(pData) << dec << " ";
     }
-    debugLog->SerialComm_Log() << " :STOP" << endl;
+    debugLogPtr->SerialComm_Log() << " :STOP" << endl;
 
     return bytesRead;
 }
@@ -196,10 +196,10 @@ void C_Serial_Comm::onDsrChanged(bool status)
 {
     if (status)
     {
-        debugLog->SerialComm_Log() << "Serial Device was turned on" << endl;
+        debugLogPtr->SerialComm_Log() << "Serial Device was turned on" << endl;
     }
     else
     {
-        debugLog->SerialComm_Log() << "Serial Device was turned off" << endl;
+        debugLogPtr->SerialComm_Log() << "Serial Device was turned off" << endl;
     }
 }

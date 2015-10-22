@@ -16,16 +16,3 @@ C_AbstractParser::~C_AbstractParser()
         delete fp;
     }
 }
-
-void C_AbstractParser::writeEEGData(C_EEG_Data& data)
-{
-    this->eegData = data;
-    writeEEGData();
-}
-
-
-void C_AbstractParser::writeTMData(C_TM& data)
-{
-    this->tmData = data;
-    writeTMData();
-}

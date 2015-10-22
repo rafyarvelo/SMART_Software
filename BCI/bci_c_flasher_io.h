@@ -7,22 +7,14 @@
 #include "../smart_config.h"
 #include "../smart_debug_log.h"
 
-class C_Flasher_IO : C_ConnectedDevice
+class C_Flasher_IO : public C_ConnectedDevice, public C_Singleton<C_Flasher_IO>
 {
 public:
-     C_Flasher_IO(C_RVS* pRVS);
+     C_Flasher_IO();
     ~C_Flasher_IO();
 
-	static C_Flasher_IO* Instance(C_RVS* pRVS)
-	{
-		return new C_Flasher_IO(pRVS);
-	}
-	
-    virtual ConnectionStatusType connect() {return CONNECTED;}
-    void SendRVS();
-
-private:
-	C_RVS* mRVS_Ptr;
+    virtual ConnectionStatusType connect();
+    void SendRVS(C_RVS* pRVS);
 };
 
 #endif // BCI_C_MCU_IO

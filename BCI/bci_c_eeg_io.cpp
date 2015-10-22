@@ -26,4 +26,14 @@ void C_EEG_IO::begin()
     mThread.start();
 }
 
+//Record Telemetry to an output File
+void C_EEG_IO::RecordTMToFile(const QString& filename)
+{
+    string temp = string("Recording EEG Telemetry to File: ") + filename.toStdString();
+    debugLog->println(BCI_LOG, temp, true);
+
+    recordTM  = true;
+    eegTMFile = new C_BinaryParser(filename, QIODevice::WriteOnly);
+}
+
 

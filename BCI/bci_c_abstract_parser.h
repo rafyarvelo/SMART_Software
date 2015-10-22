@@ -39,9 +39,11 @@ namespace FILE_FORMAT
     const QString STATUS = "status";
 
     //Map Int to String
+    const QString BCI_STATES[]    = {"BCI_OFF", "BCI_STANDBY", "BCI_PROCESSING", "BCI_READY"};
     const QString LED_GROUPS[]    = {"Forward", "Backward", "Right", "Left"};
     const QString EEG_TYPES[]     = {"EEG_Emotiv", "EEG_Nautilus", "EEG_Debug"};
     const QString CONN_STATUSES[] = {"NOT_CONNECTED", "CONNECTED"};
+    const QString CONFIDENCES[]   = {"Unsure", "Moderate", "Likely", "Absolute"};
 };
 
 //Abstract Telemetry File Parser Class
@@ -50,26 +52,6 @@ class C_AbstractParser
 public:
     C_AbstractParser(const QString& filename, QIODevice::OpenModeFlag openMode);
     virtual ~C_AbstractParser();
-
-    //Read/Write EEG Data
-    virtual C_EEG_Data& readEEGData () = 0;
-
-    //Write Member data by default
-    virtual void writeEEGData() = 0;
-    void writeEEGData(C_EEG_Data& data);
-
-    //Read/Write BRS Data
-    virtual C_TM& readTMData () = 0;
-
-    //Write Member Data by default
-    virtual void writeTMData() = 0;
-    void writeTMData(C_TM& data);
-
-    //Get Individual Frames
-    C_EEG_Data&  GetEEGData(){ return eegData; }
-    C_TM&        GetTMData() { return  tmData;  }
-    EEG_Frame_t* GetLastEEGFrame(){ return eegData.GetFramePtr(); }
-    TM_Frame_t*  GetLastTMFrame(){ return tmData.GetFrame();  }
 
     //Read/Write Individual Frames
     virtual EEG_Frame_t* readEEGFrame() = 0;
@@ -80,11 +62,6 @@ public:
 protected:
     //Input/Output File Pointer
     QFile* fp;
-
-    //Buffers to Hold Data
-    C_EEG_Data eegData;
-    C_TM       tmData;
-
     QString m_filename;
 };
 

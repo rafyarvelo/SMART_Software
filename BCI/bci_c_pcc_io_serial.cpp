@@ -12,10 +12,17 @@ C_PCC_IO_Serial::~C_PCC_IO_Serial()
 
 void C_PCC_IO_Serial::SendCommand()
 {
-    QString str = QString("Sending PCC Command: ") + QString(currentCommand);
+    if (prevCommand == currentCommand)
+    {
+        //Do Nothing Here, We Don't Need to Overload the serial port
+        return;
+    }
 
+    QString str = QString("Sending PCC Command: ") + QString(currentCommand);
     debugLog->println(PCC_LOG, str.toStdString(), true);
     sendToSerialPort(currentCommand);
+
+    prevCommand = currentCommand;
 }
 
 ConnectionStatusType C_PCC_IO_Serial::connect()

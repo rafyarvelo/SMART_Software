@@ -10,22 +10,24 @@
 C_BCI_Package::C_BCI_Package()
     : bciState(BCI_OFF)
 {
+    //Setup Debug Logging
+    createDebugDirectory();
     debugLog = SMART_DEBUG_LOG::Instance();
     debugLog->BCI_Log() << "Instantiating BCI Package..." << endl;
 
     //Repetitive Visual Stimulus API
     pRVS              = C_RVS::Instance();
-    pFlasherIO        = C_Flasher_IO::Instance(pRVS);
+    pFlasherIO        = C_Flasher_IO::Instance();
 
     //Device Input/Output
     pEEG_IO           = createEEG_IO(DEFAULT_EEG_TYPE);
     pBRS_IO           = createBRS_IO(DEFAULT_BRS_TYPE);
     pPCC_IO           = createPCC_IO(DEFAULT_PCC_TYPE);
 
-    //Other Classes with dependencies
-    pSignalProcessing = C_SignalProcessing ::Instance(pEEG_IO);
-    pJA               = C_JudgmentAlgorithm::Instance(pSignalProcessing);
-    pTelemetryManager = C_TelemetryManager ::Instance(this, pEEG_IO,pBRS_IO, pRVS);
+    //Signal Processing, Judgement Algorithm, and Telemetry Management
+    pSignalProcessing = C_SignalProcessing ::Instance();
+    pJA               = C_JudgmentAlgorithm::Instance();
+    pTelemetryManager = C_TelemetryManager ::Instance(this, pEEG_IO, pBRS_IO, pRVS, pJA);
 
     //Connection Status of Peripherals
     eegConnectionStatus      = NOT_CONNECTED;
@@ -33,17 +35,21 @@ C_BCI_Package::C_BCI_Package()
     pccConnectionStatus      = NOT_CONNECTED;
     brshConnectionStatus     = NOT_CONNECTED;
 
-    //Start the EEG/BRS IO when the Threads are ready
+    //Process Commands when BRS Frames are Received
     QObject::connect(pBRS_IO, SIGNAL(BRSFrameReceived(BRS_Frame_t*)),
                      this   , SLOT(onBRSFrameReceived(BRS_Frame_t*)));
 
-    //Listen for Processed EEG Data
-    QObject::connect(pSignalProcessing, SIGNAL(eegDataProcessed(C_EEG_Data&)),
-                     this             , SLOT(onEEGDataProcessed(C_EEG_Data&)));
+    //Process EEG Frames as they become available
+    QObject::connect(pEEG_IO          , SIGNAL(EEGFrameReceived(EEG_Frame_t*)),
+                     pSignalProcessing, SLOT(processFrame(EEG_Frame_t*)));
 
-    //Listen for Emergency Stop Commands
+    //Listen for Processed EEG Data
+    QObject::connect(pSignalProcessing, SIGNAL(eegDataProcessed(resultsBufferType*)),
+                     this             , SLOT(onEEGDataProcessed(resultsBufferType*)));
+
+    //Listen for Emergency Stop Commands, and act on them immediately
     QObject::connect(pJA  , SIGNAL(RequestEmergencyStop()),
-                     this , SLOT(onEmergencyStopRequested()));
+                     this , SLOT(onEmergencyStopRequested()), Qt::DirectConnection);
 
     //Listen for the Final PCC Command
     QObject::connect(pJA  , SIGNAL(commandReady()),
@@ -204,12 +210,12 @@ void C_BCI_Package::Run()
 
     //Configure Repetitive Visual Stimulus and send to Flasher
     pRVS->Generate();
-    pJA->SetRVS(pRVS);
-    pFlasherIO->SendRVS();
+    pFlasherIO->SendRVS(pRVS);
 
     //Record our TM to an output file
     #ifdef DEBUG_ONLY
     pTelemetryManager->RecordTMToFile(TM_DATA_OUTPUTFILE_BIN);
+    pEEG_IO->RecordTMToFile(EEG_DATA_OUTPUTFILE_BIN);
     #endif
 
     //Begin Thread Execution for EEG and BRS IO
@@ -225,8 +231,24 @@ void C_BCI_Package::Run()
 }
 
 //Go Process the Command when the EEG Data is Ready
-void C_BCI_Package::onEEGDataProcessed(C_EEG_Data &eegData)
+void C_BCI_Package::onEEGDataProcessed(resultsBufferType* pResults)
 {
+    //Get Any Available results from the buffer
+    if (pResults->itemsAvailable() > 0)
+    {
+        ProcessingResult_t result = pResults->Get();
+
+        //Update the Judgement Algorithm with the latest processing Result and
+        //Process the command
+        pJA->SetCurrentProcessingResult(result);
+        processCommand();
+    }
+}
+
+void C_BCI_Package::onBRSFrameReceived(BRS_Frame_t *pBRSFrame)
+{
+    //Update TM and Notify the Judgement Algorithm that it's up to date
+    pTelemetryManager->updateTM(pBRSFrame);
     processCommand();
 }
 
@@ -244,19 +266,12 @@ void C_BCI_Package::startThreads()
     pBRS_IO->begin();
 }
 
-void C_BCI_Package::onBRSFrameReceived(BRS_Frame_t* pFrame)
-{
-    processCommand();
-}
-
 //This is the entire routine of the BCI_Processing State
 void C_BCI_Package::processCommand()
 {
     bciState = BCI_PROCESSING;
 
-    //Update TM and Notify the Judgement Algorithm that it's up to date
-    pTelemetryManager->updateTM();
-    pJA->SetTM(pTelemetryManager->GetLatestFramePtr());
+    pJA->SetCurrentTMFrame(pTelemetryManager->GetLatestFramePtr());
 
     //Tell the Judgement Algorithm to Compute the Command, it will notify us when it's ready
     pJA->computeCommand();
@@ -274,3 +289,14 @@ void C_BCI_Package::onCommandReady()
     //Move back to Standby and wait for the next command
     bciState = BCI_STANDBY;
 }
+
+void C_BCI_Package::createDebugDirectory()
+{
+    QDir dir(DEBUG_DIRECTORY);
+
+    if (!dir.exists())
+    {
+        dir.mkdir(DEBUG_DIRECTORY);
+    }
+}
+

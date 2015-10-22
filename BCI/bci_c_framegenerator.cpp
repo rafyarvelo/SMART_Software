@@ -2,10 +2,10 @@
 
 BRS_Frame_t* FrameGenerator::GenerateBRSFrame(BRS_Frame_t* pFrame)
 {
-    return GenerateBRSFrame(pFrame, GeneratePCC_Command());
+    return GenerateBRSFrame(GeneratePCC_Command(), pFrame);
 }
 
-BRS_Frame_t* FrameGenerator::GenerateBRSFrame(BRS_Frame_t* pFrame, PCC_Command_Type cmd)
+BRS_Frame_t* FrameGenerator::GenerateBRSFrame(PCC_Command_Type cmd, BRS_Frame_t* pFrame)
 {
     if (!pFrame)
     {
@@ -25,15 +25,13 @@ EEG_Frame_t* FrameGenerator::GenerateEEGFrame(EEG_Frame_t* pFrame)
         pFrame = createEEGFrame();
     }
 
-    int signs[] = { 1, -1 };
-
     pFrame->eegType = EEG_TYPE_EMOTIV; //We're not going to be ambitious
     pFrame->counter = GetRandomInt();
 
     //Electrode Data and Contact Quality
     for (int i = 0; i < MAX_EEG_ELECTRODES; i++)
     {
-        pFrame->electrodeData[i]  =  GetRandomInt() * signs[GetRandomInt() % 2];
+        pFrame->electrodeData[i]  = (GetRandomInt());
         pFrame->contactQuality[i] = (GetRandomInt() * 500) % 6000;
     }
 
@@ -47,10 +45,10 @@ EEG_Frame_t* FrameGenerator::GenerateEEGFrame(EEG_Frame_t* pFrame)
 
 TM_Frame_t*  FrameGenerator::GenerateTMFrame(TM_Frame_t* pFrame)
 {
-    return GenerateTMFrame(pFrame, GeneratePCC_Command());
+    return GenerateTMFrame(GeneratePCC_Command(), pFrame);
 }
 
-TM_Frame_t*  FrameGenerator::GenerateTMFrame(TM_Frame_t* pFrame, PCC_Command_Type cmd)
+TM_Frame_t*  FrameGenerator::GenerateTMFrame(PCC_Command_Type cmd, TM_Frame_t* pFrame)
 {
     if (!pFrame)
     {
@@ -58,10 +56,13 @@ TM_Frame_t*  FrameGenerator::GenerateTMFrame(TM_Frame_t* pFrame, PCC_Command_Typ
     }
 
     //Update The TM Frame
-    pFrame->timeStamp = GetRandomInt();
-    pFrame->bciState  = BCI_STANDBY;
-    GenerateEEGFrame(&pFrame->eegFrame);
-    GenerateBRSFrame(&pFrame->brsFrame, cmd);
+    pFrame->timeStamp      = GetRandomInt();
+    pFrame->bciState       = BCI_STANDBY;
+    pFrame->lastCommand    = GeneratePCC_Command();
+    pFrame->lastConfidence = UNSURE;
+    pFrame->processingResult.command    = GeneratePCC_Command();
+    pFrame->processingResult.confidence = UNSURE;
+    GenerateBRSFrame(cmd,&pFrame->brsFrame);
 
     /*Leave LED Groups as the Default Groups*/
 
@@ -83,7 +84,7 @@ int FrameGenerator::GetRandomInt()
         seeded = true;
     }
 
-    return (qrand() % RAND_MAX) + RAND_MIN;
+    return ((qrand() % RANDOM_MAX) + RANDOM_MIN);
 }
 
 float FrameGenerator::GetRandomFloat()
@@ -96,13 +97,15 @@ SensorData_t* FrameGenerator::GenerateSensorData(SensorData_t* pData)
     if (!pData)
     {
         pData = new SensorData_t;
-        memset(reinterpret_cast<void*>(pData),0,sizeof(SensorData_t));
     }
 
     pData->gpsData.latitude    = GetRandomFloat();
     pData->gpsData.longitude   = GetRandomFloat();
-    pData->gpsData.altitude    = GetRandomFloat();
-    pData->gpsData.groundSpeed = GetRandomFloat();
+    pData->gpsData.altitude    = GetRandomFloat() / 200;
+    pData->gpsData.groundSpeed = GetRandomFloat() / 100;
+
+    pData->rangeFinderData.rangeBack  = GetRandomFloat() / 100;
+    pData->rangeFinderData.rangeFront = GetRandomFloat() / 100;
 
     return pData;
 }

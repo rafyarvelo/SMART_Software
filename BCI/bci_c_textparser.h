@@ -24,16 +24,6 @@ public:
     C_TextParser(const QString& filename, QIODevice::OpenModeFlag openMode);
     virtual ~C_TextParser();
 
-    //Read/Write EEG Data
-    virtual C_EEG_Data& readEEGData ();
-    virtual void writeEEGData();
-    virtual void writeEEGData(C_EEG_Data& data) {eegData = data; writeEEGData();}
-
-    //Read/Write BRS Data
-    virtual C_TM& readTMData ();
-    virtual void writeTMData();
-    virtual void writeTMData(C_TM& data) {tmData = data; writeTMData();}
-
     //Read Individual Frames
     virtual EEG_Frame_t* readEEGFrame();
     virtual TM_Frame_t*  readTMFrame();

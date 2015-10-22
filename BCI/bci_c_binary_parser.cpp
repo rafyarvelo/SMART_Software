@@ -40,72 +40,15 @@ void C_BinaryParser::writeRawData(char *data, sizeType size)
     stream.writeRawData(data, size);
 }
 
-//Read EEG Data
-C_EEG_Data& C_BinaryParser::readEEGData ()
-{
-    //Clear Existing Data
-    eegData.clear();
-
-    while (!stream.atEnd())
-    {
-        eegData.AddFrame(readEEGFrame());
-    }
-
-    return eegData;
-}
-
-//Write EEG Data
-void C_BinaryParser::writeEEGData()
-{
-    //Tell the other functions that we already wrote the start sync
-    eegDataStarted = true;
-
-    //Write the Data enclosed in Syncs
-    writeRawData((char*) EEG_DATA_START, sizeof(TelemetrySyncType));
-    for (int i = 0; i < eegData.size(); i++)
-    {
-        writeEEGFrame(eegData.GetFramePtr(i));
-    }
-    writeRawData((char*) EEG_DATA_STOP, sizeof(TelemetrySyncType));
-}
-
-//Read BRS Data
-C_TM& C_BinaryParser::readTMData ()
-{
-    //Clear Existing Data
-    tmData.clear();
-
-    while (!stream.atEnd())
-    {
-        tmData.addFrame(readTMFrame());
-    }
-
-    return tmData;
-}
-
-//Write BRS Data
-void C_BinaryParser::writeTMData()
-{
-    //Tell the other functions that we already wrote the start sync
-    tmDataStarted = true;
-
-    //Write the Data enclosed in Syncs
-    writeRawData((char*) TM_DATA_START, sizeof(TelemetrySyncType));
-    for (int i = 0; i < eegData.size(); i++)
-    {
-        writeTMFrame(tmData.GetFrame(i));
-    }
-    writeRawData((char*) TM_DATA_END, sizeof(TelemetrySyncType));
-}
-
 EEG_Frame_t* C_BinaryParser::readEEGFrame()
 {
-    EEG_Frame_t* frame = createEEGFrame();
+    EEG_Frame_t* frame = 0;
 
     //Find the Start of the EEG Frame
     if (findSync(EEG_FRAME_START))
     {
         //Read Data
+        frame = new EEG_Frame_t;
         stream.readRawData(reinterpret_cast<char*> (frame), sizeof(EEG_Frame_t));
     }
 
@@ -114,12 +57,13 @@ EEG_Frame_t* C_BinaryParser::readEEGFrame()
 
 TM_Frame_t*  C_BinaryParser::readTMFrame()
 {
-    TM_Frame_t* frame = createTMFrame();
+    TM_Frame_t* frame = 0;
 
     //Find the Start of the TM Frame
     if (findSync(TM_FRAME_START))
     {
         //Read Data
+        frame = new TM_Frame_t;
         stream.readRawData(reinterpret_cast<char*> (frame), sizeof(TM_Frame_t));
     }
 

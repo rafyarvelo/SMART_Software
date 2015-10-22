@@ -61,7 +61,7 @@ private slots:
 
 protected:
     void printPortSettings(ostream& stream);
-    SMART_DEBUG_LOG* debugLog;
+    SMART_DEBUG_LOG* debugLogPtr;
 
     QString         mPortName;
     QByteArray      UARTReceiveBuffer;

@@ -1,15 +1,18 @@
 #ifndef BCI_C_BCI_PACKAGE_H
 #define BCI_C_BCI_PACKAGE_H
 
-//Forward Declaration
+//Forward Declarations
 class C_TelemetryManager;
+class C_JudgmentAlgorithm;
 
 #include <QTime>
 #include <QtCore>
+#include <QDir>
 #include "bci_c_rvs.h"
 #include "bci_c_flasher_io.h"
 #include "bci_c_signal_processing.h"
 #include "bci_c_eeg_io_debug.h"
+#include "bci_c_safequeue.h"
 
 #ifdef EMOTIV
     #include "bci_c_eeg_io_emotiv.h"
@@ -23,6 +26,9 @@ class C_TelemetryManager;
 #include "bci_c_pcc_io_serial.h"
 #include "bci_c_pcc_io_debug.h"
 
+#define DEBUG_DIRECTORY "debug_files"
+#define EEG_BUFFER_SIZE 25
+#define BRS_BUFFER_SIZE 25
 
 class C_BCI_Package : public QObject , public C_Singleton<C_BCI_Package>
 {
@@ -39,6 +45,7 @@ private:
     bool checkConnections();
     void startThreads();
     void goToState(BCIState state);
+    void createDebugDirectory();
 
     //Factory Constructors for our IO Classes
     C_EEG_IO*  createEEG_IO(eegTypeEnum type=DEFAULT_EEG_TYPE);
@@ -46,7 +53,7 @@ private:
     C_PCC_IO*  createPCC_IO(pccTypeEnum type=DEFAULT_PCC_TYPE);
 
 private slots:
-    void onEEGDataProcessed(C_EEG_Data& data);
+    void onEEGDataProcessed(resultsBufferType* pResults);
     void onBRSFrameReceived(BRS_Frame_t* pFrame);
     void onEmergencyStopRequested();
     void onCommandReady();

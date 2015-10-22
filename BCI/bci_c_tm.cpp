@@ -1,76 +1,47 @@
 #include "bci_c_tm.h"
 
-C_TM::C_TM()
+C_TM::C_TM(unsigned int bufferSize)
 {
+    //Store the TM Frames in a Semaphore protected Circular FIFO
+    //Array with timeouts set to 5ms
+    tmFrames = new C_SafeQueue<TM_Frame_t*>(bufferSize, true, 5);
 }
 
 C_TM::~C_TM()
 {
 }
 
-void C_TM::addFrame(TM_Frame_t* frame, int index)
+void C_TM::addFrame(TM_Frame_t* frame)
 {
-    //Don't Grow infinitely Large
-    if (size() >= MAX_TM_FRAMES)
+    if (frame)
     {
-        clear();
+        tmFrames->Put(frame);
     }
+}
 
-    if (index < 0 || index > tmFrames.size())
+//Get a Frame, return the latest if there is none available
+TM_Frame_t* C_TM::GetFrame()
+{
+    static TM_Frame_t* defaultFrame = createTMFrame();
+
+    if (tmFrames->itemsAvailable() < 1)
     {
-        tmFrames.append(frame);
+        return defaultFrame;
     }
     else
     {
-        tmFrames.insert(index, frame);
+        return tmFrames->Get();
     }
-}
-
-void C_TM::clear()
-{
-    for (int i = 0; i < size(); i++)
-    {
-        delete tmFrames.at(i);
-    }
-    tmFrames.clear();
-}
-
-TM_Frame_t* C_TM::GetFrame(int index)
-{
-    if (index < 0 || index > tmFrames.size())
-    {
-        //Return the default frame if were empty to avoid a seg fault
-        if (tmFrames.size() == 0)
-        {
-            return createTMFrame();
-        }
-        else
-        {
-            return tmFrames.back();
-        }
-    }
-    else
-    {
-        return tmFrames.at(index);
-    }
-}
-
-TM_Frame_t* C_TM::popFrame()
-{
-    return this->GetFrame();
 }
 
 C_TM& C_TM::operator =(C_TM& rhs)
 {
-    int i = 0;
-    tmFrames.clear();
+    int size = tmFrames->itemsAvailable();
 
     //Copy Each Frame
-    for (i = 0; i < rhs.size(); i++)
+    for (int i = 0; i < size; i++)
     {
-        TM_Frame_t* pFrame = createTMFrame();
-        memcpy(reinterpret_cast<void*>(pFrame),reinterpret_cast<const void*>(rhs.GetFrame(i)),sizeof(TM_Frame_t));
-        tmFrames.append(pFrame);
+        tmFrames->Put(rhs.tmFrames->Get());
     }
 
     return *this;

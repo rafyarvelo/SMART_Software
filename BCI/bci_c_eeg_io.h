@@ -8,11 +8,7 @@
 #include "bci_c_singleton.h"
 #include "bci_c_connected_device.h"
 #include "bci_c_eeg_data.h"
-
-using namespace std;
-
-//Need at least 10 frames for a good sample
-#define MIN_FRAMES_NEEDED 10
+#include "bci_c_binary_parser.h"
 
 //This is an abstract EEG interface to be used in the BCI_Package
 //Implement these methods in subclasses to connect to the corresponding EEG
@@ -23,17 +19,14 @@ public:
     C_EEG_IO();
     virtual ~C_EEG_IO();
 
-    //Basic Getters
-    virtual C_EEG_Data&  GetData()     { return eegData; }
-    virtual EEG_Frame_t& GetFrame()    { return eegData.GetFrame(); }
-    virtual EEG_Frame_t* GetFramePtr() { return eegData.GetFramePtr(); }
-
     //Must implement these members in subclasses
     virtual eegTypeEnum  getType() = 0;
     virtual ConnectionStatusType connect() = 0;
 
     //The Rate we will execute the EEG IO Task (50 Hz)
     static const uint16_t EXECUTION_RATE;
+
+    void RecordTMToFile(const QString& filename);
 
 public slots:
     //Start Getting Data
@@ -45,15 +38,19 @@ public slots:
 signals:
     void EEGFrameReceived(EEG_Frame_t* frame);
 
-    //Emit when we have received 10 frames successfully
-    void EEGDataReady(C_EEG_Data& eegData);
-
 protected:
     SMART_DEBUG_LOG* debugLog;
-    C_EEG_Data       eegData;
+
+    //Used to Record TM to File
+    C_BinaryParser* eegTMFile;
+
+    //Log TM Flag
+    bool recordTM;
+
+private:
+
     QTimer           mTimer; //How we will implement our execution
     QThread          mThread;
 };
 
 #endif // BCI_C_EEG_IO
-

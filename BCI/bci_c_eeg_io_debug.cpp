@@ -2,15 +2,14 @@
 
 bool C_EEG_IO_DEBUG::fetchEEGFrame()
 {
+    EEG_Frame_t* frame = FrameGenerator::GenerateEEGFrame();
 
-    //Get a new EEG Frame and Signal that it's received
-    eegData.AddFrame(FrameGenerator::GenerateEEGFrame());
-    emit EEGFrameReceived(eegData.GetFramePtr());
+    //Get a new EEG Frame and Notify Listeners
+    emit EEGFrameReceived(frame);
 
-    //Signal that our EEG Data is Ready every 10 Frames
-    if (eegData.size() >= MIN_FRAMES_NEEDED)
+    if (recordTM)
     {
-        emit EEGDataReady(eegData);
+        eegTMFile->writeEEGFrame(frame);
     }
 
     return true; //Hell yea I got a bald head

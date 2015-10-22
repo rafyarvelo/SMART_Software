@@ -1,7 +1,5 @@
 #include "bci_c_textparser.h"
 
-
-
 C_TextParser::C_TextParser(const QString& filename, QIODevice::OpenModeFlag openMode)
     : C_AbstractParser(filename, openMode)
 {
@@ -12,39 +10,6 @@ C_TextParser::C_TextParser(const QString& filename, QIODevice::OpenModeFlag open
 C_TextParser::~C_TextParser()
 {
 
-}
-
-//Read EEG Data
-C_EEG_Data& C_TextParser::readEEGData ()
-{
-
-}
-
-//Write EEG Data
-void C_TextParser::writeEEGData()
-{
-    writeEEGHeader();
-
-    for (int i = 0; i < eegData.size(); i++)
-    {
-        writeEEGFrame(eegData.GetFramePtr(i));
-        stream << endl;
-    }
-}
-
-//Read BRS Data
-C_TM& C_TextParser::readTMData ()
-{
-    return tmData;
-}
-
-//Write BRS Data
-void C_TextParser::writeTMData()
-{
-    for (int i = 0; i < tmData.size(); i++)
-    {
-        writeTMFrame(tmData.GetFrame(i));
-    }
 }
 
 EEG_Frame_t* C_TextParser::readEEGFrame()
@@ -64,16 +29,24 @@ TM_Frame_t*  C_TextParser::readTMFrame()
 void C_TextParser::writeEEGFrame(EEG_Frame_t* frame)
 {
     int i = 0;
-    stream << frame->eegType << delimeter;
-    stream << frame->counter << delimeter;
+    static bool firstFrame = true;
 
-    //Electrode Data, Ignore Spares
-    for (i = 0; i < MAX_EEG_ELECTRODES; i++)
+    if (firstFrame)
     {
-        stream << frame->electrodeData[i] << delimeter;
+        writeEEGHeader();
+        firstFrame = false;
     }
 
-    //Contact Quality, Ignore Spares
+    stream << FILE_FORMAT::EEG_TYPES[0] << delimeter;
+    stream << frame->counter << delimeter;
+
+    //Electrode Data
+    for (i = 0; i < MAX_EEG_ELECTRODES; i++)
+    {
+        stream << (float) frame->electrodeData[i] / 100.0 << delimeter;
+    }
+
+    //Contact Quality
     for (i = 0; i < MAX_EEG_ELECTRODES; i++)
     {
         stream << frame->contactQuality[i] << delimeter;
@@ -83,6 +56,7 @@ void C_TextParser::writeEEGFrame(EEG_Frame_t* frame)
     stream << frame->gyroX             << delimeter;
     stream << frame->gyroY             << delimeter;
     stream << frame->batteryPercentage << delimeter;
+    stream << endl;
 }
 
 void C_TextParser::writeTMFrame(TM_Frame_t* frame)
@@ -96,18 +70,23 @@ void C_TextParser::writeTMFrame(TM_Frame_t* frame)
     }
 
     //Write all the Data to the text File
-    stream << frame->timeStamp << delimeter;
-    stream << frame->bciState  << delimeter;
-    writeEEGFrame(&frame->eegFrame);
+    stream << (float) frame->timeStamp / 1000.0         << delimeter;
+    stream << FILE_FORMAT::BCI_STATES[frame->bciState]  << delimeter;
+    stream << static_cast<char>(frame->lastCommand)     << delimeter;
+    stream << FILE_FORMAT::CONFIDENCES[frame->lastConfidence]              << delimeter;
+    stream << static_cast<char>(frame->processingResult.command)           << delimeter;
+    stream << FILE_FORMAT::CONFIDENCES[frame->processingResult.confidence] << delimeter;
+
     writeBRSFrame(&frame->brsFrame);
+
     stream << frame->ledForward .frequency   << delimeter;
     stream << frame->ledBackward.frequency   << delimeter;
     stream << frame->ledRight   .frequency   << delimeter;
     stream << frame->ledLeft    .frequency   << delimeter;
-    stream << frame->eegConnectionStatus     << delimeter;
-    stream << frame->pccConnectionStatus     << delimeter;
-    stream << frame->brsConnectionStatus     << delimeter;
-    stream << frame->flasherConnectionStatus << delimeter;
+    stream << FILE_FORMAT::CONN_STATUSES[frame->eegConnectionStatus]     << delimeter;
+    stream << FILE_FORMAT::CONN_STATUSES[frame->pccConnectionStatus]     << delimeter;
+    stream << FILE_FORMAT::CONN_STATUSES[frame->brsConnectionStatus]     << delimeter;
+    stream << FILE_FORMAT::CONN_STATUSES[frame->flasherConnectionStatus] << delimeter;
 
     stream << endl;
 }

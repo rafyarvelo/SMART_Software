@@ -10,10 +10,7 @@ public:
     virtual ~C_PCC_IO_Debug(){}
 
 public slots:
-    virtual void SendCommand()
-    {
-        cout << "Sending PCC Command: " << currentCommand << endl;
-    }
+    virtual void SendCommand();
 
     virtual ConnectionStatusType connect() { return CONNECTED; }
 };

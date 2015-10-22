@@ -6,10 +6,10 @@
 
 //Default Input/Output Filenames
 #ifdef WIN32
-    const QString TM_DATA_INPUTFILE_BIN   = ".\\debug_files\\tm_input_data.bin";
-    const QString TM_DATA_OUTPUTFILE_BIN  = ".\\debug_files\\tm_output_data.bin";
-    const QString EEG_DATA_INPUTFILE_BIN  = ".\\debug_files\\eeg_input_data.bin";
-    const QString EEG_DATA_OUTPUTFILE_BIN = ".\\debug_files\\eeg_output_data.bin";
+    const QString TM_DATA_INPUTFILE_BIN   = "..\\debug_files\\tm_input_data.bin";
+    const QString TM_DATA_OUTPUTFILE_BIN  = "..\\debug_files\\tm_output_data.bin";
+    const QString EEG_DATA_INPUTFILE_BIN  = "..\\debug_files\\eeg_input_data.bin";
+    const QString EEG_DATA_OUTPUTFILE_BIN = "..\\debug_files\\eeg_output_data.bin";
 #else
     const QString TM_DATA_INPUTFILE_BIN   = "./debug_files/tm_input_data.bin";
     const QString TM_DATA_OUTPUTFILE_BIN  = "./debug_files/tm_output_data.bin";
@@ -24,16 +24,6 @@ class C_BinaryParser : public C_AbstractParser
 public:
     C_BinaryParser(const QString& filename, QIODevice::OpenModeFlag openMode);
     virtual ~C_BinaryParser();
-
-    //Read/Write EEG Data
-    virtual C_EEG_Data& readEEGData ();
-    virtual void writeEEGData();
-    virtual void writeTMData(C_EEG_Data& data) {eegData = data; writeEEGData();}
-
-    //Read/Write BRS Data
-    virtual C_TM& readTMData ();
-    virtual void writeTMData();
-    virtual void writeTMData(C_TM& data) {tmData = data; writeTMData();}
 
     //Read Individual Frames
     virtual EEG_Frame_t* readEEGFrame();

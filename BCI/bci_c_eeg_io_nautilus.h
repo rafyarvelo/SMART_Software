@@ -10,15 +10,11 @@ public:
 			 C_EEG_IO_NAUTILUS(){}
     virtual ~C_EEG_IO_NAUTILUS(){}	
 	
-    virtual C_EEG_Data&  GetData(){ return eegData; }
     virtual eegTypeEnum  getType(){ return EEG_TYPE_NAUTILUS; }
     virtual ConnectionStatusType connect(){return NOT_CONNECTED;}
 
 public slots:
     virtual bool fetchEEGFrame() { return true; }
-
-private:
-    C_EEG_Data eegData;
 };
 
 #endif

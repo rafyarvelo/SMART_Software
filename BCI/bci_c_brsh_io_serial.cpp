@@ -17,6 +17,9 @@ void C_BRSH_IO_Serial::SendTMFrame(TM_Frame_t* pFrame)
 {
     //Write the TM Frame to the BRS through the UART Serial Port
     sendToSerialPort(reinterpret_cast<const TM_Frame_t*>(pFrame));
+
+    //No longer need the Frame
+    delete pFrame;
 }
 
 bool C_BRSH_IO_Serial::fetchBRSFrame()
@@ -24,6 +27,7 @@ bool C_BRSH_IO_Serial::fetchBRSFrame()
     bool       received       = false;
     uint32_t   bytesAvailable = mSerialPortPtr->bytesAvailable();
     static int retryCount     = 0;
+    BRS_Frame_t* frame        = 0;
 
     //Check if we're Connected
     if (!mSerialPortPtr->isOpen())
@@ -51,46 +55,34 @@ bool C_BRSH_IO_Serial::fetchBRSFrame()
         mSerialPortPtr->readAll();
     }
 
-    //Lock the BRS Frame
-    pBRSFrameMutex->acquire(BRS_FRAME_MUTEX);
-
-    //Allocate the Frame if it hasn't been done already
-    if (!pLatestBRSFrame)
-    {
-        pLatestBRSFrame = createBRSFrame();
-    }
-
     //Read in the Next BRS Message
-    readFromSerialPort(pLatestBRSFrame);
+    readFromSerialPort(frame);
 
     //Check if the Message was Formatted correctly
-    if (checkMsgID(pLatestBRSFrame->MsgId, BRS2BCI_MSG_ID))
+    if (checkMsgID(frame->MsgId, BRS2BCI_MSG_ID))
     {
-        debugLog->println(BRS_LOG, "MSG ID Received: BRS2BCI MSG ID\n");
+        debugLogPtr->println(BRS_LOG, "MSG ID Received: BRS2BCI MSG ID\n");
 
-        //Notify that it was received
+        //Notify that it was received and save it in the buffer
         received = true;
-        emit BRSFrameReceived(pLatestBRSFrame);
+        emit BRSFrameReceived(frame);
     }
-
-    //Unlock the BRS frame
-    pBRSFrameMutex->release(BRS_FRAME_MUTEX);
 
     return received;
 }
 
 ConnectionStatusType C_BRSH_IO_Serial::connect()
 {
-    debugLog->BRS_Log() << "Attempting to Connect to BRSH..." << endl;
+    debugLogPtr->BRS_Log() << "Attempting to Connect to BRSH..." << endl;
 
     if (openSerialPort())
     {
-        debugLog->BRS_Log() << "Connected to BRSH!" << endl;
+        debugLogPtr->BRS_Log() << "Connected to BRSH!" << endl;
         connectionStatus = CONNECTED;
     }
     else
     {
-        debugLog->BCI_Log() << "Could Not Connect to BRSH:(" << endl;
+        debugLogPtr->BCI_Log() << "Could Not Connect to BRSH:(" << endl;
         connectionStatus = NOT_CONNECTED;
     }
 

@@ -1,13 +1,16 @@
 #include "bci_c_judgment_algorithm.h"
 
-C_JudgmentAlgorithm::C_JudgmentAlgorithm(C_SignalProcessing* signalProcessing)
-    : mRVS_Ptr(0),
-      commandFinalized(false),
-      prevCommand(PCC_CMD_NONE),
-      finalCommand(PCC_CMD_NONE),
-      cmdConfidence(UNSURE),
-      mSignalProcessingPtr(signalProcessing)
+C_JudgmentAlgorithm::C_JudgmentAlgorithm()
 {
+    commandFinalized = false;
+    prevCommand      = PCC_CMD_NONE;
+    finalCommand     = PCC_CMD_NONE;
+    cmdConfidence    = UNSURE;
+
+    //Initialize Members
+    memset(&mCurrentTMFrame, 0, sizeof(TM_Frame_t));
+    mCurrentProcessingResult.command = PCC_CMD_NONE;
+    mCurrentProcessingResult.confidence = UNSURE;
 }
 
 C_JudgmentAlgorithm::~C_JudgmentAlgorithm()
@@ -15,18 +18,15 @@ C_JudgmentAlgorithm::~C_JudgmentAlgorithm()
 	
 }
 
-void C_JudgmentAlgorithm::SetRVS(C_RVS* pRVS)
+//Remote and Sensor Data contained within TM
+void C_JudgmentAlgorithm::SetCurrentTMFrame(TM_Frame_t *pTMFrame)
 {
-    mRVS_Ptr = pRVS;
+    memcpy(&mCurrentTMFrame, pTMFrame,sizeof(TM_Frame_t));
 }
 
-#include "bci_c_telemetrymanager.h"
-//Remote and Sensor Data contained within TM
-void C_JudgmentAlgorithm::SetTM(TM_Frame_t *pTMFrame)
+void C_JudgmentAlgorithm::SetCurrentProcessingResult(ProcessingResult_t& result)
 {
-    C_TelemetryManager::pTMFrameMutex->acquire();
-    memcpy(&mCurrentTMFrame, pTMFrame,sizeof(TM_Frame_t));
-    C_TelemetryManager::pTMFrameMutex->release();
+    mCurrentProcessingResult = result;
 }
 
 PCC_Command_Type C_JudgmentAlgorithm::GetFinalCommand()
@@ -49,7 +49,9 @@ void C_JudgmentAlgorithm::computeCommand()
     {
         cmdConfidence = ABSOLUTE;
         finalizeCommand(PCC_STOP);
+        return;
     }
+
 
     //Check for Remote Command
     else if (!commandFinalized && mCurrentTMFrame.brsFrame.remoteCommand != PCC_CMD_NONE)
@@ -57,6 +59,7 @@ void C_JudgmentAlgorithm::computeCommand()
         //Update Final Command with Remote Command
         cmdConfidence = ABSOLUTE;
         finalizeCommand(mCurrentTMFrame.brsFrame.remoteCommand);
+        return;
     }
 
     //Process EEG Data
@@ -81,10 +84,16 @@ bool C_JudgmentAlgorithm::SafeToProceed()
     return safeToProceed;
 }
 
-//Parse the EEG Data, Update the Final Command and the Confidence Value
+//Signal Processing Does the work for us, Just need to
+//Update the Final Command and the Confidence Value
 void C_JudgmentAlgorithm::ParseEEGData()
 {
-
+    //Update Final PCC Command From Signal Processing Result
+    if (mCurrentProcessingResult.command != PCC_CMD_NONE)
+    {
+        cmdConfidence = mCurrentProcessingResult.confidence;
+        finalizeCommand(mCurrentProcessingResult.command);
+    }
 }
 
 void C_JudgmentAlgorithm::finalizeCommand(PCC_Command_Type cmd)
