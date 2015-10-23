@@ -4,6 +4,7 @@
 //So we don't have to declare these elsewhere
 #include <iostream>
 #include <fstream>
+#include <string>
 #include <stdio.h>
 #include <stdlib.h>
 #include "smart_config.h"
