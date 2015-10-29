@@ -1,7 +1,7 @@
 #include "bci_c_brsh_io.h"
 
-//Execute BRSH IO at 10 Hertz
-const uint16_t C_BRSH_IO::EXECUTION_RATE = 100;
+//Execute BRSH IO at 5 Hertz
+const uint16_t C_BRSH_IO::EXECUTION_RATE = 200;
 
 C_BRSH_IO::C_BRSH_IO()
 {

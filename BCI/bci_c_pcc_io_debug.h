@@ -10,8 +10,8 @@ public:
     virtual ~C_PCC_IO_Debug(){}
 
 public slots:
-    virtual void SendCommand();
-
+    virtual void SendCommand(PCC_Command_Type cmd);
+    virtual void EmergencyStop(){ SendCommand(PCC_STOP);}
     virtual ConnectionStatusType connect() { return CONNECTED; }
 };
 

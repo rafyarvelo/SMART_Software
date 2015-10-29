@@ -12,19 +12,17 @@ class C_PCC_IO : public QObject , public C_ConnectedDevice
 {
     Q_OBJECT
 public:
-     C_PCC_IO();
-     virtual ~C_PCC_IO();
+    C_PCC_IO();
+    virtual ~C_PCC_IO();
 
-    void SetCommand(PCC_Command_Type cmd) { currentCommand = cmd; }
     virtual ConnectionStatusType connect() = 0;
 
 public slots:
-    virtual void SendCommand() = 0;
-    void SendCommand(PCC_Command_Type& cmd) { SetCommand(cmd); SendCommand(); }
+    virtual void SendCommand(PCC_Command_Type cmd) = 0;
+    virtual void EmergencyStop() = 0;
 
 protected:
     SMART_DEBUG_LOG* debugLog;
-    PCC_Command_Type currentCommand;
     PCC_Command_Type prevCommand;
 };
 

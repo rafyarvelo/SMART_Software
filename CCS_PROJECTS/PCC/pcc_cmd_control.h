@@ -21,10 +21,14 @@ typedef enum
 	SERVO_CENTER
 } ServoDirection;
 
-typedef unsigned int ServoAngle;
-
 //Servo LOOK UP TABLE that holds the values for the Servos to Point to, use it to move the servos
 unsigned int servo_lut[ SERVO_STEPS+1 ];
+
+//Servo Angles
+typedef unsigned int ServoAngle;
+#define ANGLE_FORWARD  35  //-55 Degrees in the Look up Table
+#define ANGLE_CENTER   90  // 0  Degrees in the Look up Table
+#define ANGLE_BACKWARD 145 //+55 Degrees in the Look up Table
 
 //This Encapsulates the Servo Commands to only Move in 3 Directions (Forward, Back, Center)
 void sendServoCmd(unsigned char servo, ServoDirection direction);

@@ -90,6 +90,7 @@ void Initialize_PCC()
 //		if (1)
 //		{
 //			TACCR1 =servo_lut[0];
+//			TACCR2 =servo_lut[0];
 //		}
 //
 //		if (c >= '0' && c <= '9')
@@ -98,41 +99,38 @@ void Initialize_PCC()
 //
 //			// Go forward
 //			TA0CCR1 = servo_lut[index];
+//			TA0CCR2 = servo_lut[index];
 //		}
 //		else if (c == 'a')
 //		{
 //			// Go backward
 //			TA0CCR1 = servo_lut[120];
+//			TA0CCR2 = servo_lut[120];
 //		}
 //		else if (c == 'b')
 //		{
 //			// Go backward
 //			TA0CCR1 = servo_lut[140];
+//			TA0CCR2 = servo_lut[140];
 //		}
 //
 //		else if (c == 'c')
 //		{
 //			// Go backward
 //			TA0CCR1 = servo_lut[160];
+//			TA0CCR2 = servo_lut[160];
 //		}
 //		else if (c == 'd')
 //		{
 //			// Go backward
 //			TA1CCR1 = servo_lut[179];
+//			TA1CCR2 = servo_lut[179];
 //		}
-//		else if (c == 'f')
+//		else if (c == 'k')
 //		{
 //			// Go backward
-//			TA1CCR1 = servo_lut[179];
-//		}
-//		else if (c == 'g')
-//		{
-//			// Go backward
-//			TA1CCR1 = servo_lut[0];
-//		}
-//		else if (c == 's')
-//		{
-//			TA1CCR1 = PWM_OFF;//stop Servo
+//			TA1CCR1 = PWM_OFF;
+//			TA1CCR2 = PWM_OFF;
 //		}
 //	}
 //}

@@ -4,17 +4,17 @@ C_PCC_IO_Debug::C_PCC_IO_Debug()
 {
 }
 
-void C_PCC_IO_Debug::SendCommand()
+void C_PCC_IO_Debug::SendCommand(PCC_Command_Type cmd)
 {
-    if (currentCommand == prevCommand)
+    if (cmd == prevCommand)
     {
         //Don't Send anything Here
     }
     else
     {
-        QString toPrint = QString("Sending PCC Command: ") + QString(currentCommand);
+        QString toPrint = QString("Sending PCC Command: ") + QString(cmd);
         debugLog->println(PCC_LOG, toPrint.toStdString(), true);
 
-        prevCommand = currentCommand;
+        prevCommand = cmd;
     }
 }

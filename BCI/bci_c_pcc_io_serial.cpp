@@ -1,28 +1,84 @@
 #include "bci_c_pcc_io_serial.h"
 
 C_PCC_IO_Serial::C_PCC_IO_Serial()
-    : C_Serial_Comm(PCC_PORT)
+    : C_PCC_IO(),
+      C_Serial_Comm(PCC_PORT)
 {
-    currentCommand = PCC_CMD_NONE;
+    //Set up the Execution Rate of the PCC IO Task
+    mTimer.setInterval(PCC_COMMAND_SEND_RATE);
+    QObject::connect(&mTimer, SIGNAL(timeout()),this, SLOT(onTimer()));
+    QObject::connect(&mThread, SIGNAL(started()), &mTimer, SLOT(start()));
+
+    //Store the PCC Commands in a Semaphore Protected Circular Buffer FIFO with
+    //Timeouts Disabled
+    pccCommandQueue = new C_SafeQueue<PCC_Command_Type>(PCC_COMMAND_BUFFER_SIZE, true, 0);
 }
 
 C_PCC_IO_Serial::~C_PCC_IO_Serial()
 {
 }
 
-void C_PCC_IO_Serial::SendCommand()
+void C_PCC_IO_Serial::SendCommand(PCC_Command_Type cmd)
 {
-    if (prevCommand == currentCommand)
+    //Ignore Duplicate Commands
+    if (cmd == prevCommand || pccCommandQueue->spacesAvailable() == 0)
     {
-        //Do Nothing Here, We Don't Need to Overload the serial port
         return;
     }
+    else
+    {
+        //Add the Command to our Queue, if we are full, the Calling thread will
+        //be forced to wait on a semaphore
+        pccCommandQueue->Put(cmd);
+    }
+}
 
-    QString str = QString("Sending PCC Command: ") + QString(currentCommand);
-    debugLog->println(PCC_LOG, str.toStdString(), true);
-    sendToSerialPort(currentCommand);
+//Try to Send the Curent Command to the Serial Port on the Timer Event
+void C_PCC_IO_Serial::onTimer()
+{
+    PCC_Command_Type cmd = PCC_CMD_NONE;
 
-    prevCommand = currentCommand;
+    //Get the Next Command if there is one available
+    if (pccCommandQueue->itemsAvailable() > 0)
+    {
+        cmd = pccCommandQueue->Get();
+
+        if (cmd != prevCommand)
+        {
+            SendCmdToSerialPort(cmd);
+        }
+    }
+    else
+    {
+        return;
+    }
+}
+
+void C_PCC_IO_Serial::SendCmdToSerialPort(PCC_Command_Type cmd)
+{
+    char printBuffer[100];
+
+    if (connectionStatus == CONNECTED)
+    {
+        //Try to Send the Command
+        if (sendToSerialPort(cmd))
+        {
+            sprintf(printBuffer, "Sending PCC Command: %c", (char) cmd);
+            debugLog->println(PCC_LOG, printBuffer, true);
+        }
+        else
+        {
+            sprintf(printBuffer, "Couldn't Send PCC Command: %c",(char) cmd);
+            debugLog->println(PCC_LOG, printBuffer, true);
+        }
+
+        prevCommand = cmd;
+    }
+}
+
+void C_PCC_IO_Serial::EmergencyStop()
+{
+    SendCmdToSerialPort(static_cast<PCC_Command_Type>(PCC_STOP));
 }
 
 ConnectionStatusType C_PCC_IO_Serial::connect()
@@ -33,6 +89,7 @@ ConnectionStatusType C_PCC_IO_Serial::connect()
     {
         debugLog->println(PCC_LOG, "Connected to Power Chair Controller!");
         connectionStatus = CONNECTED;
+        mThread.start();
     }
     else
     {

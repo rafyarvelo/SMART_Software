@@ -59,13 +59,13 @@ void sendServoCmd(unsigned char servo, ServoDirection direction)//direction
 	switch (direction)
 	{
 		case SERVO_FORWARD:
-			rotateServo(servo, 0);//Move to +90 degrees
+			rotateServo(servo, ANGLE_FORWARD);
 		break;
 		case SERVO_BACKWARD:
-			rotateServo(servo, 179);  //Move to -90 degrees
+			rotateServo(servo, ANGLE_BACKWARD);
 			break;
 		case SERVO_CENTER:
-			rotateServo(servo, 90); //Return to Center
+			rotateServo(servo, ANGLE_CENTER);
 		break;
 	}
 }

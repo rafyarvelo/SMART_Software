@@ -255,8 +255,7 @@ void C_BCI_Package::onBRSFrameReceived(BRS_Frame_t *pBRSFrame)
 void C_BCI_Package::onEmergencyStopRequested()
 {
     //No messing around here, just send the command
-    pPCC_IO->SetCommand(PCC_STOP);
-    pPCC_IO->SendCommand();
+    pPCC_IO->EmergencyStop();
 }
 
 //Begin EEG and BRS IO Tasks
@@ -283,8 +282,7 @@ void C_BCI_Package::onCommandReady()
     bciState = BCI_READY;
 
     //Send the Command to the Power Chair Controller
-    pPCC_IO->SetCommand(pJA->GetFinalCommand());
-    pPCC_IO->SendCommand();
+    pPCC_IO->SendCommand(pJA->GetFinalCommand());
 
     //Move back to Standby and wait for the next command
     bciState = BCI_STANDBY;
