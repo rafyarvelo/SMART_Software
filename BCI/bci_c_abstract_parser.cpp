@@ -16,3 +16,19 @@ C_AbstractParser::~C_AbstractParser()
         delete fp;
     }
 }
+
+QString FILE_FORMAT::Int2String(const QString* array, unsigned size, unsigned value)
+{
+    QString convertedString;
+
+    if (value > size)
+    {
+        convertedString = QString("Invalid Value::") + QString::number(value) ;
+    }
+    else
+    {
+        convertedString = array[value];
+    }
+
+    return convertedString;
+}

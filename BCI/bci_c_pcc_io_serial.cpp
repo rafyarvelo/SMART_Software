@@ -1,8 +1,7 @@
 #include "bci_c_pcc_io_serial.h"
 
 C_PCC_IO_Serial::C_PCC_IO_Serial()
-    : C_PCC_IO(),
-      C_Serial_Comm(PCC_PORT)
+    : C_PCC_IO()
 {
     //Set up the Execution Rate of the PCC IO Task
     mTimer.setInterval(PCC_COMMAND_SEND_RATE);
@@ -12,6 +11,8 @@ C_PCC_IO_Serial::C_PCC_IO_Serial()
     //Store the PCC Commands in a Semaphore Protected Circular Buffer FIFO with
     //Timeouts Disabled
     pccCommandQueue = new C_SafeQueue<PCC_Command_Type>(PCC_COMMAND_BUFFER_SIZE, true, 0);
+
+    mSerialPortPtr = new C_Serial_Comm(PCC_PORT);
 }
 
 C_PCC_IO_Serial::~C_PCC_IO_Serial()
@@ -61,7 +62,7 @@ void C_PCC_IO_Serial::SendCmdToSerialPort(PCC_Command_Type cmd)
     if (connectionStatus == CONNECTED)
     {
         //Try to Send the Command
-        if (sendToSerialPort(cmd))
+        if (mSerialPortPtr->sendToSerialPort(cmd))
         {
             sprintf(printBuffer, "Sending PCC Command: %c", (char) cmd);
             debugLog->println(PCC_LOG, printBuffer, true);
@@ -85,7 +86,7 @@ ConnectionStatusType C_PCC_IO_Serial::connect()
 {
     debugLog->println(PCC_LOG, "Attempting to Connect to Power Chair Controller...");
 
-    if (openSerialPort())
+    if (mSerialPortPtr->openSerialPort())
     {
         debugLog->println(PCC_LOG, "Connected to Power Chair Controller!");
         connectionStatus = CONNECTED;

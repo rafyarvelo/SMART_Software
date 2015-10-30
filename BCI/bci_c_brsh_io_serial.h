@@ -6,7 +6,6 @@
 #include "smart_data_types.h"
 
 class C_BRSH_IO_Serial : public C_BRSH_IO ,
-                         public C_Serial_Comm,
                          public C_Singleton<C_BRSH_IO_Serial>
 {
 public:
@@ -18,6 +17,12 @@ public:
     virtual void SendTMFrame(TM_Frame_t* pFrame);
 
     virtual ConnectionStatusType connect();
+
+private slots:
+    void onPortDisconnected();
+
+private:
+    C_Serial_Comm* mSerialPortPtr;
 };
 
 #endif // BCI_C_BRSH_IO_SERIAL_H

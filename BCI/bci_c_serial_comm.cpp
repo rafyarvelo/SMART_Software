@@ -1,13 +1,12 @@
 #include "bci_c_serial_comm.h"
 
-C_Serial_Comm::C_Serial_Comm(const QString& portName)
+C_Serial_Comm::C_Serial_Comm(const QString& portName, BaudRateType baudRate, FlowType flowCtrl,
+                             ParityType parity      , DataBitsType dataBits, StopBitsType stopBits,
+                             long timeout)
     : mPortName(portName)
 {
     debugLogPtr    = SMART_DEBUG_LOG::Instance();//Get a pointer to the debug log
     mSerialPortPtr = new QextSerialPort(mPortName);
-
-    //Config Port Setup
-    SetDefaultPortSettings();
 
     connect(mSerialPortPtr, SIGNAL(dsrChanged(bool)), this, SLOT(onDsrChanged(bool)));
 }
@@ -194,12 +193,17 @@ int C_Serial_Comm::readFromSerialPort(BRS_Frame_t* pFrame)
 //SLOTS
 void C_Serial_Comm::onDsrChanged(bool status)
 {
+    std::string toPrint = mPortName.toStdString();
+
     if (status)
     {
-        debugLogPtr->SerialComm_Log() << "Serial Device was turned on" << endl;
+        toPrint += std::string(" was turned on");
+        debugLogPtr->println(SERIAL_COMM_LOG, toPrint);
     }
-    else
+    else //We Lost Connection
     {
-        debugLogPtr->SerialComm_Log() << "Serial Device was turned off" << endl;
+        toPrint += std::string(" was turned off");
+        debugLogPtr->println(SERIAL_COMM_LOG,toPrint ,false,true);
+        emit PortDisconnected();
     }
 }

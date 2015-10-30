@@ -42,6 +42,7 @@ signals:
 protected:
     QTimer       mTimer;
     QThread      mThread;
+    SMART_DEBUG_LOG* debugLog;
 };
 
 #endif // C_BRSH_IO_H

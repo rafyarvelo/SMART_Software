@@ -12,9 +12,7 @@
 #define PCC_COMMAND_SEND_RATE   1000 //1 Hz
 
 class C_PCC_IO_Serial : public C_PCC_IO,
-                        public C_Serial_Comm,
-                        public C_Singleton<C_PCC_IO_Serial>,
-                        public QObject
+                        public C_Singleton<C_PCC_IO_Serial>
 {
     Q_OBJECT
 public:
@@ -42,8 +40,10 @@ private:
     //they don't get sent too fast. Only Actually Send the data on a Timer event
     C_SafeQueue<PCC_Command_Type>* pccCommandQueue;
 
-    QTimer       mTimer;
-    QThread      mThread;
+    //Send PCC Commands to a Serial Port continuously in a Thread using a Timer
+    QTimer         mTimer;
+    QThread        mThread;
+    C_Serial_Comm* mSerialPortPtr;
 };
 
 #endif // BCI_C_JA2PCC

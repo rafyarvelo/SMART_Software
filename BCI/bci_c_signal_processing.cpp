@@ -24,8 +24,8 @@ void C_SignalProcessing::resetData()
     //Reset Member to their Default Values
     mCurrentProcessingResult.command    = PCC_CMD_NONE;
     mCurrentProcessingResult.confidence = UNSURE;
-    memset(&voltageSums     [0], 0, sizeof(uint64_t) * MAX_EEG_ELECTRODES);
-    memset(&qualitySums     [0], 0, sizeof(uint64_t) * MAX_EEG_ELECTRODES);
+    memset(&voltageSums     [0], 0, sizeof(uint64t) * MAX_EEG_ELECTRODES);
+    memset(&qualitySums     [0], 0, sizeof(uint64t) * MAX_EEG_ELECTRODES);
     memset(&averageCQ       [0], 0, sizeof(uint16_t) * MAX_EEG_ELECTRODES);
     memset(&normalizedData  [0], 0, sizeof(uint32_t) * MAX_EEG_ELECTRODES);
 

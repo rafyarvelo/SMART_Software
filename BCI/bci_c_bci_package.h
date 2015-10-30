@@ -27,8 +27,6 @@ class C_JudgmentAlgorithm;
 #include "bci_c_pcc_io_debug.h"
 
 #define DEBUG_DIRECTORY "debug_files"
-#define EEG_BUFFER_SIZE 25
-#define BRS_BUFFER_SIZE 25
 
 class C_BCI_Package : public QObject , public C_Singleton<C_BCI_Package>
 {

@@ -70,12 +70,13 @@ void C_TextParser::writeTMFrame(TM_Frame_t* frame)
     }
 
     //Write all the Data to the text File
-    stream << (float) frame->timeStamp / 1000.0         << delimeter;
-    stream << FILE_FORMAT::BCI_STATES[frame->bciState]  << delimeter;
+    using namespace FILE_FORMAT;
+    stream << (float) frame->timeStamp / 1000.0 << delimeter;
+    stream << Int2String(BCI_STATES, BCI_STATES_SIZE, frame->bciState)  << delimeter;
     stream << static_cast<char>(frame->lastCommand)     << delimeter;
-    stream << FILE_FORMAT::CONFIDENCES[frame->lastConfidence]              << delimeter;
+    stream << Int2String(CONFIDENCES,CONFIDENCES_SIZE, frame->lastConfidence) << delimeter;
     stream << static_cast<char>(frame->processingResult.command)           << delimeter;
-    stream << FILE_FORMAT::CONFIDENCES[frame->processingResult.confidence] << delimeter;
+    stream << Int2String(CONFIDENCES,CONFIDENCES_SIZE,frame->processingResult.confidence) << delimeter;
 
     writeBRSFrame(&frame->brsFrame);
 
@@ -83,10 +84,10 @@ void C_TextParser::writeTMFrame(TM_Frame_t* frame)
     stream << frame->ledBackward.frequency   << delimeter;
     stream << frame->ledRight   .frequency   << delimeter;
     stream << frame->ledLeft    .frequency   << delimeter;
-    stream << FILE_FORMAT::CONN_STATUSES[frame->eegConnectionStatus]     << delimeter;
-    stream << FILE_FORMAT::CONN_STATUSES[frame->pccConnectionStatus]     << delimeter;
-    stream << FILE_FORMAT::CONN_STATUSES[frame->brsConnectionStatus]     << delimeter;
-    stream << FILE_FORMAT::CONN_STATUSES[frame->flasherConnectionStatus] << delimeter;
+    stream << Int2String(CONN_STATUSES, CONN_STATUSES_SIZE, frame->eegConnectionStatus)     << delimeter;
+    stream << Int2String(CONN_STATUSES, CONN_STATUSES_SIZE, frame->pccConnectionStatus)     << delimeter;
+    stream << Int2String(CONN_STATUSES, CONN_STATUSES_SIZE, frame->brsConnectionStatus)     << delimeter;
+    stream << Int2String(CONN_STATUSES, CONN_STATUSES_SIZE, frame->flasherConnectionStatus) << delimeter;
 
     stream << endl;
 }

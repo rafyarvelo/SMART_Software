@@ -69,15 +69,15 @@ private:
     uint16_t averageCQ[MAX_EEG_ELECTRODES];
 
     //Keep Track of Sums to Calculate the Averages
-    uint64_t voltageSums[MAX_EEG_ELECTRODES];
-    uint64_t qualitySums[MAX_EEG_ELECTRODES];
+    uint64t voltageSums[MAX_EEG_ELECTRODES];
+    uint64t qualitySums[MAX_EEG_ELECTRODES];
 
     //Final Scores from Data Processing
     ProcessingScore_t finalScores[NUM_PCC_DIRECTIONS];
     Confidence_Type   finalConfidences[NUM_PCC_DIRECTIONS];
 
     //Count of how many frames we've processed
-    uint64_t framesProcessed;
+    uint64t framesProcessed;
 
     bool averagesCalculated;
     bool scoresCalculated;

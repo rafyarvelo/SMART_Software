@@ -25,8 +25,11 @@ class C_Serial_Comm : public QObject
 {
     Q_OBJECT//Required QT Macro
 public:
-     C_Serial_Comm(const QString&  portName);
-	~C_Serial_Comm();
+    C_Serial_Comm(const QString& portName       , BaudRateType baudRate = BAUD9600,
+                  FlowType flowCtrl = FLOW_OFF  , ParityType   parity   = PAR_NONE,
+                  DataBitsType dataBits = DATA_8, StopBitsType stopBits = STOP_1,
+                  long timeout = DEFAULT_TIMEOUT_MS);
+    ~C_Serial_Comm();
 
     //return true on successful Open/Send
     bool openSerialPort();
@@ -53,8 +56,10 @@ public:
 
     void SetDefaultPortSettings();
 
+    uint64t bytesAvailable(){ return mSerialPortPtr->bytesAvailable(); }
 signals:
     void dataReceived(const QByteArray& data);
+    void PortDisconnected();
 
 private slots:
     void onDsrChanged(bool status);

@@ -39,12 +39,23 @@ namespace FILE_FORMAT
     const QString STATUS = "status";
 
     //Map Int to String
+    const int BCI_STATES_SIZE = 4;
     const QString BCI_STATES[]    = {"BCI_OFF", "BCI_STANDBY", "BCI_PROCESSING", "BCI_READY"};
+
+    const int LED_GROUPS_SIZE = 4;
     const QString LED_GROUPS[]    = {"Forward", "Backward", "Right", "Left"};
+
+    const int EEG_TYPES_SIZE = 3;
     const QString EEG_TYPES[]     = {"EEG_Emotiv", "EEG_Nautilus", "EEG_Debug"};
+
+    const int CONN_STATUSES_SIZE = 2;
     const QString CONN_STATUSES[] = {"NOT_CONNECTED", "CONNECTED"};
+
+    const int CONFIDENCES_SIZE = 4;
     const QString CONFIDENCES[]   = {"Unsure", "Moderate", "Likely", "Absolute"};
-};
+
+    QString Int2String(const QString* array, unsigned size, unsigned value);
+}
 
 //Abstract Telemetry File Parser Class
 class C_AbstractParser
