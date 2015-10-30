@@ -22,6 +22,13 @@
 #include "queue.h"
 #include "semphr.h"
 
+#include "driverlib/debug.h"
+#include "driverlib/fpu.h"
+#include "driverlib/pin_map.h"
+#include "driverlib/sysctl.h"
+#include "driverlib/uart.h"
+#include "utils/uartstdio.h"
+
 // LED Color Access
 //
 // [G, R, B] range is 0 to 0xFFFF per color.
@@ -56,17 +63,16 @@ void ConfigureLEDs()
 void BlinkLED(LEDColor ledColor, uint8_t numTimes)
 {
     uint8_t  i = 0;
-    uint32_t j = 0;
 
-    for (i = 0; i < numTimes; i++)
+    for (i = 0; i < numTimes + 1; i++)
     {
 		//Turn On the LED
 		SetLED(ledColor, LED_ON);
 
-		// Wait for the required amount of time.
-		for (j = 0; j < LED_TOGGLE_DELAY; j++)
-		{
-		}
+        //
+        // Delay for a bit.
+        //
+        SysCtlDelay(SysCtlClockGet() / 10 / 3);
 
 		//Turn Off the LED
 		SetLED(ledColor, LED_OFF);

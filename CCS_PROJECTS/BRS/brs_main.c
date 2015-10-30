@@ -109,6 +109,8 @@ void StartTasks();
 //Remove this Flag when the Tactical Configuration is Ready
 #define DEBUG_ONLY
 
+#define size 50
+uint8_t buffer[size];
 //*****************************************************************************
 //
 // Initialize FreeRTOS and start the initial set of tasks.
@@ -116,36 +118,51 @@ void StartTasks();
 //*****************************************************************************
 int main(void)
 {
+	uint16_t bytesReceived = 0;
+
     //
     // Set the clocking to run at 50 MHz from the PLL.
     //
     ROM_SysCtlClockSet(SYSCTL_SYSDIV_4 | SYSCTL_USE_PLL | SYSCTL_XTAL_16MHZ |
                        SYSCTL_OSC_MAIN);
 
-    // Initialize the UART and configure it for 115,200, 8-N-1 operation.
-    ConfigureUART();
+    // Initialize the UARTs and configure them it for 115,200, 8-N-1 operation.
+    ConfigureUARTs();
 
-    //Configure the LEDs to be RGB Enabled
+//    //Configure the LEDs to be RGB Enabled
     ConfigureLEDs();
 
-    // Print Introduction.
-    //UARTprintf("\n\nWelcome to the SMART Software, BRS Processing Function!\n");
+    UARTprintf("Yes... The console is Working...\r\n");
 
-    // Create a mutex to guard the UART.
-    g_pUARTSemaphore = xSemaphoreCreateMutex();
-
-    //Create the FreeRTOS Tasks
-    StartTasks();
-
-    // Start the scheduler.  This should not return.
-    vTaskStartScheduler();
-
-    // In case the scheduler returns for some reason, print an error and loop
-    // forever.
-    UARTprintf("\n We have reached level 4... Inception\n ");
-    while(1)
+    // Get all of the Bytes from the BT UART and Print them to the console
+    while (1)
     {
+    	bytesReceived = UARTReceive(BT_UART, (volatile uint8_t*)  &buffer[0], size);
+    	UARTSend(CONSOLE_UART, (const uint8_t*) &buffer[0], bytesReceived);
+
+    	if (buffer[0] == 's')
+    	{
+    		UARTSend(BT_UART, (const uint8_t*) "YO YO", 6);
+    	}
+
+    	BlinkLED(GREEN_LED, 2);
     }
+
+//    // Create a mutex to guard the UART.
+//    g_pUARTSemaphore = xSemaphoreCreateMutex();
+//
+//    //Create the FreeRTOS Tasks
+//    StartTasks();
+//
+//    // Start the scheduler.  This should not return.
+//    vTaskStartScheduler();
+//
+//    // In case the scheduler returns for some reason, print an error and loop
+//    // forever.
+//    UARTprintf("\n We have reached level 4... Inception\n ");
+//    while(1)
+//    {
+//    }
 }
 
 void StartTasks()

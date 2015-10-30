@@ -23,53 +23,38 @@
 #include "driverlib/uart.h"
 #include "../../smart_data_types.h"
 
-//*****************************************************************************
-//
-// Blink the LED for Debugging/Status
-//
-//*****************************************************************************
-void LED_Blink(uint16_t delay);
+typedef enum UART_ID
+{
+	CONSOLE_UART = UART0_BASE, //Console I/0 UART
+	BCI_UART     = UART1_BASE, //BCI Comm UART
+	GPS_UART     = UART2_BASE, //GPS Sensor UART
+	BT_UART      = UART3_BASE, //Bluetooth UART
+	USF_UART     = UART5_BASE, //Ultrasonic Range Finder - Front
+	USR_UART     = UART6_BASE  //Ultrasonic Range Finder - Back
+} UART_ID;
 
-#ifdef UART_INTERRUPT
-//*****************************************************************************
-//
-// Initialize the UART for interrupt enabled responses. This will be our
-// Secondary method of UART Communication if the UART Task is not responsive
-//
-//*****************************************************************************
-void Init_UART();
+#define UART_BAUD_RATE 112500
 
 //*****************************************************************************
 //
-// The UART interrupt handler.
+// Configure the UARTs and their pins.  This must be called before UARTprintf().
 //
 //*****************************************************************************
-void UARTIntHandler(void);
-
-#else //Use FreeRTOS UART Task
-
-//*****************************************************************************
-//
-// Configure the UART and its pins.  This must be called before UARTprintf().
-//
-//*****************************************************************************
-void ConfigureUART(void);
-
-#endif //UART_INTERRUPT
+void ConfigureUARTs(void);
 
 //*****************************************************************************
 //
 // Send a string to the UART.
 //
 //*****************************************************************************
-void UARTSend(const uint8_t *pui8Buffer, uint32_t ui32Count);
+void UARTSend(UART_ID uartID, const uint8_t *pui8Buffer, uint32_t ui32Count);
 
 //*****************************************************************************
 //
 // Retrieve a string from the UART, return bytes actually read
 //
 //*****************************************************************************
-uint16_t UARTReceive(volatile uint8_t *pui8Buffer, uint32_t ui32Count);
+uint16_t UARTReceive(UART_ID uartID, volatile uint8_t *pui8Buffer, uint32_t ui32Count);
 
 //*****************************************************************************
 //
@@ -92,5 +77,19 @@ TM_Frame_t* ReadBCI2BRSMsg();
 //
 //*****************************************************************************
 void SendBRSFrame(BRS_Frame_t* pFrame);
+
+//*****************************************************************************
+//
+// Check for a Bluetooth Frame in the UART
+//
+//*****************************************************************************
+int BluetoothFrameAvailable();
+
+//*****************************************************************************
+//
+// Retrieve a Bluetooth Frame from the UART
+//
+//*****************************************************************************
+BluetoothFrame_t* ReadBluetoothFrame();
 
 #endif /* BRS_C_UART_H_ */

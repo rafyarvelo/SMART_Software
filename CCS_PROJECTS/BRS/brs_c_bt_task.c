@@ -67,9 +67,14 @@ static void BluetoothTask(void *pvParameters)
 		#ifdef DEBUG_ONLY
     		receivedBTFrame.remoteCommand = pcc_cmds[rand() % pcc_cmds_SIZE];
     		btFrameReceived = TRUE;
-    	//Actually Get Data
-		#else
 
+    		//Actually Get Data
+		#else
+    		if (BluetoothFrameAvailable())
+    		{
+    			memcpy(&receivedBTFrame, ReadBluetoothFrame(), sizeof(BluetoothFrame_t));
+    			btFrameReceived = TRUE;
+    		}
 		#endif
 
     	if (btFrameReceived)
