@@ -2,6 +2,7 @@
 #define BCI_C_SERIAL_COMM_H
 
 #include "../smart_config.h"
+#include "../smart_data_types.h"
 #include "../smart_debug_log.h"
 #include <QFile>
 #include <QTextStream>
@@ -9,7 +10,6 @@
 
 //Serial Comm Implementation using qextserialport
 #include "qextserialport.h"
-#include "bci_c_tm.h"
 
 #define SUCCESS true
 #define FAILURE false
@@ -54,7 +54,10 @@ public:
     int readFromSerialPort(TM_Frame_t*  pFrame);
     int readFromSerialPort(BRS_Frame_t* pFrame);
 
-    void SetDefaultPortSettings();
+    //Allow users to change the port settings dynamically
+    void SetPortSettings(BaudRateType baudRate = BAUD9600,FlowType flowCtrl = FLOW_OFF,
+                         ParityType   parity   = PAR_NONE,DataBitsType dataBits = DATA_8,
+                         StopBitsType stopBits = STOP_1,long timeout = DEFAULT_TIMEOUT_MS);
 
     uint64t bytesAvailable(){ return mSerialPortPtr->bytesAvailable(); }
 signals:

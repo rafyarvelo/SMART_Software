@@ -2,8 +2,8 @@
 
 void Init_GPIO()
 {
-	P1DIR |= RED_LED;
-	P1DIR |= GREEN_LED;
+	P1DIR |= TIVA_RED_LED;
+	P1DIR |= TIVA_GREEN_LED;
 
 	P1OUT = 0x00;
 }
@@ -31,13 +31,13 @@ void sendGPIO(volatile unsigned char* portRef, unsigned char bit, unsigned short
 
 void toggleGreen()
 {
-	setLED(GREEN_LED, LOGIC_TOGGLE);
+	setLED(TIVA_GREEN_LED, LOGIC_TOGGLE);
 }
 
 void toggleRed()
 {
 	//P1OUT ^= 0x01;
-	setLED(RED_LED, LOGIC_TOGGLE);
+	setLED(TIVA_RED_LED, LOGIC_TOGGLE);
 }
 
 void toggleAll()
@@ -53,8 +53,8 @@ void setLED(unsigned char LED, unsigned char value)
 
 void setLEDs(unsigned char value)
 {
-	setLED(RED_LED, value);
-	setLED(GREEN_LED, value);
+	setLED(TIVA_RED_LED, value);
+	setLED(TIVA_GREEN_LED, value);
 }
 
 //Blink LEDs for Debugging

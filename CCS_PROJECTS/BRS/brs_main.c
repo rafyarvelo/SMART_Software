@@ -106,11 +106,8 @@ void vApplicationStackOverflowHook(xTaskHandle *pxTask, char *pcTaskName)
 //Begin all the FreeRTOS Tasks
 void StartTasks();
 
-//Remove this Flag when the Tactical Configuration is Ready
-#define DEBUG_ONLY
+//Remove these Flags when the Tactical Configuration is Ready
 
-#define size 50
-uint8_t buffer[size];
 //*****************************************************************************
 //
 // Initialize FreeRTOS and start the initial set of tasks.
@@ -118,8 +115,6 @@ uint8_t buffer[size];
 //*****************************************************************************
 int main(void)
 {
-	uint16_t bytesReceived = 0;
-
     //
     // Set the clocking to run at 50 MHz from the PLL.
     //
@@ -132,37 +127,25 @@ int main(void)
 //    //Configure the LEDs to be RGB Enabled
     ConfigureLEDs();
 
+	#ifdef VERBOSE
     UARTprintf("Yes... The console is Working...\r\n");
+	#endif
 
-    // Get all of the Bytes from the BT UART and Print them to the console
-    while (1)
+    // Create a mutex to guard the UART.
+    g_pUARTSemaphore = xSemaphoreCreateMutex();
+
+    //Create the FreeRTOS Tasks
+    StartTasks();
+
+    // Start the scheduler.  This should not return.
+    vTaskStartScheduler();
+
+    // In case the scheduler returns for some reason, print an error and loop
+    // forever.
+    UARTprintf("\n We have reached level 4... Inception\n ");
+    while(1)
     {
-    	bytesReceived = UARTReceive(BT_UART, (volatile uint8_t*)  &buffer[0], size);
-    	UARTSend(CONSOLE_UART, (const uint8_t*) &buffer[0], bytesReceived);
-
-    	if (buffer[0] == 's')
-    	{
-    		UARTSend(BT_UART, (const uint8_t*) "YO YO", 6);
-    	}
-
-    	BlinkLED(GREEN_LED, 2);
     }
-
-//    // Create a mutex to guard the UART.
-//    g_pUARTSemaphore = xSemaphoreCreateMutex();
-//
-//    //Create the FreeRTOS Tasks
-//    StartTasks();
-//
-//    // Start the scheduler.  This should not return.
-//    vTaskStartScheduler();
-//
-//    // In case the scheduler returns for some reason, print an error and loop
-//    // forever.
-//    UARTprintf("\n We have reached level 4... Inception\n ");
-//    while(1)
-//    {
-//    }
 }
 
 void StartTasks()

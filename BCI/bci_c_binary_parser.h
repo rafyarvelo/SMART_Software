@@ -6,10 +6,10 @@
 
 //Default Input/Output Filenames
 #ifdef WIN32
-    const QString TM_DATA_INPUTFILE_BIN   = "..\\debug_files\\tm_input_data.bin";
-    const QString TM_DATA_OUTPUTFILE_BIN  = "..\\debug_files\\tm_output_data.bin";
-    const QString EEG_DATA_INPUTFILE_BIN  = "..\\debug_files\\eeg_input_data.bin";
-    const QString EEG_DATA_OUTPUTFILE_BIN = "..\\debug_files\\eeg_output_data.bin";
+    const QString TM_DATA_INPUTFILE_BIN   = "../debug_files/tm_input_data.bin";
+    const QString TM_DATA_OUTPUTFILE_BIN  = "../debug_files/tm_output_data.bin";
+    const QString EEG_DATA_INPUTFILE_BIN  = "../debug_files/eeg_input_data.bin";
+    const QString EEG_DATA_OUTPUTFILE_BIN = "../debug_files/eeg_output_data.bin";
 #else
     const QString TM_DATA_INPUTFILE_BIN   = "./debug_files/tm_input_data.bin";
     const QString TM_DATA_OUTPUTFILE_BIN  = "./debug_files/tm_output_data.bin";

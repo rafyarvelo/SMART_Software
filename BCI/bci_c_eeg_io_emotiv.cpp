@@ -60,7 +60,6 @@ ConnectionStatusType C_EEG_IO_EMOTIV::connect()
 
 bool C_EEG_IO_EMOTIV::fetchEEGFrame()
 {
-    EEG_Frame_t* frame;
     struct emokit_frame eFrame;
     EmotivReadStatus readStatus;
     int timeout_count = 0;
@@ -86,12 +85,15 @@ bool C_EEG_IO_EMOTIV::fetchEEGFrame()
         {
             //Get the current EEG Frame and add it to our data
             eFrame = emokit_get_next_frame(m_device);
-            frame  = fromEmotivFrame(eFrame);
-            emit EEGFrameReceived(frame);
+            mCurrentEEGFrame = *fromEmotivFrame(eFrame);
+            eegFrameBuffer.Put(mCurrentEEGFrame);
+
+            //Signal That our buffer contains a frame
+            emit EEGFrameReceived(&eegFrameBuffer);
 
             if (recordTM)
             {
-                eegTMFile->writeEEGFrame(frame);
+                eegTMFile->writeEEGFrame(&mCurrentEEGFrame);
             }
 
             return (bool) EMOKIT_READ_SUCCESS;

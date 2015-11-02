@@ -54,6 +54,7 @@ static void UARTTask(void *pvParameters)
 {
     portTickType  ui32WakeTime;
     BRS_Frame_t BRSFrameToSend;
+    TM_Frame_t  receivedTMFrame;
     int         frameReadyToSend = FALSE;
 
     //
@@ -62,17 +63,48 @@ static void UARTTask(void *pvParameters)
     ui32WakeTime = xTaskGetTickCount();
 
     //Initialize the TM Frame
+    memset(&receivedTMFrame, 0, sizeof(TM_Frame_t));
 
     //
     // Loop forever.
     //
     while(1)
     {
-    	//Receive BCI Message if it is Available
-    	if (BCIMessageAvailable())
+		#ifdef BRS_DEBUG
+
+    	//Generate Random TM Frame
+    	memcpy(&receivedTMFrame.MsgId, BCI2BRS_MSG_ID, sizeof(MsgIdType));
+    	receivedTMFrame.lastCommand = "fblr"[(rand() % 4)];
+
+    	//Send the Frame to the Bluetooth Task
+		xQueueSend(g_pBluetoothSendQueue, &receivedTMFrame , portMAX_DELAY);
+
+		//Send BRS Message
+		if (xQueueReceive(g_pUARTSendQueue, &BRSFrameToSend, 0) == pdPASS)
+		{
+			memcpy(&BRSFrameToSend.MsgId, BRS2BCI_MSG_ID, MSG_ID_SIZE);
+			xSemaphoreTake(g_pUARTSemaphore, portMAX_DELAY);
+			SendBRSFrame(&BRSFrameToSend);
+			xSemaphoreGive(g_pUARTSemaphore);
+			BlinkLED(TIVA_GREEN_LED, 1); //Blink Send Status
+		}
+
+		#else //Actually Send the Data
+
+    	//Try and Get a TM Frame from the UART
+    	ReadBCI2BRSMsg(&receivedTMFrame);
+
+    	//If the Frame was Good, put it in the Queue
+    	if (checkMsgID(receivedTMFrame.MsgId, BCI2BRS_MSG_ID))
     	{
+			//Blink Receive Status
+			BlinkLED(TIVA_GREEN_LED, 1);
+
     		//Send the Frame to the Bluetooth Task
-    		xQueueSend(g_pBluetoothSendQueue, ReadBCI2BRSMsg() , portMAX_DELAY);
+    		xQueueSend(g_pBluetoothSendQueue, &receivedTMFrame , portMAX_DELAY);
+
+    		//Reset the Message ID so we check it next time
+    		memset(&receivedTMFrame.MsgId,0, sizeof(MsgIdType));
     	}
 
     	//Send The BRS Message through the UART if it is Available
@@ -91,12 +123,11 @@ static void UARTTask(void *pvParameters)
             SendBRSFrame(&BRSFrameToSend);
             xSemaphoreGive(g_pUARTSemaphore);
 
-            //Blink Send Status
-    		BlinkLED(GREEN_LED, 1);
-
     		//Reset Frame Ready Flag
     		frameReadyToSend = FALSE;
     	}
+
+		#endif
 
     	vTaskDelayUntil(&ui32WakeTime, UART_TASK_DELAY / portTICK_RATE_MS);
     }
@@ -109,7 +140,7 @@ static void UARTTask(void *pvParameters)
 //*****************************************************************************
 uint32_t UARTTaskInit(void)
 {
-    #ifdef ENABLE_PRINTS
+    #ifdef VERBOSE
     UARTprintf("\nInitializing UART Task...\n");
     #endif
     //

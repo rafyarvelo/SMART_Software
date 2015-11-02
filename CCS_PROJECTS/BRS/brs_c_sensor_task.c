@@ -49,16 +49,19 @@ static void SensorTask(void *pvParameters)
     while(1)
     {
     	//Generate Debug Data
-		#ifdef DEBUG_ONLY
-    		sensorData.gpsData.altitude           = rand() % 100 * 3.14;
-    		sensorData.gpsData.latitude           = rand() % 100 * 3.14;
-    		sensorData.gpsData.longitude          = rand() % 100 * 3.14;
-    		sensorData.gpsData.groundSpeed        = rand() % 100 * 3.14;
-    		sensorData.rangeFinderData.rangeFront = rand() % 100 * 3.14;
-    		sensorData.rangeFinderData.rangeBack  = rand() % 100 * 3.14;
+		#ifdef BRS_DEBUG
+
+    	sensorData.gpsData.altitude           = rand() % 100 * 3.14;
+		sensorData.gpsData.latitude           = rand() % 100 * 3.14;
+		sensorData.gpsData.longitude          = rand() % 100 * 3.14;
+		sensorData.gpsData.groundSpeed        = rand() % 100 * 3.14;
+		sensorData.rangeFinderData.rangeFront = rand() % 100 * 3.14;
+		sensorData.rangeFinderData.rangeBack  = rand() % 100 * 3.14;
 
     	//Actually Get Data
 		#else
+
+
 
 		#endif
 
@@ -84,7 +87,7 @@ static void SensorTask(void *pvParameters)
 //*****************************************************************************
 uint32_t SensorTaskInit(void)
 {
-    #ifdef ENABLE_PRINTS
+    #ifdef VERBOSE
     UARTprintf("Initializing Sensor Task...\n");
     #endif
     //

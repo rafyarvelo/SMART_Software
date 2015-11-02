@@ -4,9 +4,6 @@ C_SignalProcessing::C_SignalProcessing()
 {
     debugLog = SMART_DEBUG_LOG::Instance();
 
-    //Store the Processing Results in a Thread Safe Circular Buffer FIFO with a 5ms timeout
-    pProcessingResults = new resultsBufferType(RESULTS_BUFFER_SIZE,true, 5);
-
     //Execute Processing Tasks in a Seperate Thread
     moveToThread(&mThread);
     mThread.start();
@@ -108,27 +105,23 @@ void C_SignalProcessing::calculateResult()
     resultReady = true;
 }
 
-void C_SignalProcessing::processFrame(EEG_Frame_t* pFrame)
+void C_SignalProcessing::processFrame(EEG_Frame_t& frame)
 {
     //TODO: PROCESS FRAME HERE
-    if (pFrame)
+    for (int j = 0; j < MAX_EEG_ELECTRODES; j++)
     {
-        for (int j = 0; j < MAX_EEG_ELECTRODES; j++)
-        {
-            voltageSums[j] += pFrame->electrodeData[j];
-            qualitySums[j] += pFrame->contactQuality[j];
-        }
-
-        //Save Memory here by clearing the frames
-        delete pFrame;
-        framesProcessed++;
+        voltageSums[j] += frame.electrodeData[j];
+        qualitySums[j] += frame.contactQuality[j];
     }
 
+    //Perform Calculations when we have received enough frames
     if (framesProcessed >= MIN_FRAMES_NEEDED)
     {
         performCalculations();
         framesProcessed = 0;
     }
+
+    framesProcessed++;
 }
 
 void C_SignalProcessing::performCalculations()
@@ -143,11 +136,11 @@ void C_SignalProcessing::performCalculations()
     calculateResult();
 
     //If the Data was good, we would have set the "resultReady" Flag
-    if (resultReady && pProcessingResults->spacesAvailable() > 0)
+    if (resultReady && processingResults.spacesAvailable() > 0)
     {
         //Add the Result to the Buffer and Signal that it can now be retrieved
-        pProcessingResults->Put(mCurrentProcessingResult);
-        emit eegDataProcessed(pProcessingResults);
+        processingResults.Put(mCurrentProcessingResult);
+        emit eegDataProcessed(&processingResults);
     }
 
     //Reset Processing Data

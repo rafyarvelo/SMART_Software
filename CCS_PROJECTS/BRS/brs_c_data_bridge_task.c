@@ -31,6 +31,7 @@
 #include "drivers/rgb.h"
 #include "drivers/buttons.h"
 #include "utils/uartstdio.h"
+#include "brs_c_led.h"
 #include "brs_c_data_bridge_task.h"
 #include "../../smart_data_types.h"
 #include "priorities.h"
@@ -86,7 +87,7 @@ static void DataBridgeTask(void *pvParameters)
 		}
 
     	//Create BRS Frame from Received Data and Reset Flags
-    	if (sensorDataAvailable && remoteDataAvailable)
+    	if (sensorDataAvailable || remoteDataAvailable)
     	{
     		//Initialize Message ID
     		memcpy(&BRSFrameToSend.MsgId, BRS2BCI_MSG_ID, MSG_ID_SIZE);
@@ -112,6 +113,7 @@ static void DataBridgeTask(void *pvParameters)
 				UARTprintf("\nQueue full. This should never happen.\n");
 				while(1)
 				{
+					BlinkLED(TIVA_RED_LED, 5);
 				}
 			}
 
@@ -132,7 +134,7 @@ static void DataBridgeTask(void *pvParameters)
 //*****************************************************************************
 uint32_t DataBridgeTaskInit(void)
 {
-    #ifdef ENABLE_PRINTS
+    #ifdef VERBOSE
     UARTprintf("Initializing Data Bridge Task...\n");
     #endif
     //

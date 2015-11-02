@@ -5,7 +5,7 @@
 #include <QSemaphore>
 #include <QVector>
 
-#define DEFAULT_BUFFER_SIZE 25
+#define DEFAULT_BUFFER_SIZE 50
 #define SEMAPHORE_TIMEOUT   100 //ms
 
 //Implement our Queue using a Simple Circular Buffer
@@ -27,32 +27,28 @@ public:
     ~C_CircularBuffer(){}
 
     //FIFO Retrieval
-    T Get()
+    inline const T& Get()
     {
-        T val;
-
+        //Implement Circular Retrieval
         if (retrievalIndex >= this->QVector<T>::size())
         {
             retrievalIndex = 0;
         }
 
-        //Get the Data from the Internal QVector
-        val = this->QVector<T>::value(retrievalIndex++);
-
-        return val;
+        //Return Desired item and increment index
+        return this->QVector<T>::at(retrievalIndex++);
     }
 
     //Circular insertion
-    void Put(T item)
+    inline void Put(const T& item)
     {
         if (insertionIndex >= this->QVector<T>::size())
         {
             insertionIndex = 0;
         }
 
-        this->QVector<T>::operator [](insertionIndex++) = item;
+        this->QVector<T>::replace(insertionIndex++, item);
     }
-
 
     //Easy printing
     void print(std::ostream& stream)
@@ -101,31 +97,34 @@ public:
     //Item Retrieval, We don't need to know nor care about the size here,
     //if we try to retrieve before there's anything available, we will
     //be forced to wait on the ItemsToConsume Semaphore
-    T Get(bool* status = 0)
+    const T& Get(bool* status = 0)
     {
-        T item;
         bool ok = false;
 
         //Check on our Consumption Semaphore to see if we have items available
         ok = pItemsToConsume->tryAcquire(1, mTimeout);
         if (ok)
         {
-            //Retrieve the item
-            item = buffer->Get();
-
             //Notify that we can now produce one more item
             pItemsToProduce->release();
+
+            //Update Status
+            if (status) *status = ok;
+
+            //Return a reference to the requested item
+            return buffer->Get();
         }
 
-        //Update Status
-        if (status) *status = ok;
-
-        return item;
+        else //No items available, return first item by default
+        {
+            if (status) *status = false;
+            return buffer->at(0);
+        }
     }
 
     //Item Insertion, We can insert freely until the ItemsToProduce Semaphore says
     //that we need to slow down and wait
-    void Put(T item, bool* status = 0)
+    void Put(T& item, bool* status = 0)
     {
         bool ok = false;
 

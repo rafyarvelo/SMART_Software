@@ -20,7 +20,6 @@ typedef unsigned short ProcessingScore_t;
 //Since we will used a Qt::QueuedConnection for our Signal along with FIFO access to
 //our buffer, we will be all good to go here
 typedef C_SafeQueue<ProcessingResult_t> resultsBufferType;
-#define RESULTS_BUFFER_SIZE 30
 
 class C_SignalProcessing : public QObject , public C_Singleton<C_SignalProcessing>
 {
@@ -34,7 +33,7 @@ signals:
     void eegDataProcessed(resultsBufferType* pProcessingResults);
 
 public slots:
-    void processFrame(EEG_Frame_t* frame);
+    void processFrame(EEG_Frame_t& frame);
 	
 private:
     void resetData();
@@ -54,10 +53,9 @@ private:
 private:
     SMART_DEBUG_LOG*   debugLog;
     QThread            mThread;
-    C_EEG_Data         eegData; //Buffer Frames here
 
     //Store all Processing Results in a Circular Buffer FIFO
-    resultsBufferType* pProcessingResults;
+    resultsBufferType processingResults;
 
     //Only the latest Result
     ProcessingResult_t mCurrentProcessingResult;

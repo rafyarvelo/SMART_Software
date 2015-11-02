@@ -25,15 +25,28 @@
 
 typedef enum UART_ID
 {
+
 	CONSOLE_UART = UART0_BASE, //Console I/0 UART
-	BCI_UART     = UART1_BASE, //BCI Comm UART
-	GPS_UART     = UART2_BASE, //GPS Sensor UART
+	GPS_UART     = UART1_BASE, //GPS Sensor UART
+
+	//Hack For Now
+	#ifdef BRS_DEBUG
+	BCI_UART     = UART0_BASE, //BCI Comm UART
+	#else
+	BCI_UART     = UART2_BASE, //BCI Comm UART
+	#endif
+
 	BT_UART      = UART3_BASE, //Bluetooth UART
 	USF_UART     = UART5_BASE, //Ultrasonic Range Finder - Front
 	USR_UART     = UART6_BASE  //Ultrasonic Range Finder - Back
 } UART_ID;
 
-#define UART_BAUD_RATE 112500
+//Default BAUD_RATE for all the boards
+#define BAUD_RATE      9600
+
+//FOR GPS SENSORS
+#define GPS_NAV_MSG_ID "$GPRMC"
+#define GPS_DATA_DELIM ','
 
 //*****************************************************************************
 //
@@ -58,6 +71,13 @@ uint16_t UARTReceive(UART_ID uartID, volatile uint8_t *pui8Buffer, uint32_t ui32
 
 //*****************************************************************************
 //
+// Retrieve a string from the UART until a delimeter is found, return bytes actually read
+//
+//*****************************************************************************
+uint16_t UARTReceiveUntil(UART_ID uartID, volatile uint8_t *pui8Buffer, uint8_t delim);
+
+//*****************************************************************************
+//
 // Return true  (1) if there is a BCI Message ready in the UART, otherwise
 // return false (0)
 //
@@ -69,7 +89,21 @@ int BCIMessageAvailable();
 // Read Incoming BCI Message from UART
 //
 //*****************************************************************************
-TM_Frame_t* ReadBCI2BRSMsg();
+void ReadBCI2BRSMsg(TM_Frame_t* pFrame);
+
+//*****************************************************************************
+//
+// Read Incoming GPS Data, return TRUE if data is available
+//
+//*****************************************************************************
+int ReadGPSData(GPS_Data_t* pData);
+
+//*****************************************************************************
+//
+// Read Range Finder data
+//
+//*****************************************************************************
+void ReadUSData(US_Data_t* pData);
 
 //*****************************************************************************
 //
@@ -87,9 +121,30 @@ int BluetoothFrameAvailable();
 
 //*****************************************************************************
 //
+// Check for a GPS Frame in the UART
+//
+//*****************************************************************************
+int GPSDataAvailable();
+
+//*****************************************************************************
+//
+// Check if the
+//
+//*****************************************************************************
+int TMFrameRequested();
+
+//*****************************************************************************
+//
 // Retrieve a Bluetooth Frame from the UART
 //
 //*****************************************************************************
-BluetoothFrame_t* ReadBluetoothFrame();
+void ReadBluetoothFrame(BluetoothFrame_t* pFrame);
+
+//*****************************************************************************
+//
+// Send a TM Frame through the Bluetooth Module
+//
+//*****************************************************************************
+void SendTMFrame(TM_Frame_t* pFrame);
 
 #endif /* BRS_C_UART_H_ */

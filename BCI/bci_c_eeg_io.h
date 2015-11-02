@@ -7,8 +7,11 @@
 #include "../smart_debug_log.h"
 #include "bci_c_singleton.h"
 #include "bci_c_connected_device.h"
-#include "bci_c_eeg_data.h"
+#include "bci_c_safequeue.h"
 #include "bci_c_binary_parser.h"
+
+//Store the EEG Frames in a Circular Buffer
+typedef C_SafeQueue<EEG_Frame_t> eegFrameBufferType;
 
 //This is an abstract EEG interface to be used in the BCI_Package
 //Implement these methods in subclasses to connect to the corresponding EEG
@@ -36,7 +39,7 @@ public slots:
     virtual bool fetchEEGFrame() = 0;
 
 signals:
-    void EEGFrameReceived(EEG_Frame_t* frame);
+    void EEGFrameReceived(eegFrameBufferType* pEEGFrameBuffer);
 
 protected:
     SMART_DEBUG_LOG* debugLog;
@@ -47,10 +50,14 @@ protected:
     //Log TM Flag
     bool recordTM;
 
-private:
+    //Store All EEG Frames here
+    eegFrameBufferType eegFrameBuffer;
+    EEG_Frame_t mCurrentEEGFrame; //Only the Latest Frame
 
+private:
     QTimer           mTimer; //How we will implement our execution
     QThread          mThread;
+
 };
 
 #endif // BCI_C_EEG_IO

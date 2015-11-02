@@ -7,7 +7,6 @@
 #include "bci_c_signal_processing.h"
 #include "bci_c_telemetrymanager.h"
 #include "bci_c_rvs.h"
-#include "bci_c_tm.h"
 
 //Forward Declaration of Telemetry Manager Class
 class C_TelemetryManager;
@@ -32,7 +31,7 @@ public:
     friend class C_TelemetryManager;
 
 public slots:
-    void SetCurrentTMFrame(TM_Frame_t* pTMFrame);
+    void SetCurrentTMFrame(const TM_Frame_t& frame);
     void SetCurrentProcessingResult(ProcessingResult_t& result);
 
 signals:
@@ -42,6 +41,9 @@ signals:
 private:
     void ParseEEGData();
     void finalizeCommand(PCC_Command_Type cmd);
+
+private:
+    SMART_DEBUG_LOG* debugLog;
 
     //We Maintain our own local copies of the TM
     //Frame and the Signal Processing Result so they can be updated independently

@@ -6,7 +6,10 @@ C_Serial_Comm::C_Serial_Comm(const QString& portName, BaudRateType baudRate, Flo
     : mPortName(portName)
 {
     debugLogPtr    = SMART_DEBUG_LOG::Instance();//Get a pointer to the debug log
+
+    //Open Serial Port and Set Port Settings
     mSerialPortPtr = new QextSerialPort(mPortName);
+    SetPortSettings(baudRate,flowCtrl,parity, dataBits, stopBits, timeout);
 
     connect(mSerialPortPtr, SIGNAL(dsrChanged(bool)), this, SLOT(onDsrChanged(bool)));
 }
@@ -20,15 +23,16 @@ C_Serial_Comm::~C_Serial_Comm()
     }
 }
 
-void C_Serial_Comm::SetDefaultPortSettings()
+void C_Serial_Comm::SetPortSettings(BaudRateType baudRate, FlowType flowCtrl    , ParityType parity,
+                                    DataBitsType dataBits, StopBitsType stopBits, long timeout)
 {
-    //Config Port Setup
-    mSerialPortPtr->setBaudRate   (BAUD9600);
-    mSerialPortPtr->setFlowControl(FLOW_OFF);
-    mSerialPortPtr->setParity     (PAR_NONE);
-    mSerialPortPtr->setDataBits   (DATA_8);
-    mSerialPortPtr->setStopBits   (STOP_1);
-    mSerialPortPtr->setTimeout    (DEFAULT_TIMEOUT_MS);
+    //Configure Port Setup
+    mSerialPortPtr->setBaudRate   (baudRate);
+    mSerialPortPtr->setFlowControl(flowCtrl);
+    mSerialPortPtr->setParity     (parity);
+    mSerialPortPtr->setDataBits   (dataBits);
+    mSerialPortPtr->setStopBits   (stopBits);
+    mSerialPortPtr->setTimeout    (timeout);
 }
 
 void C_Serial_Comm::printPortSettings(ostream &stream)
@@ -44,22 +48,25 @@ void C_Serial_Comm::printPortSettings(ostream &stream)
 
 bool C_Serial_Comm::openSerialPort()
 {
+    bool status;
+    std::string toPrint;
+
     if (mSerialPortPtr->open(QIODevice::ReadWrite))
     {
-        cout                << "Successfully Opened Port: " << mPortName.toStdString() << endl;
-        debugLogPtr->BCI_Log() << "Successfully Opened Port: " << mPortName.toStdString() << endl;
-
-        printPortSettings(debugLogPtr->SerialComm_Log());
+        toPrint = std::string("Successfully Opened Port: ") + mPortName.toStdString();
+        status = SUCCESS;
     }
     else
     {
-        cout                << "Could Not Open Port: " << mPortName.toStdString() << endl;
-        debugLogPtr->BCI_Log() << "Could Not Open Port: " << mPortName.toStdString() << endl;
-        printPortSettings(debugLogPtr->BCI_Log());
-        return FAILURE;
+        toPrint = std::string("Could Not Open Port: ") + mPortName.toStdString();
+        status = FAILURE;
     }
+
+    //Print Port Opening Status
+    debugLogPtr->println(SERIAL_COMM_LOG, toPrint, true);
+    printPortSettings(debugLogPtr->SerialComm_Log());
 	
-	return SUCCESS;
+    return status;
 }
 
 bool C_Serial_Comm::sendRawData(const char* pData, sizeType size)
@@ -142,24 +149,15 @@ int C_Serial_Comm::readRawData(char* pData, sizeType size)
 
 QByteArray& C_Serial_Comm::readFromSerialPort(int numBytes)
 {
-    int numToRead;
-
     if (numBytes < 0 || numBytes > mSerialPortPtr->bytesAvailable())
     {
-        numToRead = mSerialPortPtr->bytesAvailable();
+        UARTReceiveBuffer = mSerialPortPtr->readAll();
     }
     else
     {
-        numToRead = numBytes;
+        UARTReceiveBuffer = mSerialPortPtr->read(numBytes);
     }
 
-    //Return if there are no bytes available
-    if (numBytes <= 0)
-    {
-        return UARTReceiveBuffer;
-    }
-
-    UARTReceiveBuffer = mSerialPortPtr->read(numBytes);
     return UARTReceiveBuffer;
 }
 

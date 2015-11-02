@@ -22,9 +22,9 @@
 //Actually a full RGB Range, but this is for Simplicity
 typedef enum LEDColor
 {
-	RED_LED=0,
-	GREEN_LED,
-	BLUE_LED,
+	TIVA_RED_LED=0,
+	TIVA_GREEN_LED,
+	TIVA_BLUE_LED,
 	NUM_LED_COLORS
 } LEDColor;
 

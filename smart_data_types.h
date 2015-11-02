@@ -88,6 +88,14 @@ typedef struct ProcessingResult_t
     PCC_Command_Type command;
     Confidence_Type  confidence;
 
+#ifdef __cplusplus
+    ProcessingResult_t()
+    {
+        command = PCC_CMD_NONE;
+        confidence = UNSURE;
+    }
+#endif
+
 } ProcessingResult_t;
 
 //This struct defines what a single frame of EEG Data looks like
@@ -110,6 +118,18 @@ typedef struct EEG_Frame_t
 
     //Percentage of Full Battery Charge
     uint8_t batteryPercentage;
+
+#ifdef __cplusplus
+    EEG_Frame_t()
+    {
+        eegType = DEFAULT_EEG_TYPE;
+        counter = 0;
+        memset(&electrodeData[0] ,0, MAX_EEG_ELECTRODES * sizeof(uint32_t));
+        memset(&contactQuality[0],0, MAX_EEG_ELECTRODES * sizeof(uint16_t));
+        gyroX = 0;
+        gyroY = 0;
+    }
+#endif
 } EEG_Frame_t;
 //===============================================
 
@@ -120,12 +140,30 @@ typedef struct GPS_Data_t
     float longitude;
     float altitude;
     float groundSpeed;
+
+#ifdef __cplusplus
+    GPS_Data_t()
+    {
+        latitude  = 0.0;
+        longitude = 0.0;
+        altitude  = 0.0;
+        groundSpeed = 0.0;
+    }
+#endif
 } GPS_Data_t;
 
 typedef struct US_Data_t
 {
     float rangeFront;
     float rangeBack;
+
+#ifdef __cplusplus
+    US_Data_t()
+    {
+        rangeFront = MAX_RANGE_TO_OBJECT;
+        rangeBack  = MAX_RANGE_TO_OBJECT;
+    }
+#endif
 } US_Data_t;
 
 typedef struct SensorData_t
@@ -138,6 +176,12 @@ typedef struct SensorData_t
 typedef struct BluetoothFrame_t
 {
 	PCC_Command_Type remoteCommand;
+#ifdef __cplusplus
+    BluetoothFrame_t()
+    {
+        remoteCommand = PCC_CMD_NONE;
+    }
+#endif
 } BluetoothFrame_t;
 
 // A Frame of BRS Data
@@ -146,6 +190,13 @@ typedef struct BRS_Frame_t
 	MsgIdType        MsgId; //Message Sent from BRS to BCI
     PCC_Command_Type remoteCommand;
 	SensorData_t     sensorData;
+#ifdef __cplusplus
+    BRS_Frame_t()
+    {
+        memcpy(&MsgId, BRS2BCI_MSG_ID, MSG_ID_SIZE);
+        remoteCommand = PCC_CMD_NONE;
+    }
+#endif
 } BRS_Frame_t;
 //===============================================
 
@@ -219,6 +270,21 @@ typedef struct TM_Frame_t
     ConnectionStatusType pccConnectionStatus;
     ConnectionStatusType brsConnectionStatus;
     ConnectionStatusType flasherConnectionStatus;
+
+#ifdef __cplusplus
+    TM_Frame_t()
+    {
+        memcpy(&MsgId, BCI2BRS_MSG_ID, MSG_ID_SIZE);
+        timeStamp = 0;
+        bciState = BCI_OFF;
+        lastCommand = PCC_CMD_NONE;
+        lastConfidence = UNSURE;
+        eegConnectionStatus     = NOT_CONNECTED;
+        pccConnectionStatus     = NOT_CONNECTED;
+        brsConnectionStatus     = NOT_CONNECTED;
+        flasherConnectionStatus = NOT_CONNECTED;
+    }
+#endif
 } TM_Frame_t;
 
 //############################################

@@ -52,7 +52,7 @@ void ConfigureLEDs()
     SetLEDRGB(0x0000, 0x0000, 0x0000);
 
     //Status Good
-    BlinkLED(GREEN_LED, 3);
+    BlinkLED(TIVA_GREEN_LED, 3);
 }
 
 //*****************************************************************************
@@ -67,15 +67,20 @@ void BlinkLED(LEDColor ledColor, uint8_t numTimes)
     for (i = 0; i < numTimes + 1; i++)
     {
 		//Turn On the LED
-		SetLED(ledColor, LED_ON);
+    	SetLED(ledColor, LED_ON);
 
         //
         // Delay for a bit.
         //
-        SysCtlDelay(SysCtlClockGet() / 10 / 3);
+        SysCtlDelay(SysCtlClockGet() / 10 / 4);
 
 		//Turn Off the LED
 		SetLED(ledColor, LED_OFF);
+
+        //
+        // Delay for a bit.
+        //
+        SysCtlDelay(SysCtlClockGet() / 10 / 4);
     }
 
 }
@@ -92,17 +97,15 @@ void SetLED(LEDColor color, int state)
 		return;
 	}
 
-	//Set the Applicable LED on or off
-	if (state == LED_ON)
-	{
-		g_pui32Colors[color] = LED_ON;
-		RGBColorSet(g_pui32Colors);
-		RGBEnable();
-	}
-	else
-	{
-		RGBDisable();
-	}
+	//Initialize the LEDS to OFF
+	memset(g_pui32Colors, 0, 12);
+
+	//Update the Desired LED
+	g_pui32Colors[color] = state;
+
+	//Enable RGB Colors
+	RGBColorSet(g_pui32Colors);
+	RGBEnable();
 }
 
 //*****************************************************************************
@@ -112,9 +115,9 @@ void SetLED(LEDColor color, int state)
 //*****************************************************************************
 void SetLEDRGB(uint32_t red, uint32_t green, uint32_t blue)
 {
-	g_pui32Colors[RED_LED]   = red;
-	g_pui32Colors[GREEN_LED] = green;
-	g_pui32Colors[BLUE_LED]  = blue;
+	g_pui32Colors[TIVA_RED_LED]   = red;
+	g_pui32Colors[TIVA_GREEN_LED] = green;
+	g_pui32Colors[TIVA_BLUE_LED]  = blue;
 
 	RGBColorSet(g_pui32Colors);
 	RGBEnable();

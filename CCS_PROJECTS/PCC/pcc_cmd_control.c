@@ -7,8 +7,8 @@ void initCmdControl()
 	configureServos();
 
 	//Initialize LEDS OFF
-	setLED(RED_LED, OFF);
-	setLED(GREEN_LED, OFF);
+	setLED(TIVA_RED_LED, OFF);
+	setLED(TIVA_GREEN_LED, OFF);
 }
 
 //This Sets up the Timers and PWM for the Servos

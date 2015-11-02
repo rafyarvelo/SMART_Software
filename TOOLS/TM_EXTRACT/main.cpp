@@ -16,6 +16,7 @@ int main(int argc, char** argv)
     C_TextParser*   textParser   = 0;
     TM_Frame_t*     tmFrame      = 0;
     EEG_Frame_t*    eegFrame     = 0;
+    unsigned int cnt = 0;
 
     cout <<"TM FRAME SIZE: " << sizeof(TM_Frame_t) << endl;
     //Get input/output filename from command line or use default
@@ -48,17 +49,21 @@ int main(int argc, char** argv)
     {
         textParser->writeTMFrame(tmFrame);
         tmFrame = binaryParser->readTMFrame();
+        cnt++;
     }
+    cout << "TM Frames Found: " << cnt << endl;
 
     //Clean up
     delete binaryParser;
     delete textParser;
+    cnt = 0;
     cout << endl;
 
     //Extract EEG Data
     binaryParser = new C_BinaryParser(eegInFile, QIODevice::ReadOnly);
     textParser   = new C_TextParser(eegOutFile, QIODevice::WriteOnly);
 
+    cout <<"EEG FRAME SIZE: " << sizeof(EEG_Frame_t) << endl;
     cout << "Reading EEG TM from inputfile: " << eegInFile.toStdString() << endl;
     cout << "Outputting EEG TM to File: "     << eegOutFile.toStdString() << endl;
 
@@ -69,7 +74,10 @@ int main(int argc, char** argv)
     {
         textParser->writeEEGFrame(eegFrame);
         eegFrame = binaryParser->readEEGFrame();
+        cnt++;
     }
+    cout << "EEG Frames Found: " << cnt << endl;
+
 
     return 0;
 }

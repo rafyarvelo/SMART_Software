@@ -7,10 +7,14 @@
 #include "../smart_debug_log.h"
 #include "bci_c_singleton.h"
 #include "bci_c_connected_device.h"
-#include "bci_c_tm.h"
+#include "bci_c_safequeue.h"
 #include "bci_c_framegenerator.h"
 
-#define MAX_MISS_COUNT 5  //Disconnect after 5 misses
+//Store the Received BRS Frames in a Semaphore Protected Circular Buffer
+typedef C_SafeQueue<BRS_Frame_t> brsFrameBufferType;
+
+//The TM Frames are also stored in a Circular Buffer
+typedef C_SafeQueue<TM_Frame_t> tmFrameBufferType;
 
 //Abstract BRS IO Class, essentially just a worker-object
 class C_BRSH_IO : public QObject, public C_ConnectedDevice
@@ -34,15 +38,20 @@ public slots:
     virtual bool fetchBRSFrame() = 0;
 
     //Send a Frame to the BRSH
-    virtual void SendTMFrame(TM_Frame_t* pFrame) = 0;
+    virtual void SendTMFrame(tmFrameBufferType*) = 0;
 
 signals:
-    void BRSFrameReceived(BRS_Frame_t* frame);
+    //Give the Receiver access to the buffer where we will store the Frames
+    void BRSFrameReceived(brsFrameBufferType* pBRSFrameBuffer);
 
 protected:
     QTimer       mTimer;
     QThread      mThread;
-    SMART_DEBUG_LOG* debugLog;
+    SMART_DEBUG_LOG*   debugLog;
+
+    //Store all of the BRS Frames here
+    brsFrameBufferType brsFrameBuffer;
+    BRS_Frame_t        mCurrentBRSFrame; //Only the Latest Frame
 };
 
 #endif // C_BRSH_IO_H

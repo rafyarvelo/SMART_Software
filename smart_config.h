@@ -70,14 +70,19 @@ typedef enum
 
 //The Actual Configuration for a real setup
 #ifdef TACTICAL
-    #define DEFAULT_EEG_TYPE EEG_TYPE_EMOTIV
+    #define USE_EEG_DATA //Start the EEG Thread
+    #define ENABLE_EMERGENCY_STOP //Allow E-Stop signal from Range Finder Data
+    #define DEFAULT_EEG_TYPE EEG_TYPE_DEBUG//EEG_TYPE_EMOTIV
     #define DEFAULT_BRS_TYPE BRS_TYPE_TIVA
     #define DEFAULT_PCC_TYPE PCC_TYPE_MSP
+
 //Debug Configuration for testing
 #else
+    #define VERBOSE //Allow Prints to Console
     #define DEFAULT_EEG_TYPE EEG_TYPE_DEBUG
-    #define DEFAULT_BRS_TYPE BRS_TYPE_DEBUG //BRS_TYPE_TIVA  
-    #define DEFAULT_PCC_TYPE PCC_TYPE_DEBUG //PCC_TYPE_MSP  
+    #define DEFAULT_BRS_TYPE BRS_TYPE_TIVA //BRS_TYPE_TIVA
+    #define BRS_DEBUG                      //For BRS Code on CCS
+    #define DEFAULT_PCC_TYPE PCC_TYPE_MSP  //PCC_TYPE_DEBUG
 #endif
 
 //==========================================================
@@ -110,7 +115,7 @@ typedef enum
 
 //PCC Serial Port
 #ifdef WIN32
-    #define PCC_PORT "COM5"
+    #define PCC_PORT "COM3"
     #define BRS_PORT "COM7"
     #define ENDL "/r/n"
     #define WINDOWS

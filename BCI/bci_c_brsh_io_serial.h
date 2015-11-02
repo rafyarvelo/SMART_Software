@@ -14,7 +14,7 @@ public:
 
     //Send TM to/from the BRSH
     virtual bool fetchBRSFrame();
-    virtual void SendTMFrame(TM_Frame_t* pFrame);
+    virtual void SendTMFrame(tmFrameBufferType* tmFrameBuffer);
 
     virtual ConnectionStatusType connect();
 

@@ -2,6 +2,8 @@
 
 C_JudgmentAlgorithm::C_JudgmentAlgorithm()
 {
+    debugLog = SMART_DEBUG_LOG::Instance();
+
     commandFinalized = false;
     prevCommand      = PCC_CMD_NONE;
     finalCommand     = PCC_CMD_NONE;
@@ -19,9 +21,9 @@ C_JudgmentAlgorithm::~C_JudgmentAlgorithm()
 }
 
 //Remote and Sensor Data contained within TM
-void C_JudgmentAlgorithm::SetCurrentTMFrame(TM_Frame_t *pTMFrame)
+void C_JudgmentAlgorithm::SetCurrentTMFrame(const TM_Frame_t& frame)
 {
-    memcpy(&mCurrentTMFrame, pTMFrame,sizeof(TM_Frame_t));
+    mCurrentTMFrame = frame;
 }
 
 void C_JudgmentAlgorithm::SetCurrentProcessingResult(ProcessingResult_t& result)
@@ -45,16 +47,17 @@ PCC_Command_Type C_JudgmentAlgorithm::GetFinalCommand()
 void C_JudgmentAlgorithm::computeCommand()
 {
     //Check for Emergency Stop
+    #ifdef ENABLE_EMERGENCY_STOP
     if (!SafeToProceed())
     {
         cmdConfidence = ABSOLUTE;
         finalizeCommand(PCC_STOP);
         return;
     }
-
+    #endif
 
     //Check for Remote Command
-    else if (!commandFinalized && mCurrentTMFrame.brsFrame.remoteCommand != PCC_CMD_NONE)
+    if (!commandFinalized && mCurrentTMFrame.brsFrame.remoteCommand != PCC_CMD_NONE)
     {
         //Update Final Command with Remote Command
         cmdConfidence = ABSOLUTE;
@@ -77,6 +80,7 @@ bool C_JudgmentAlgorithm::SafeToProceed()
     if (prevCommand == PCC_FORWARD  && rangeData.rangeFront <= EMERGENCY_STOP_DISTANCE ||
         prevCommand == PCC_BACKWARD && rangeData.rangeBack  <= EMERGENCY_STOP_DISTANCE)
     {
+        debugLog->println(BCI_LOG, "Emergency Stop Requested",true);
         emit RequestEmergencyStop();
         safeToProceed = false;
     }

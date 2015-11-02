@@ -36,12 +36,12 @@ C_BCI_Package::C_BCI_Package()
     brshConnectionStatus     = NOT_CONNECTED;
 
     //Process Commands when BRS Frames are Received
-    QObject::connect(pBRS_IO, SIGNAL(BRSFrameReceived(BRS_Frame_t*)),
-                     this   , SLOT(onBRSFrameReceived(BRS_Frame_t*)));
+    QObject::connect(pBRS_IO, SIGNAL(BRSFrameReceived(brsFrameBufferType*)),
+                     this   , SLOT(onBRSFrameReceived(brsFrameBufferType*)));
 
     //Process EEG Frames as they become available
-    QObject::connect(pEEG_IO          , SIGNAL(EEGFrameReceived(EEG_Frame_t*)),
-                     pSignalProcessing, SLOT(processFrame(EEG_Frame_t*)));
+    QObject::connect(pEEG_IO, SIGNAL(EEGFrameReceived(eegFrameBufferType*)),
+                     this   , SLOT(onEEGFrameReceived(eegFrameBufferType*)));
 
     //Listen for Processed EEG Data
     QObject::connect(pSignalProcessing, SIGNAL(eegDataProcessed(resultsBufferType*)),
@@ -213,10 +213,8 @@ void C_BCI_Package::Run()
     pFlasherIO->SendRVS(pRVS);
 
     //Record our TM to an output file
-    #ifdef DEBUG_ONLY
     pTelemetryManager->RecordTMToFile(TM_DATA_OUTPUTFILE_BIN);
     pEEG_IO->RecordTMToFile(EEG_DATA_OUTPUTFILE_BIN);
-    #endif
 
     //Begin Thread Execution for EEG and BRS IO
     startThreads();
@@ -233,23 +231,61 @@ void C_BCI_Package::Run()
 //Go Process the Command when the EEG Data is Ready
 void C_BCI_Package::onEEGDataProcessed(resultsBufferType* pResults)
 {
-    //Get Any Available results from the buffer
-    if (pResults->itemsAvailable() > 0)
-    {
-        ProcessingResult_t result = pResults->Get();
+    bool status = false;
+    ProcessingResult_t result;
 
-        //Update the Judgement Algorithm with the latest processing Result and
-        //Process the command
-        pJA->SetCurrentProcessingResult(result);
-        processCommand();
+    if (pResults)
+    {
+        //Get Any Available results from the buffer
+        result = pResults->Get(&status);
+
+        if (status)
+        {
+            //Update the Judgement Algorithm with the latest processing Result and
+            //Process the command
+            pJA->SetCurrentProcessingResult(result);
+            processCommand();
+        }
     }
 }
 
-void C_BCI_Package::onBRSFrameReceived(BRS_Frame_t *pBRSFrame)
+//Get a Frame from the EEG IO Buffer When Signaled
+void C_BCI_Package::onEEGFrameReceived(eegFrameBufferType* pBuffer)
 {
-    //Update TM and Notify the Judgement Algorithm that it's up to date
-    pTelemetryManager->updateTM(pBRSFrame);
-    processCommand();
+    bool status = false;
+    EEG_Frame_t frame;
+
+    if (pBuffer)
+    {
+        //Try to Get a Frame from the Buffer
+        frame = pBuffer->Get(&status);
+
+        if (status)
+        {
+            //Tell Signal Processing to Go Process the Frame
+            pSignalProcessing->processFrame(frame);
+        }
+    }
+}
+
+//Get a Frame from the BRS IO Buffer When Signaled
+void C_BCI_Package::onBRSFrameReceived(brsFrameBufferType* pBuffer)
+{
+    bool status = false;
+    BRS_Frame_t frame;
+
+    if (pBuffer)
+    {
+        //Try to Get a Frame from the Buffer
+        frame = pBuffer->Get(&status);
+
+        if (status)
+        {
+            //Update TM and Notify the Judgement Algorithm that it's up to date
+            pTelemetryManager->updateTM(frame);
+            processCommand();
+        }
+    }
 }
 
 void C_BCI_Package::onEmergencyStopRequested()
@@ -261,7 +297,10 @@ void C_BCI_Package::onEmergencyStopRequested()
 //Begin EEG and BRS IO Tasks
 void C_BCI_Package::startThreads()
 {
+    #ifdef USE_EEG_DATA
     pEEG_IO->begin();
+    #endif
+
     pBRS_IO->begin();
 }
 
@@ -270,7 +309,7 @@ void C_BCI_Package::processCommand()
 {
     bciState = BCI_PROCESSING;
 
-    pJA->SetCurrentTMFrame(pTelemetryManager->GetLatestFramePtr());
+    pJA->SetCurrentTMFrame(pTelemetryManager->GetLatestFrame());
 
     //Tell the Judgement Algorithm to Compute the Command, it will notify us when it's ready
     pJA->computeCommand();

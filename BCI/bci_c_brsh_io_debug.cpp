@@ -6,21 +6,23 @@ C_BRSH_IO_Debug::C_BRSH_IO_Debug()
 
 bool C_BRSH_IO_Debug::fetchBRSFrame()
 {
-    BRS_Frame_t* frame = 0;
-
     //Generate a Random Frame
-    frame = FrameGenerator::GenerateBRSFrame(FrameGenerator::GeneratePCC_Command());
+    FrameGenerator::GenerateBRSFrame(FrameGenerator::GeneratePCC_Command(), &mCurrentBRSFrame);
+
+    //Put the frame in our buffer
+    brsFrameBuffer.Put(mCurrentBRSFrame);
 
     //Notify Listeners that a frame has arrived
-    emit BRSFrameReceived(frame);
+    emit BRSFrameReceived(&brsFrameBuffer);
 
     return true;//it's all good in the hood homie
 }
 
-void C_BRSH_IO_Debug::SendTMFrame(TM_Frame_t* pFrame)
+void C_BRSH_IO_Debug::SendTMFrame(tmFrameBufferType* pBuffer)
 {
     SMART_DEBUG_LOG* debugLog = SMART_DEBUG_LOG::Instance();
+    TM_Frame_t frame = pBuffer->Get();
 
-    QString toPrint = QString("Sending TM Frame: ") + QString::number(pFrame->timeStamp);
+    QString toPrint = QString("Sending TM Frame: ") + QString::number(frame.timeStamp);
     debugLog->println(BRS_LOG, toPrint.toStdString());
 }

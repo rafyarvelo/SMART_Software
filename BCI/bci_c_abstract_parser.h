@@ -4,8 +4,7 @@
 #include <QString>
 #include <QStringList>
 #include <QFile>
-#include "bci_c_tm.h"
-#include "bci_c_eeg_data.h"
+#include "../smart_data_types.h"
 
 #define READ_ONLY  true
 #define WRITE_ONLY false

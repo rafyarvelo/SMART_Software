@@ -2,14 +2,16 @@
 
 bool C_EEG_IO_DEBUG::fetchEEGFrame()
 {
-    EEG_Frame_t* frame = FrameGenerator::GenerateEEGFrame();
+    //Generate a Random EEG Frame and Buffer it
+    FrameGenerator::GenerateEEGFrame(&mCurrentEEGFrame);
+    eegFrameBuffer.Put(mCurrentEEGFrame);
 
-    //Get a new EEG Frame and Notify Listeners
-    emit EEGFrameReceived(frame);
+    //Notify Listeners that a frame is ready in the Buffer
+    emit EEGFrameReceived(&eegFrameBuffer);
 
     if (recordTM)
     {
-        eegTMFile->writeEEGFrame(frame);
+        eegTMFile->writeEEGFrame(&mCurrentEEGFrame);
     }
 
     return true; //Hell yea I got a bald head

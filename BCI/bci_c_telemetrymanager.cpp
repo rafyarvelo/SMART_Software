@@ -15,12 +15,9 @@ C_TelemetryManager::C_TelemetryManager(C_BCI_Package* pBCI, C_EEG_IO* pEEG_IO, C
     //Don't Record TM By Default
     recordTM = false;
 
-    //Initialize Current Frame to NULL
-    pLatestTMFrame = 0;
-
     //Send a Frame every time it's Ready
-    connect(this      , SIGNAL(tmFrameCreated(TM_Frame_t*)),
-            mBRS_IOPtr, SLOT(SendTMFrame(TM_Frame_t*)));
+    connect(this      , SIGNAL(tmFrameCreated(tmFrameBufferType*)),
+            mBRS_IOPtr, SLOT(SendTMFrame(tmFrameBufferType*)));
 }
 
 C_TelemetryManager::~C_TelemetryManager()
@@ -36,62 +33,43 @@ C_TelemetryManager* C_TelemetryManager::Instance(C_BCI_Package* pBCI, C_EEG_IO* 
 
 
 //Create a New TM Frame from the Latest Data
-TM_Frame_t* C_TelemetryManager::updateTM(BRS_Frame_t* pBRSFrame)
+const TM_Frame_t& C_TelemetryManager::updateTM(BRS_Frame_t& brsFrame)
 {
-    //Make default frames if pointers are invalid
-    if (!pLatestTMFrame)
-    {
-        pLatestTMFrame = createTMFrame();
-    }
-    else if (!pBRSFrame)
-    {
-        pBRSFrame = createBRSFrame();
-    }
 
     //Update TM from Interfaces
-    pLatestTMFrame->timeStamp        = mBCIPackagePtr->stopwatch.elapsed();
-    pLatestTMFrame->bciState         = mBCIPackagePtr->bciState;
-    pLatestTMFrame->lastCommand      = mJA_Ptr->finalCommand;
-    pLatestTMFrame->lastConfidence   = mJA_Ptr->cmdConfidence;
+    mCurrentTMFrame.timeStamp        = mBCIPackagePtr->stopwatch.elapsed();
+    mCurrentTMFrame.bciState         = mBCIPackagePtr->bciState;
+    mCurrentTMFrame.lastCommand      = mJA_Ptr->finalCommand;
+    mCurrentTMFrame.lastConfidence   = mJA_Ptr->cmdConfidence;
 
     //The Processing Result that the Judgment Algorithm is using
-    pLatestTMFrame->processingResult.command    = mJA_Ptr->mCurrentProcessingResult.command;
-    pLatestTMFrame->processingResult.confidence = mJA_Ptr->mCurrentProcessingResult.confidence;
+    mCurrentTMFrame.processingResult.command    = mJA_Ptr->mCurrentProcessingResult.command;
+    mCurrentTMFrame.processingResult.confidence = mJA_Ptr->mCurrentProcessingResult.confidence;
 
     //Update BRS Frame
-    memcpy(&pLatestTMFrame->brsFrame, pBRSFrame, sizeof(BRS_Frame_t));
+    memcpy(&mCurrentTMFrame.brsFrame, &brsFrame, sizeof(BRS_Frame_t));
 
     //Update the Rest of the Data
-    pLatestTMFrame->ledForward.frequency    = mRVSPtr->GetLEDGroup(LED_FORWARD) ->frequency;
-    pLatestTMFrame->ledBackward.frequency   = mRVSPtr->GetLEDGroup(LED_BACKWARD)->frequency;
-    pLatestTMFrame->ledRight.frequency      = mRVSPtr->GetLEDGroup(LED_RIGHT)   ->frequency;
-    pLatestTMFrame->ledLeft.frequency       = mRVSPtr->GetLEDGroup(LED_LEFT)    ->frequency;
-    pLatestTMFrame->eegConnectionStatus     = mBCIPackagePtr->eegConnectionStatus;
-    pLatestTMFrame->brsConnectionStatus     = mBCIPackagePtr->brshConnectionStatus;
-    pLatestTMFrame->pccConnectionStatus     = mBCIPackagePtr->pccConnectionStatus;
-    pLatestTMFrame->flasherConnectionStatus = mBCIPackagePtr->flasherConnectionStatus;
+    mCurrentTMFrame.ledForward.frequency    = mRVSPtr->GetLEDGroup(LED_FORWARD) ->frequency;
+    mCurrentTMFrame.ledBackward.frequency   = mRVSPtr->GetLEDGroup(LED_BACKWARD)->frequency;
+    mCurrentTMFrame.ledRight.frequency      = mRVSPtr->GetLEDGroup(LED_RIGHT)   ->frequency;
+    mCurrentTMFrame.ledLeft.frequency       = mRVSPtr->GetLEDGroup(LED_LEFT)    ->frequency;
+    mCurrentTMFrame.eegConnectionStatus     = mBCIPackagePtr->eegConnectionStatus;
+    mCurrentTMFrame.brsConnectionStatus     = mBCIPackagePtr->brshConnectionStatus;
+    mCurrentTMFrame.pccConnectionStatus     = mBCIPackagePtr->pccConnectionStatus;
+    mCurrentTMFrame.flasherConnectionStatus = mBCIPackagePtr->flasherConnectionStatus;
 
     //Record TM to Output Files if requested
     if (recordTM)
     {
-        OutputFrameToFile(pLatestTMFrame);
+        OutputFrameToFile(&mCurrentTMFrame);
     }
 
     //Notify Listeners that our frame is ready
-    emit tmFrameCreated(pLatestTMFrame);
+    tmFrameBuffer.Put(mCurrentTMFrame);
+    emit tmFrameCreated(&tmFrameBuffer);
 
-    return pLatestTMFrame;
-}
-
-TM_Frame_t* C_TelemetryManager::GetLatestFramePtr()
-{
-    //Don't return a null frame
-    if (!pLatestTMFrame)
-    {
-        updateTM(createBRSFrame());
-    }
-
-    return pLatestTMFrame;
+    return mCurrentTMFrame;
 }
 
 void C_TelemetryManager::OutputFrameToFile(TM_Frame_t* frame)

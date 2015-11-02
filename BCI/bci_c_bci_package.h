@@ -51,8 +51,9 @@ private:
     C_PCC_IO*  createPCC_IO(pccTypeEnum type=DEFAULT_PCC_TYPE);
 
 private slots:
-    void onEEGDataProcessed(resultsBufferType* pResults);
-    void onBRSFrameReceived(BRS_Frame_t* pFrame);
+    void onEEGDataProcessed(resultsBufferType*  pResults);
+    void onEEGFrameReceived(eegFrameBufferType* pBuffer);
+    void onBRSFrameReceived(brsFrameBufferType* pBuffer);
     void onEmergencyStopRequested();
     void onCommandReady();
     void processCommand();

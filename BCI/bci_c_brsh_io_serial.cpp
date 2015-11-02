@@ -2,7 +2,7 @@
 
 C_BRSH_IO_Serial::C_BRSH_IO_Serial()
 {
-    //Tiva C Uses a different Baud Rate
+    //Create the Serial Comm Class
     mSerialPortPtr = new C_Serial_Comm(BRS_PORT, BAUD115200);
 }
 
@@ -12,21 +12,28 @@ C_BRSH_IO_Serial::~C_BRSH_IO_Serial()
 }
 
 //Send TM to the BRSH
-void C_BRSH_IO_Serial::SendTMFrame(TM_Frame_t* pFrame)
+void C_BRSH_IO_Serial::SendTMFrame(tmFrameBufferType* pBuffer)
 {
-    //Write the TM Frame to the BRS through the UART Serial Port
-    mSerialPortPtr->sendToSerialPort(reinterpret_cast<const TM_Frame_t*>(pFrame));
+    TM_Frame_t frame;
+    bool status = false;
 
-    //No longer need the Frame
-    delete pFrame;
+    frame = pBuffer->Get(&status);
+
+    if (status)
+    {
+        //Write the TM Frame to the BRS through the UART Serial Port
+        mSerialPortPtr->sendToSerialPort(reinterpret_cast<const TM_Frame_t*>(&frame));
+        debugLog->println(BRS_LOG, "Sending TM Frame");
+    }
 }
 
 bool C_BRSH_IO_Serial::fetchBRSFrame()
 {
-    bool       received       = false;
-    uint32_t   bytesAvailable = mSerialPortPtr->bytesAvailable();
-    static int retryCount     = 0;
-    BRS_Frame_t* frame        = 0;
+    bool         received       = false;
+    uint32_t     bytesAvailable = mSerialPortPtr->bytesAvailable();
+    uint32_t    index = 0;
+    char        toPrint[25];
+    QByteArray buffer;
 
     //Don't Bother if the data isn't there yet
     if (bytesAvailable < (sizeof(BRS_Frame_t)))
@@ -34,17 +41,27 @@ bool C_BRSH_IO_Serial::fetchBRSFrame()
         return false;
     }
 
-    //Read in the Next BRS Message
-    mSerialPortPtr->readFromSerialPort(frame);
+    //Read in all the bytes from the Serial Port
+    buffer = mSerialPortPtr->readFromSerialPort();
 
-    //Check if the Message was Formatted correctly
-    if (checkMsgID(frame->MsgId, BRS2BCI_MSG_ID))
+    //Send out all the BRS Frames we find
+    while (buffer.contains(BRS2BCI_MSG_ID))
     {
-        debugLog->println(BRS_LOG, "MSG ID Received: BRS2BCI MSG ID\n");
+        //Copy the Byte Array Contents To a BRS Frame and store it in the buffer
+        index = buffer.indexOf(BRS2BCI_MSG_ID);
+        memcpy(&mCurrentBRSFrame, buffer.data() + index, sizeof(BRS_Frame_t));
+        brsFrameBuffer.Put(mCurrentBRSFrame);
 
-        //Notify that it was received and save it in the buffer
+        //Status Print
+        sprintf(toPrint, "BRS Message Received: Command = %c", mCurrentBRSFrame.remoteCommand);
+        debugLog->println(BRS_LOG,toPrint , true);
+
+        //Notify that a frame is now in the buffer
         received = true;
-        emit BRSFrameReceived(frame);
+        emit BRSFrameReceived(&brsFrameBuffer);
+
+        //Move the Buffer over the Msg Id before we start again
+        buffer = QByteArray::fromRawData(buffer.data() + index + sizeof(MsgIdType), buffer.size() - index - sizeof(MsgIdType));
     }
 
     return received;

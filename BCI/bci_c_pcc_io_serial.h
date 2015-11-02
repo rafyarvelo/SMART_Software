@@ -36,6 +36,7 @@ private slots:
 private:
      //Actually Send the Command through the UART on a Timer Event
      void SendCmdToSerialPort(PCC_Command_Type cmd);
+
     //We will need to buffer our PCC Commands so that
     //they don't get sent too fast. Only Actually Send the data on a Timer event
     C_SafeQueue<PCC_Command_Type>* pccCommandQueue;

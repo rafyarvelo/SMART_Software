@@ -61,6 +61,7 @@ public:
 	
     void println(DebugLogType log,string str, bool printToStdOut=false, bool printToStdErr=false)
     {
+#ifdef VERBOSE
         //Print to console if enabled
         if (printToStdOut)
         {
@@ -71,7 +72,7 @@ public:
         {
             cerr << str << endl;
         }
-
+#endif
         //Track in desired log
         switch (log)
         {

@@ -8,6 +8,7 @@ class C_BCI_Package;
 #include "bci_c_binary_parser.h"
 #include "bci_c_textparser.h"
 #include "bci_c_judgment_algorithm.h"
+#include "bci_c_safequeue.h"
 
 //Forward Declaration of Telemetry Manager Class
 class C_JudgmentAlgorithm;
@@ -25,17 +26,17 @@ public:
                                         C_RVS*         pRVS, C_JudgmentAlgorithm* pJA);
 
     //Retrieve the Latest Frame
-    TM_Frame_t* GetLatestFramePtr();
+    const TM_Frame_t& GetLatestFrame() { return mCurrentTMFrame; }
 
     //Record Telemetry to an output File
     void RecordTMToFile(const QString& filename);
 
 signals:
-    void tmFrameCreated(TM_Frame_t* frame);
+    void tmFrameCreated(tmFrameBufferType* tmFrameBuffer);
 
 public slots:
     //Create a New TM Frame from the Latest Data
-    TM_Frame_t* updateTM(BRS_Frame_t* pFrame);
+    const TM_Frame_t& updateTM(BRS_Frame_t& brsFrame);
 
 private:
     void OutputFrameToFile(TM_Frame_t* frame);
@@ -49,8 +50,9 @@ private:
     //Used to Record TM to File
     C_BinaryParser* tmFile;
 
-    //The Latest TM Frame
-    TM_Frame_t*     pLatestTMFrame;
+    //Store TM Frames in a Circular Buffer
+    tmFrameBufferType tmFrameBuffer;
+    TM_Frame_t        mCurrentTMFrame;
 
     //Log TM Flag
     bool recordTM;

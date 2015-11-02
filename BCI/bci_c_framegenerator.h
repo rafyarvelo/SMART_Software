@@ -1,8 +1,8 @@
 #ifndef BCI_C_FRAMEGENERATOR_H
 #define BCI_C_FRAMEGENERATOR_H
 
-#include "bci_c_tm.h"
 #include <QTime>
+#include "../smart_data_types.h"
 
 #define RANDOM_MIN 1
 #define RANDOM_MAX 128
