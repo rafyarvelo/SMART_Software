@@ -1,7 +1,7 @@
 #ifndef __DATA_BRIDGE_TASK_H__
 #define __DATA_BRIDGE_TASK_H__
 
-#define DATA_BRIDGE_TASK_DELAY 120
+#define DATA_BRIDGE_TASK_DELAY 20
 
 //*****************************************************************************
 //

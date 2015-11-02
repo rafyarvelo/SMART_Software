@@ -1,7 +1,7 @@
 #ifndef __BLUETOOTH_TASK_H__
 #define __BLUETOOTH_TASK_H__
 
-#define BT_TASK_DELAY 100
+#define BT_TASK_DELAY 25
 //*****************************************************************************
 //
 // Prototypes for the Bluetooth task.

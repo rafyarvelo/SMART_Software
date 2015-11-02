@@ -71,13 +71,12 @@ static void UARTTask(void *pvParameters)
     while(1)
     {
 		#ifdef BRS_DEBUG
-
     	//Generate Random TM Frame
     	memcpy(&receivedTMFrame.MsgId, BCI2BRS_MSG_ID, sizeof(MsgIdType));
     	receivedTMFrame.lastCommand = "fblr"[(rand() % 4)];
 
     	//Send the Frame to the Bluetooth Task
-		xQueueSend(g_pBluetoothSendQueue, &receivedTMFrame , portMAX_DELAY);
+		xQueueSend(g_pBluetoothSendQueue, &receivedTMFrame , 0);
 
 		//Send BRS Message
 		if (xQueueReceive(g_pUARTSendQueue, &BRSFrameToSend, 0) == pdPASS)
@@ -86,7 +85,6 @@ static void UARTTask(void *pvParameters)
 			xSemaphoreTake(g_pUARTSemaphore, portMAX_DELAY);
 			SendBRSFrame(&BRSFrameToSend);
 			xSemaphoreGive(g_pUARTSemaphore);
-			BlinkLED(TIVA_GREEN_LED, 1); //Blink Send Status
 		}
 
 		#else //Actually Send the Data
@@ -129,7 +127,8 @@ static void UARTTask(void *pvParameters)
 
 		#endif
 
-    	vTaskDelayUntil(&ui32WakeTime, UART_TASK_DELAY / portTICK_RATE_MS);
+    	//Task Delay
+    	vTaskDelay(UART_TASK_DELAY);
     }
 }
 

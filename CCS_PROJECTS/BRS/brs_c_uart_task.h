@@ -7,7 +7,7 @@
 #ifndef __UART_TASK_H__
 #define __UART_TASK_H__
 
-#define UART_TASK_DELAY 50
+#define UART_TASK_DELAY 25
 
 //*****************************************************************************
 //

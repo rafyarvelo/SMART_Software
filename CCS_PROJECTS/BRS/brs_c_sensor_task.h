@@ -1,7 +1,7 @@
 #ifndef __SENSOR_TASK_H__
 #define __SENSOR_TASK_H__
 
-#define SENSOR_TASK_DELAY 50
+#define SENSOR_TASK_DELAY 25
 //*****************************************************************************
 //
 // Prototypes for the Sensor task.

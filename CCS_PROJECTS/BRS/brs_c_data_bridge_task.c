@@ -74,20 +74,25 @@ static void DataBridgeTask(void *pvParameters)
     // Loop forever.
     while(1)
     {
+    	//Check for Remote Data
+    	if (xQueueReceive(g_pBluetoothReceiveQueue, &btFrame, 0) == pdPASS)
+		{
+    		remoteDataAvailable = TRUE;
+		}
+    	else
+    	{
+    		//Initiliaze the Bluetooth Command to NONE if we didn't get it from the Bluetooth Task
+    		btFrame.remoteCommand = PCC_CMD_NONE;
+    	}
+
     	//Check for Sensor Data
     	if (xQueueReceive(g_pSensorDataQueue, &sensorData, 0) == pdPASS)
     	{
     		sensorDataAvailable = TRUE;
     	}
 
-    	//Check for Remote Data
-    	if (xQueueReceive(g_pBluetoothReceiveQueue, &btFrame, 0) == pdPASS)
-		{
-			remoteDataAvailable = TRUE;
-		}
-
     	//Create BRS Frame from Received Data and Reset Flags
-    	if (sensorDataAvailable || remoteDataAvailable)
+    	if (sensorDataAvailable && remoteDataAvailable)
     	{
     		//Initialize Message ID
     		memcpy(&BRSFrameToSend.MsgId, BRS2BCI_MSG_ID, MSG_ID_SIZE);
@@ -122,7 +127,7 @@ static void DataBridgeTask(void *pvParameters)
 		}
 
     	//Wait the required amount of time
-    	vTaskDelayUntil(&ui32WakeTime, DATA_BRIDGE_TASK_DELAY / portTICK_RATE_MS);//Do Stuff
+    	vTaskDelay(DATA_BRIDGE_TASK_DELAY);
     }
 
 }

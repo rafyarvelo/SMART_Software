@@ -115,6 +115,8 @@ void StartTasks();
 //*****************************************************************************
 int main(void)
 {
+	char temp = 0x00;
+
     //
     // Set the clocking to run at 50 MHz from the PLL.
     //
@@ -153,7 +155,7 @@ void StartTasks()
 	// Create the UART task.
     if(UARTTaskInit() != 0)
     {
-
+    	UARTprintf("Couldn't Start UART Task:(");
         while(1)
         {
         }
@@ -162,6 +164,7 @@ void StartTasks()
     // Create the Bluetooth task.
     if(BluetoothTaskInit() != 0)
     {
+    	UARTprintf("Couldn't Start BT Task:(");
         while(1)
         {
         }
@@ -170,6 +173,7 @@ void StartTasks()
     // Create the Sensor task.
     if(SensorTaskInit() != 0)
     {
+    	UARTprintf("Couldn't Start Sensor Task:(");
         while(1)
         {
         }
@@ -178,6 +182,7 @@ void StartTasks()
     // Create the Data Bridge task.
     if(DataBridgeTaskInit() != 0)
     {
+    	UARTprintf("Couldn't Start Data Bridge Task:(");
         while(1)
         {
         }

@@ -75,8 +75,8 @@ static void SensorTask(void *pvParameters)
             {
             }
         }
-    	//Do Stuff
-    	vTaskDelayUntil(&ui32WakeTime, SENSOR_TASK_DELAY / portTICK_RATE_MS);//Do Stuff
+
+    	vTaskDelay(SENSOR_TASK_DELAY);
     }
 }
 

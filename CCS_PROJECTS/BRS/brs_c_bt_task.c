@@ -26,7 +26,7 @@
 //*****************************************************************************
 #define BLUETOOTHTASKSTACKSIZE        128         // Stack size in words
 #define BLUETOOTH_SEND_QUEUE_SIZE     5           // Queue size in messages
-#define BLUETOOTH_RECEIVE_QUEUE_SIZE  100         // Queue size in messages
+#define BLUETOOTH_RECEIVE_QUEUE_SIZE  25          // Queue size in messages
 
 #define BLUETOOTH_BUFFER_SIZE 50 //bytes
 
@@ -41,12 +41,11 @@ xQueueHandle g_pBluetoothReceiveQueue;
 static void BluetoothTask(void *pvParameters)
 {
     portTickType     ui32WakeTime;
-    uint8_t          buff[BLUETOOTH_BUFFER_SIZE];
     BluetoothFrame_t receivedBTFrame;
     TM_Frame_t       tmFrameToSend;
-    uint32_t         bytesReceived = 0;
-    int              i             = 0;
-    volatile uint8_t temp = 0x00;
+    uint8_t          prevByte = 0x00;
+    uint8_t          currByte = 0x00;
+    uint8_t          maxBytesToRead = BLUETOOTH_RECEIVE_QUEUE_SIZE;
 
     const uint16_t pcc_cmds_SIZE = 4;
     PCC_Command_Type pcc_cmds[] =
@@ -64,11 +63,12 @@ static void BluetoothTask(void *pvParameters)
 
     //Initialize the Receive Frame and TM Frame
     memset(&receivedBTFrame, 0, sizeof(BluetoothFrame_t));
+    memset(&tmFrameToSend,   0, sizeof(TM_Frame_t));
 
     // Loop forever.
     while(1)
     {
-    	#ifdef BRS_DEBUG //Generate Debug Data
+    	#if 0 //Generate Debug Data
 
     	//Get a Random Bluetooth Frame
     	receivedBTFrame.remoteCommand = pcc_cmds[rand() % pcc_cmds_SIZE];
@@ -89,73 +89,44 @@ static void BluetoothTask(void *pvParameters)
 
 		#else  //Actually Get Data
 
-
     	//Read Whatever Data is in the Bluetooth Buffer
-		if (BluetoothFrameAvailable())
+		while (ROM_UARTCharsAvail(BT_UART))
 		{
-			//Get one Character
-			UARTReceive(BT_UART, &temp, 1);
+			//Get one Character from the Buffer
+			currByte = ROM_UARTCharGetNonBlocking(BT_UART);
 
-			//Status Good
-			BlinkLED(TIVA_BLUE_LED, 1);
+			#ifdef VERBOSE
+			UARTprintf("Bluetooth Received \"%c\"\r\n", currByte);
+			#endif
 
-			if (temp == 'T')
+			//Check if the Bluetooth Device is Requesting a TM Frame
+			if (prevByte == 'T' && currByte == 'M')
 			{
-    			//Get one more Character
-				if (ROM_UARTCharsAvail(BT_UART))
-				{
-	    			UARTReceive(BT_UART, &temp, 1);
+				//Get the TM Frame from the UART Task and Send it
+				xQueueReceive(g_pBluetoothSendQueue, &tmFrameToSend, 0);
 
-	    			//Status Good
-					BlinkLED(TIVA_BLUE_LED, 1);
-				}
-
-    			// "TM" indicates a Request for Telemetry, So Send the Frame
-    			if (temp == 'M')
-    			{
-					#ifdef VERBOSE
-    				UARTprintf("Bluetooth Received \"TM\"\r\n", temp);
-					#endif
-
-           			//Get the TM Frame from the UART Task and Send it
-           	    	xQueueReceive(g_pBluetoothSendQueue, &tmFrameToSend, 0);
-
-           	    	//Still Send the frame whether the Queue Receive was Successful or not
-           	    	SendTMFrame(&tmFrameToSend);
-
-					#ifdef VERBOSE
-					UARTprintf("TM Frame Sent\r\n", temp);
-					#endif
-    			}
-			}
-			else //Must be a remote Command
-			{
-				receivedBTFrame.remoteCommand = (PCC_Command_Type) temp;
+				//Still Send the frame whether the Queue Receive was Successful or not
+				SendTMFrame(&tmFrameToSend);
 
 				#ifdef VERBOSE
-				UARTprintf("Bluetooth Received \"%c\"\r\n", (unsigned char) temp);
+				UARTprintf("TM Frame Sent\r\n");
 				#endif
+			}
+
+			else //Must Be a Remote Command
+			{
+				receivedBTFrame.remoteCommand = (PCC_Command_Type) currByte;
 
 				//Send the Data to the Data Bridge
-    			if(xQueueSend(g_pBluetoothReceiveQueue, &receivedBTFrame, portMAX_DELAY) != pdPASS)
-    			{
-    				// Error. The queue should never be full. If so print the
-    				// error message on UART and wait for ever.
-    				UARTprintf("\nQueue full. This should never happen.\n");
-    				while(1)
-    				{
-    					BlinkLED(TIVA_RED_LED, 5);
-    				}
-    			}
+				xQueueSend(g_pBluetoothReceiveQueue, &receivedBTFrame, portMAX_DELAY);
 			}
+			prevByte = currByte;
 		}
-
 		#endif
 
-    	vTaskDelayUntil(&ui32WakeTime, BT_TASK_DELAY / portTICK_RATE_MS);//Do Stuff
-    }
-
-
+    	//Delay
+    	vTaskDelay(BT_TASK_DELAY);
+	}
 }
 
 //*****************************************************************************
