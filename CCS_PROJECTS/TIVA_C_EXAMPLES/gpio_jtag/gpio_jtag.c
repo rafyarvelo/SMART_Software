@@ -176,7 +176,7 @@ SysTickIntHandler(void)
 //
 //*****************************************************************************
 void
-ConfigureUART(void)
+ConfigureUARTs(void)
 {
     //
     // Enable the GPIO Peripheral used by the UART.
@@ -266,7 +266,7 @@ main(void)
     //
     // Initialize the UART.
     //
-    ConfigureUART();
+    ConfigureUARTs();
 
     UARTprintf("\033[2JGPIO <-> JTAG\n");
 

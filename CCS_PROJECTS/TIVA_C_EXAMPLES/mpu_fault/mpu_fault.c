@@ -126,7 +126,7 @@ MPUFaultHandler(void)
 //
 //*****************************************************************************
 void
-ConfigureUART(void)
+ConfigureUARTs(void)
 {
     //
     // Enable the GPIO Peripheral used by the UART.
@@ -203,7 +203,7 @@ main(void)
     //
     // Initialize the UART and write status.
     //
-    ConfigureUART();
+    ConfigureUARTs();
 
     UARTprintf("\033[2JMPU example\n");
 

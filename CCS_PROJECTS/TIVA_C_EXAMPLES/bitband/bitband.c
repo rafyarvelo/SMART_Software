@@ -114,7 +114,7 @@ Delay(uint32_t ui32Seconds)
 //
 //*****************************************************************************
 void
-ConfigureUART(void)
+ConfigureUARTs(void)
 {
     //
     // Enable the GPIO Peripheral used by the UART.
@@ -171,7 +171,7 @@ main(void)
     //
     // Initialize the UART interface.
     //
-    ConfigureUART();
+    ConfigureUARTs();
 
     UARTprintf("\033[2JBit banding...\n");
 

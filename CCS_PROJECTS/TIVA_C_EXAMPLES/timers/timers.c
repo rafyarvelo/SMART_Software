@@ -149,7 +149,7 @@ Timer1IntHandler(void)
 //
 //*****************************************************************************
 void
-ConfigureUART(void)
+ConfigureUARTs(void)
 {
     //
     // Enable the GPIO Peripheral used by the UART.
@@ -204,7 +204,7 @@ main(void)
     //
     // Initialize the UART and write status.
     //
-    ConfigureUART();
+    ConfigureUARTs();
 
     UARTprintf("\033[2JTimers example\n");
     UARTprintf("T1: 0  T2: 0");

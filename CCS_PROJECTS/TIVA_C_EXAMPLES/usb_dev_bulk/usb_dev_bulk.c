@@ -444,7 +444,7 @@ RxHandler(void *pvCBData, uint32_t ui32Event,
 //
 //*****************************************************************************
 void
-ConfigureUART(void)
+ConfigureUARTs(void)
 {
     //
     // Enable the GPIO Peripheral used by the UART.
@@ -512,7 +512,7 @@ main(void)
     //
     // Open UART0 and show the application name on the UART.
     //
-    ConfigureUART();
+    ConfigureUARTs();
 
     UARTprintf("\033[2JTiva C Series USB bulk device example\n");
     UARTprintf("---------------------------------\n\n");

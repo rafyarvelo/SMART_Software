@@ -33,6 +33,7 @@
 #include "driverlib/rom.h"
 #include "driverlib/sysctl.h"
 #include "driverlib/uart.h"
+//#include "drivers/buttons.h"
 #include "utils/uartstdio.h"
 
 //*****************************************************************************
@@ -66,7 +67,7 @@ __error__(char *pcFilename, uint32_t ui32Line)
 //
 //*****************************************************************************
 void
-ConfigureUART(void)
+ConfigureUARTs(void)
 {
     //
     // Enable the GPIO Peripheral used by the UART.
@@ -132,7 +133,7 @@ main(void)
     //
     // Initialize the UART.
     //
-    ConfigureUART();
+    ConfigureUARTs();
 
     //
     // Hello!
@@ -148,6 +149,8 @@ main(void)
         // Turn on the BLUE LED.
         //
         GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_2, GPIO_PIN_2);
+        UARTprintf("Hello, world!\n");
+
 
         //
         // Delay for a bit.

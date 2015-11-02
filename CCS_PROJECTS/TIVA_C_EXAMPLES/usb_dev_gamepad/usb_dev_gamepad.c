@@ -273,7 +273,7 @@ GamepadHandler(void *pvCBData, uint32_t ui32Event, uint32_t ui32MsgData,
 //
 //*****************************************************************************
 void
-ConfigureUART(void)
+ConfigureUARTs(void)
 {
     //
     // Enable the GPIO Peripheral used by the UART.
@@ -383,7 +383,7 @@ main(void)
     //
     // Open UART0 and show the application name on the UART.
     //
-    ConfigureUART();
+    ConfigureUARTs();
 
     UARTprintf("\033[2JTiva C Series USB gamepad device example\n");
     UARTprintf("---------------------------------\n\n");

@@ -121,7 +121,7 @@ vApplicationStackOverflowHook(xTaskHandle *pxTask, char *pcTaskName)
 //
 //*****************************************************************************
 void
-ConfigureUART(void)
+ConfigureUARTs(void)
 {
     //
     // Enable the GPIO Peripheral used by the UART.
@@ -167,7 +167,7 @@ int main(void)
     //
     // Initialize the UART and configure it for 115,200, 8-N-1 operation.
     //
-    ConfigureUART();
+    ConfigureUARTs();
 
     //
     // Print demo introduction.

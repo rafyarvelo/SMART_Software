@@ -48,9 +48,9 @@
 //
 //*****************************************************************************
 
-#define RED_LED   GPIO_PIN_1
+#define TIVA_RED_LED   GPIO_PIN_1
 #define BLUE_LED  GPIO_PIN_2
-#define GREEN_LED GPIO_PIN_3
+#define TIVA_GREEN_LED GPIO_PIN_3
 
 //*****************************************************************************
 //
@@ -84,7 +84,7 @@ main(void)
     // Enable and configure the GPIO port for the LED operation.
     //
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
-    GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, RED_LED|BLUE_LED|GREEN_LED);
+    GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, TIVA_RED_LED|BLUE_LED|TIVA_GREEN_LED);
 
     //
     // Loop Forever
@@ -94,7 +94,7 @@ main(void)
         //
         // Turn on the LED
         //
-        GPIOPinWrite(GPIO_PORTF_BASE, RED_LED|BLUE_LED|GREEN_LED, RED_LED);
+        GPIOPinWrite(GPIO_PORTF_BASE, TIVA_RED_LED|BLUE_LED|TIVA_GREEN_LED, TIVA_RED_LED);
 
         //
         // Delay for a bit
@@ -104,7 +104,7 @@ main(void)
         //
         // Turn on the LED
         //
-        GPIOPinWrite(GPIO_PORTF_BASE, RED_LED|BLUE_LED|GREEN_LED, BLUE_LED);
+        GPIOPinWrite(GPIO_PORTF_BASE, TIVA_RED_LED|BLUE_LED|TIVA_GREEN_LED, BLUE_LED);
 
         //
         // Delay for a bit

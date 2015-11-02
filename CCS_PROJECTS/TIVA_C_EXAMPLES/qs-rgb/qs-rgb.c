@@ -468,7 +468,7 @@ AppHibernateEnter(void)
 //
 //*****************************************************************************
 void
-ConfigureUART(void)
+ConfigureUARTs(void)
 {
     //
     // Enable the GPIO Peripheral used by the UART.
@@ -537,7 +537,7 @@ main(void)
     //
     // Enable and Initialize the UART.
     //
-    ConfigureUART();
+    ConfigureUARTs();
 
     UARTprintf("Welcome to the Tiva C Series TM4C123G LaunchPad!\n");
     UARTprintf("Type 'help' for a list of commands\n");
