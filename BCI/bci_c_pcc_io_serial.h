@@ -8,8 +8,8 @@
 #include <QTimer>
 #include <QThread>
 
-#define PCC_COMMAND_BUFFER_SIZE 5
-#define PCC_COMMAND_SEND_RATE   1000 //1 Hz
+#define PCC_COMMAND_BUFFER_SIZE 25
+#define PCC_COMMAND_SEND_RATE   200 //5dfgdfgvdfxbcxvbcvbI  Hz
 
 class C_PCC_IO_Serial : public C_PCC_IO,
                         public C_Singleton<C_PCC_IO_Serial>
