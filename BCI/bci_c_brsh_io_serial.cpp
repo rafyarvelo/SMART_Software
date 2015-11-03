@@ -32,7 +32,7 @@ bool C_BRSH_IO_Serial::fetchBRSFrame()
     bool         received       = false;
     uint32_t     bytesAvailable = mSerialPortPtr->bytesAvailable();
     uint32_t    index = 0;
-    char        toPrint[25];
+    char        toPrint[50];
     QByteArray buffer;
 
     //Don't Bother if the data isn't there yet
@@ -88,4 +88,10 @@ ConnectionStatusType C_BRSH_IO_Serial::connect()
 void C_BRSH_IO_Serial::onPortDisconnected()
 {
     connectionStatus = NOT_CONNECTED;
+}
+
+ConnectionStatusType C_BRSH_IO_Serial::GetConnectionStatus()
+{
+   connectionStatus = mSerialPortPtr->Connected();
+   return connectionStatus;
 }

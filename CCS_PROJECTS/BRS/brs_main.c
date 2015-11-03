@@ -108,14 +108,16 @@ void StartTasks();
 
 //Remove these Flags when the Tactical Configuration is Ready
 
-//*****************************************************************************
-//
-// Initialize FreeRTOS and start the initial set of tasks.
-//
-//*****************************************************************************
+//Data Buffers
+uint8_t      prevByte = 0x00;
+uint8_t      currByte = 0x00;
+BRS_Frame_t  brsFrame;
+TM_Frame_t   tmFrame;
+SensorData_t sensorData;
+
 int main(void)
 {
-	char temp = 0x00;
+	uint8_t byteReceived = FALSE;
 
     //
     // Set the clocking to run at 50 MHz from the PLL.
@@ -126,27 +128,94 @@ int main(void)
     // Initialize the UARTs and configure them it for 115,200, 8-N-1 operation.
     ConfigureUARTs();
 
-//    //Configure the LEDs to be RGB Enabled
+    //Configure the LEDs to be RGB Enabled
     ConfigureLEDs();
 
-	#ifdef VERBOSE
+	#ifdef ENABLE_CONSOLE
     UARTprintf("Yes... The console is Working...\r\n");
 	#endif
 
-    // Create a mutex to guard the UART.
-    g_pUARTSemaphore = xSemaphoreCreateMutex();
+    //Initialize Buffers
+    memset(&tmFrame, 0, sizeof(TM_Frame_t));
+    memset(&sensorData, 0, sizeof(SensorData_t));
+    memset(&brsFrame,   0, sizeof(BRS_Frame_t));
+    memcpy(&brsFrame.MsgId, BRS2BCI_MSG_ID, MSG_ID_SIZE);
+    memset(&brsFrame.remoteCommand, PCC_CMD_NONE, 1);
 
-    //Create the FreeRTOS Tasks
-    StartTasks();
-
-    // Start the scheduler.  This should not return.
-    vTaskStartScheduler();
-
-    // In case the scheduler returns for some reason, print an error and loop
-    // forever.
-    UARTprintf("\n We have reached level 4... Inception\n ");
-    while(1)
+    //Execute BRS Code Forever
+    while (1)
     {
+    	//Check for TM Frame
+    	if (ROM_UARTCharsAvail(BCI_UART))
+    	{
+    		ReadBCI2BRSMsg(&tmFrame);
+    	}
+
+    	//Check for Bluetooth Characters
+    	if (ROM_UARTCharsAvail(BT_UART))
+    	{
+        	currByte = ROM_UARTCharGetNonBlocking(BT_UART);
+        	byteReceived = TRUE;
+
+        	#ifdef ENABLE_CONSOLE
+			UARTprintf("Bluetooth Received %c\r\n", currByte);
+			#endif
+    	}
+
+		//Read one more byte in the case of a TM Request
+    	if ('T' == currByte)
+    	{
+    		prevByte = currByte;
+        	currByte = ROM_UARTCharGetNonBlocking(BT_UART);
+    	}
+
+    	//Send TM When Requested
+    	if ('T' == prevByte && 'M' == currByte)
+    	{
+			#ifdef ENABLE_CONSOLE
+        	UARTprintf("Sending TM Frame\r\n");
+			#endif
+    		SendTMFrame(&tmFrame);
+    	}
+
+    	else //Remote Command
+    	{
+    		brsFrame.remoteCommand = currByte;
+    	}
+
+    	//Check for Sensor Data
+    	if (ROM_UARTCharsAvail(GPS_UART))
+    	{
+    		ReadGPSData(&sensorData.gpsData);
+    	}
+
+    	if (ROM_UARTCharsAvail(USF_UART) || ROM_UARTCharsAvail(USR_UART))
+    	{
+    		ReadUSData(&sensorData.rangeFinderData);
+    	}
+
+    	//Combine Sensor Data and Remote Data
+    	memcpy(&brsFrame.sensorData, &sensorData, sizeof(SensorData_t));
+
+    	//Send BRS Frame
+		#ifdef ENABLE_CONSOLE
+    	UARTprintf("Sending BRS Frame...\r\n");
+    	#endif
+
+    	//Reset Remote Command before send if no bluetooth frame was received
+    	if (!byteReceived)
+    	{
+    		brsFrame.remoteCommand = PCC_CMD_NONE;
+    	}
+    	SendBRSFrame(&brsFrame);
+
+    	//Reset default values
+    	brsFrame.remoteCommand = PCC_CMD_NONE;
+    	byteReceived = FALSE;
+    	prevByte = currByte;
+
+    	//Relax for a bit
+    	SysCtlDelay(SysCtlClockGet() / 10 / 5);
     }
 }
 

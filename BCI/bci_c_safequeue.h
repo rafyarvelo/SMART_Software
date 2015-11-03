@@ -6,7 +6,7 @@
 #include <QVector>
 
 #define DEFAULT_BUFFER_SIZE 50
-#define SEMAPHORE_TIMEOUT   100 //ms
+#define SEMAPHORE_TIMEOUT   0 //ms
 
 //Implement our Queue using a Simple Circular Buffer
 template <typename T>

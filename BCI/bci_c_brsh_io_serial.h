@@ -17,6 +17,7 @@ public:
     virtual void SendTMFrame(tmFrameBufferType* tmFrameBuffer);
 
     virtual ConnectionStatusType connect();
+    virtual ConnectionStatusType GetConnectionStatus();
 
 private slots:
     void onPortDisconnected();

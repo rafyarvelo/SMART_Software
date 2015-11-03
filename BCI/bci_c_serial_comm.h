@@ -54,6 +54,9 @@ public:
     int readFromSerialPort(TM_Frame_t*  pFrame);
     int readFromSerialPort(BRS_Frame_t* pFrame);
 
+    //Return Connection Status
+    bool Connected() { return mSerialPortPtr->isOpen(); }
+
     //Allow users to change the port settings dynamically
     void SetPortSettings(BaudRateType baudRate = BAUD9600,FlowType flowCtrl = FLOW_OFF,
                          ParityType   parity   = PAR_NONE,DataBitsType dataBits = DATA_8,
