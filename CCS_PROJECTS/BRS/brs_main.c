@@ -106,18 +106,14 @@ void vApplicationStackOverflowHook(xTaskHandle *pxTask, char *pcTaskName)
 //Begin all the FreeRTOS Tasks
 void StartTasks();
 
-//Remove these Flags when the Tactical Configuration is Ready
-
-//Data Buffers
-uint8_t      prevByte = 0x00;
-uint8_t      currByte = 0x00;
-BRS_Frame_t  brsFrame;
-TM_Frame_t   tmFrame;
-SensorData_t sensorData;
-
 int main(void)
 {
-	uint8_t byteReceived = FALSE;
+	uint8_t      tmFrameReceived = FALSE;
+	uint8_t      currByte = 0x00;
+	BRS_Frame_t  brsFrame;
+	TM_Frame_t   tmFrame;
+	SensorData_t sensorData;
+	volatile unsigned int iterations = 0;
 
     //
     // Set the clocking to run at 50 MHz from the PLL.
@@ -149,46 +145,33 @@ int main(void)
     	if (ROM_UARTCharsAvail(BCI_UART))
     	{
     		ReadBCI2BRSMsg(&tmFrame);
+    		tmFrameReceived = TRUE; //latch
     	}
 
     	//Check for Bluetooth Characters
     	if (ROM_UARTCharsAvail(BT_UART))
     	{
         	currByte = ROM_UARTCharGetNonBlocking(BT_UART);
-        	byteReceived = TRUE;
 
         	#ifdef ENABLE_CONSOLE
 			UARTprintf("Bluetooth Received %c\r\n", currByte);
 			#endif
-    	}
 
-		//Read one more byte in the case of a TM Request
-    	if ('T' == currByte)
-    	{
-    		prevByte = currByte;
-        	currByte = ROM_UARTCharGetNonBlocking(BT_UART);
+			//Update Remote Command
+	   		brsFrame.remoteCommand = currByte;
     	}
-
-    	//Send TM When Requested
-    	if ('T' == prevByte && 'M' == currByte)
-    	{
-			#ifdef ENABLE_CONSOLE
-        	UARTprintf("Sending TM Frame\r\n");
-			#endif
-    		SendTMFrame(&tmFrame);
-    	}
-
     	else //Remote Command
     	{
-    		brsFrame.remoteCommand = currByte;
+    		brsFrame.remoteCommand = PCC_CMD_NONE;
     	}
 
-    	//Check for Sensor Data
-    	if (ROM_UARTCharsAvail(GPS_UART))
+    	//Check for GPS Data
+    	if (GPSDataAvailable())
     	{
     		ReadGPSData(&sensorData.gpsData);
     	}
 
+    	//Read Range Finder Data
     	if (ROM_UARTCharsAvail(USF_UART) || ROM_UARTCharsAvail(USR_UART))
     	{
     		ReadUSData(&sensorData.rangeFinderData);
@@ -197,25 +180,30 @@ int main(void)
     	//Combine Sensor Data and Remote Data
     	memcpy(&brsFrame.sensorData, &sensorData, sizeof(SensorData_t));
 
-    	//Send BRS Frame
-		#ifdef ENABLE_CONSOLE
-    	UARTprintf("Sending BRS Frame...\r\n");
-    	#endif
-
-    	//Reset Remote Command before send if no bluetooth frame was received
-    	if (!byteReceived)
+    	//Send Frame to BCI Processor if it is not a TM Request
+    	if (currByte != 'T' && currByte != 'M')
     	{
-    		brsFrame.remoteCommand = PCC_CMD_NONE;
+			#ifdef ENABLE_CONSOLE
+			UARTprintf("Sending %c\r\n", brsFrame.remoteCommand);
+			#endif
+        	SendBRSFrame(&brsFrame);
     	}
-    	SendBRSFrame(&brsFrame);
+
+    	//Once we receive the first TM Frame start sending out a TM Stream to the Bluetooth device
+    	if (tmFrameReceived)
+    	{
+    		//Change Message Id and send through Bluetooth Module
+    		memcpy(&tmFrame.MsgId, BRS2MD_MSG_ID, MSG_ID_SIZE);
+        	SendTMFrame(&tmFrame);
+    	}
 
     	//Reset default values
     	brsFrame.remoteCommand = PCC_CMD_NONE;
-    	byteReceived = FALSE;
-    	prevByte = currByte;
+    	currByte = PCC_CMD_NONE;
 
     	//Relax for a bit
     	SysCtlDelay(SysCtlClockGet() / 10 / 5);
+    	iterations++;
     }
 }
 
