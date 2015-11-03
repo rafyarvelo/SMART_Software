@@ -70,7 +70,7 @@ static void UARTTask(void *pvParameters)
     //
     while(1)
     {
-		#ifdef BRS_DEBUG
+		#if 0
     	//Generate Random TM Frame
     	memcpy(&receivedTMFrame.MsgId, BCI2BRS_MSG_ID, sizeof(MsgIdType));
     	receivedTMFrame.lastCommand = "fblr"[(rand() % 4)];
@@ -88,22 +88,6 @@ static void UARTTask(void *pvParameters)
 		}
 
 		#else //Actually Send the Data
-
-    	//Try and Get a TM Frame from the UART
-    	ReadBCI2BRSMsg(&receivedTMFrame);
-
-    	//If the Frame was Good, put it in the Queue
-    	if (checkMsgID(receivedTMFrame.MsgId, BCI2BRS_MSG_ID))
-    	{
-			//Blink Receive Status
-			BlinkLED(TIVA_GREEN_LED, 1);
-
-    		//Send the Frame to the Bluetooth Task
-    		xQueueSend(g_pBluetoothSendQueue, &receivedTMFrame , portMAX_DELAY);
-
-    		//Reset the Message ID so we check it next time
-    		memset(&receivedTMFrame.MsgId,0, sizeof(MsgIdType));
-    	}
 
     	//Send The BRS Message through the UART if it is Available
     	if (!frameReadyToSend && xQueueReceive(g_pUARTSendQueue, &BRSFrameToSend, 0) == pdPASS)
@@ -125,6 +109,18 @@ static void UARTTask(void *pvParameters)
     		frameReadyToSend = FALSE;
     	}
 
+    	//Try and Get a TM Frame from the UART
+    	ReadBCI2BRSMsg(&receivedTMFrame);
+
+    	//If the Frame was Good, put it in the Queue
+    	if (checkMsgID(receivedTMFrame.MsgId, BCI2BRS_MSG_ID))
+    	{
+    		//Send the Frame to the Bluetooth Task
+    		xQueueSend(g_pBluetoothSendQueue, &receivedTMFrame , portMAX_DELAY);
+
+    		//Reset the Message ID so we check it next time
+    		memset(&receivedTMFrame.MsgId,0, sizeof(MsgIdType));
+    	}
 		#endif
 
     	//Task Delay

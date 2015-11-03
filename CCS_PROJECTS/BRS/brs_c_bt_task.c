@@ -68,11 +68,10 @@ static void BluetoothTask(void *pvParameters)
     // Loop forever.
     while(1)
     {
-    	#if 0 //Generate Debug Data
+    	#if 1 //Generate Debug Data
 
     	//Get a Random Bluetooth Frame
     	receivedBTFrame.remoteCommand = pcc_cmds[rand() % pcc_cmds_SIZE];
-    	BlinkLED(TIVA_BLUE_LED, 1);
 
     	//Send The Frame to the Data Bridge Task
 		xQueueSend(g_pBluetoothReceiveQueue, &receivedBTFrame, portMAX_DELAY);
@@ -100,6 +99,13 @@ static void BluetoothTask(void *pvParameters)
 			#endif
 
 			//Check if the Bluetooth Device is Requesting a TM Frame
+			if (currByte == 'T')
+			{
+				prevByte = currByte;
+				currByte = ROM_UARTCharGetNonBlocking(BT_UART);
+			}
+
+			//Send TM When Frame is requested
 			if (prevByte == 'T' && currByte == 'M')
 			{
 				//Get the TM Frame from the UART Task and Send it
