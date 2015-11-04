@@ -80,8 +80,8 @@ typedef enum
 #else
     #define VERBOSE //Allow Prints to Console
     #define DEFAULT_EEG_TYPE EEG_TYPE_DEBUG
-    #define DEFAULT_BRS_TYPE BRS_TYPE_TIVA //BRS_TYPE_TIVA
-    #define BRS_DEBUG                      //For BRS Code on CCS
+    #define DEFAULT_BRS_TYPE BRS_TYPE_TIVA   //BRS_TYPE_TIVA
+    #define BRS_DEBUG                        //For BRS Code on CCS
     #define DEFAULT_PCC_TYPE PCC_TYPE_MSP  //PCC_TYPE_DEBUG
 #endif
 
@@ -113,15 +113,13 @@ typedef enum
 
 //============================================================
 
-//PCC Serial Port
+//Serial Port Names
+#define PORTNAMES_FILE "port_names.txt"
+
 #ifdef WIN32
-    #define PCC_PORT "COM3"
-    #define BRS_PORT "COM7"
     #define ENDL "/r/n"
     #define WINDOWS
 #else
-    #define BRS_PORT "/dev/ttyACM0"
-    #define PCC_PORT "/dev/ttyACM1"
     #define ENDL "/n"
     #define UNIX
     #define EMOTIV //Emotiv Only Compiles on Unix Machines

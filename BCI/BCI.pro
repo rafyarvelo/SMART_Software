@@ -33,6 +33,7 @@ HEADERS += \
     bci_c_brsh_io_debug.h \
     bci_c_brsh_io_serial.h \
     bci_c_tm_header_names.h \
+    bci_c_portnames.h \
     bci_c_pcc_io_serial.h \
     bci_c_pcc_io.h \
     bci_c_pcc_io_debug.h \
@@ -62,6 +63,7 @@ SOURCES += \
     bci_c_brsh_io_serial.cpp \
     bci_c_pcc_io_serial.cpp \
     bci_c_pcc_io_debug.cpp \
+    bci_c_portnames.cpp \
     bci_c_brsh_io.cpp \
     bci_c_eeg_io.cpp \
     bci_c_framegenerator.cpp \

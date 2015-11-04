@@ -5,7 +5,7 @@ C_Serial_Comm::C_Serial_Comm(const QString& portName, BaudRateType baudRate, Flo
                              long timeout)
     : mPortName(portName)
 {
-    debugLogPtr    = SMART_DEBUG_LOG::Instance();//Get a pointer to the debug log
+    debugLogPtr = SMART_DEBUG_LOG::Instance();
 
     //Open Serial Port and Set Port Settings
     mSerialPortPtr = new QextSerialPort(mPortName);

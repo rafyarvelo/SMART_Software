@@ -3,13 +3,7 @@
 
 #include "../CCS_PROJECTS/PCC/power_chair_command_constants.h"
 #include "bci_c_serial_comm.h"
-#include "bci_c_safequeue.h"
 #include "bci_c_pcc_io.h"
-#include <QTimer>
-#include <QThread>
-
-#define PCC_COMMAND_BUFFER_SIZE 25
-#define PCC_COMMAND_SEND_RATE   200 //5dfgdfgvdfxbcxvbcvbI  Hz
 
 class C_PCC_IO_Serial : public C_PCC_IO,
                         public C_Singleton<C_PCC_IO_Serial>
@@ -23,27 +17,12 @@ public:
     virtual ConnectionStatusType connect();
 
 public slots:
-    //Only we can decide when to send commands, so this just
-    //Puts the Command in our Buffer
     virtual void SendCommand(PCC_Command_Type cmd);
 
-     //Avoid All the Nonsense and send a quick E-Stop
+    //Avoid All the Nonsense and send a quick E-Stop
     virtual void EmergencyStop();
 
-private slots:
-     void onTimer();
-
 private:
-     //Actually Send the Command through the UART on a Timer Event
-     void SendCmdToSerialPort(PCC_Command_Type cmd);
-
-    //We will need to buffer our PCC Commands so that
-    //they don't get sent too fast. Only Actually Send the data on a Timer event
-    C_SafeQueue<PCC_Command_Type>* pccCommandQueue;
-
-    //Send PCC Commands to a Serial Port continuously in a Thread using a Timer
-    QTimer         mTimer;
-    QThread        mThread;
     C_Serial_Comm* mSerialPortPtr;
 };
 

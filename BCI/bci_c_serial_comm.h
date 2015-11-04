@@ -4,6 +4,7 @@
 #include "../smart_config.h"
 #include "../smart_data_types.h"
 #include "../smart_debug_log.h"
+#include "bci_c_portnames.h"
 #include <QFile>
 #include <QTextStream>
 #include <QDataStream>
@@ -63,6 +64,7 @@ public:
                          StopBitsType stopBits = STOP_1,long timeout = DEFAULT_TIMEOUT_MS);
 
     uint64t bytesAvailable(){ return mSerialPortPtr->bytesAvailable(); }
+
 signals:
     void dataReceived(const QByteArray& data);
     void PortDisconnected();
@@ -77,7 +79,7 @@ protected:
     QString         mPortName;
     QByteArray      UARTReceiveBuffer;
 
-public:
+private:
     QextSerialPort* mSerialPortPtr;
 };
 

@@ -1,9 +1,13 @@
 #include "bci_c_brsh_io_serial.h"
+#include "bci_c_portnames.h"
 
 C_BRSH_IO_Serial::C_BRSH_IO_Serial()
 {
+    C_PortNames* portNames = C_PortNames::Instance();
+    QString portName = portNames->GetBRSPortName();
+
     //Create the Serial Comm Class
-    mSerialPortPtr = new C_Serial_Comm(BRS_PORT, BAUD115200);
+    mSerialPortPtr = new C_Serial_Comm(portName, BAUD115200);
 }
 
 C_BRSH_IO_Serial::~C_BRSH_IO_Serial()
