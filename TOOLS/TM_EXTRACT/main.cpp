@@ -1,11 +1,17 @@
 #include "bci_c_binary_parser.h"
 #include "bci_c_textparser.h"
 
-#define DEFAULT_TM_INPUT_NAME  QString("../../debug_files/tm_output_data.bin")
-#define DEFAULT_TM_OUTPUT_NAME QString("../../debug_files/extracted_telemetry.csv")
-
-#define DEFAULT_EEG_INPUT_NAME  QString("../../debug_files/eeg_output_data.bin")
-#define DEFAULT_EEG_OUTPUT_NAME QString("../../debug_files/extracted_eeg_telemetry.csv")
+#ifdef WIN32
+    #define DEFAULT_TM_INPUT_NAME  QString("../../debug_files/tm_output_data.bin")
+    #define DEFAULT_TM_OUTPUT_NAME QString("../../debug_files/extracted_telemetry.csv")
+    #define DEFAULT_EEG_INPUT_NAME  QString("../../debug_files/eeg_output_data.bin")
+    #define DEFAULT_EEG_OUTPUT_NAME QString("../../debug_files/extracted_eeg_telemetry.csv")
+#else
+    #define DEFAULT_TM_INPUT_NAME  QString("tm_output_data.bin")
+    #define DEFAULT_TM_OUTPUT_NAME QString("extracted_telemetry.csv")
+    #define DEFAULT_EEG_INPUT_NAME  QString("eeg_output_data.bin")
+    #define DEFAULT_EEG_OUTPUT_NAME QString("extracted_eeg_telemetry.csv")
+#endif
 
 int main(int argc, char** argv)
 {
