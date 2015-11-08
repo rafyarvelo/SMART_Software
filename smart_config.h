@@ -18,18 +18,14 @@
 #ifdef __cplusplus
 	#include <iostream>
 	using namespace std;
-
-	typedef bool ConnectionStatusType;
-#else
-	typedef int  ConnectionStatusType;
 #endif
 
 //Common Typedefs
+typedef unsigned int       ConnectionStatusType;
 typedef unsigned char      PCC_Command_Type;
 typedef unsigned char      uint8_t;
 typedef unsigned short     uint16_t;
 typedef unsigned int       uint32_t;
-
 typedef unsigned long long uint64t;
 typedef unsigned int       sizeType;
 

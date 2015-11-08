@@ -13,15 +13,13 @@
 #include <stdbool.h>
 #include "inc/hw_ints.h"
 #include "inc/hw_memmap.h"
-#include "driverlib/debug.h"
-#include "driverlib/fpu.h"
 #include "driverlib/gpio.h"
-#include "driverlib/interrupt.h"
 #include "driverlib/pin_map.h"
 #include "driverlib/rom.h"
 #include "driverlib/sysctl.h"
 #include "driverlib/uart.h"
 #include "../../smart_data_types.h"
+#include "brs_c_sensor_formats.h"
 
 typedef enum UART_ID
 {
@@ -43,10 +41,6 @@ typedef enum UART_ID
 
 //Default BAUD_RATE for all the boards
 #define BAUD_RATE      9600
-
-//FOR GPS SENSORS
-#define GPS_NAV_MSG_ID "$GPRMC"
-#define GPS_DATA_DELIM ','
 
 //*****************************************************************************
 //
@@ -74,15 +68,42 @@ uint16_t UARTReceive(UART_ID uartID, volatile uint8_t *pui8Buffer, uint32_t ui32
 // Retrieve a string from the UART until a delimeter is found, return bytes actually read
 //
 //*****************************************************************************
-uint16_t UARTReceiveUntil(UART_ID uartID, volatile uint8_t *pui8Buffer, uint8_t delim);
+uint16_t UARTReceiveUntil(UART_ID uartID, volatile uint8_t *pui8Buffer, char delim);
 
 //*****************************************************************************
 //
-// Return true  (1) if there is a BCI Message ready in the UART, otherwise
-// return false (0)
+// Retrieve all the delimeted words until a CRLF is seen and place in a buffer.
+// Return the number of words read
 //
 //*****************************************************************************
-int BCIMessageAvailable();
+uint16_t UARTReadDelimetedLine(UART_ID uartID, volatile uint8_t** pui8DoubleBuffer, char delim);
+
+//*****************************************************************************
+//
+// Convert ASCII Character to Hexadecimal
+//
+//*****************************************************************************
+uint8_t ASCII2HEX(char asciiChar);
+
+//*****************************************************************************
+//
+// Convert ASCII word to Number, read until '\0' is seen
+//
+//*****************************************************************************
+uint32_t ASCII2UINT(const uint8_t* pui8buffer, uint32_t length);
+
+//*****************************************************************************
+//
+// Convert ASCII word to Number, read until count or '\0' is seen
+//
+//*****************************************************************************
+float ASCII2FLOAT(const uint8_t* pui8buffer, uint32_t length);
+
+//*****************************************************************************
+//
+// Read Incoming BCI Message from UART
+//
+//*****************************************************************************
 
 //*****************************************************************************
 //
@@ -118,13 +139,6 @@ void SendBRSFrame(BRS_Frame_t* pFrame);
 //
 //*****************************************************************************
 int BluetoothFrameAvailable();
-
-//*****************************************************************************
-//
-// Check for a GPS Frame in the UART
-//
-//*****************************************************************************
-int GPSDataAvailable();
 
 //*****************************************************************************
 //
