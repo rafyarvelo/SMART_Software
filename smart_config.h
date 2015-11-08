@@ -21,7 +21,7 @@
 #endif
 
 //Common Typedefs
-typedef unsigned char      ConnectionStatusType;
+typedef unsigned int       ConnectionStatusType;
 typedef unsigned char      PCC_Command_Type;
 typedef unsigned char      uint8_t;
 typedef unsigned short     uint16_t;
