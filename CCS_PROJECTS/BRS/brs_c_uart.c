@@ -245,7 +245,7 @@ uint8_t ASCII2HEX(char asciiChar)
 // Convert ASCII word to Number, read until '\0' is seen
 //
 //*****************************************************************************
-uint32_t ASCII2UINT(const uint8_t* pui8buffer)
+uint32_t ASCII2UINT(const uint8_t* pui8buffer, uint32_t length)
 {
 	uint32_t ui32Val = 0;
 	int index = 0, digit = 0;
@@ -257,7 +257,7 @@ uint32_t ASCII2UINT(const uint8_t* pui8buffer)
 	}
 
 	//Find length of string
-	while (*tmp++ != '/0')
+	while (length-- > 0 && *tmp++ != '\0')
 	{
 		index++;
 	}
@@ -276,7 +276,7 @@ uint32_t ASCII2UINT(const uint8_t* pui8buffer)
 // Convert ASCII word to Number, read until count or '\0' is seen
 //
 //*****************************************************************************
-float ASCII2FLOAT(const uint8_t* pui8buffer)
+float ASCII2FLOAT(const uint8_t* pui8buffer, uint32_t length)
 {
 	if (pui8buffer == NULL)
 	{
@@ -287,8 +287,7 @@ float ASCII2FLOAT(const uint8_t* pui8buffer)
 	float fVal = 0.0;
 	const uint8_t* tmp = pui8buffer;
 
-	//Find length of buffer
-	while (*tmp != '\0' && *tmp != '\r' && *tmp != '\n')
+	while (length-- > 0 && *tmp != '\0' && *tmp != '\r' && *tmp != '\n')
 	{
 		if (*tmp == '.')
 		{
@@ -371,9 +370,9 @@ int ReadGPSData(GPS_Data_t* pData)
 	//We only care about the "RMC" sentence
 	if (strcmp((const char*) &GPS_NMEA_SENTENCE[RMC_MSG_ID], GPS_RMC_MSG_ID) == 0)
 	{
-		pData->longitude   = ASCII2FLOAT((const uint8_t*) &GPS_NMEA_SENTENCE[RMC_LONGITUDE]);
-		pData->latitude    = ASCII2FLOAT((const uint8_t*) &GPS_NMEA_SENTENCE[RMC_LATITUDE]);
-		pData->groundSpeed = ASCII2FLOAT((const uint8_t*) &GPS_NMEA_SENTENCE[RMC_SPEED]) * GPS_KNOTS2MPS;
+		pData->longitude   = ASCII2FLOAT((const uint8_t*) &GPS_NMEA_SENTENCE[RMC_LONGITUDE], GPS_NMEA_MAX_WORD_SIZE);
+		pData->latitude    = ASCII2FLOAT((const uint8_t*) &GPS_NMEA_SENTENCE[RMC_LATITUDE] , GPS_NMEA_MAX_WORD_SIZE);
+		pData->groundSpeed = ASCII2FLOAT((const uint8_t*) &GPS_NMEA_SENTENCE[RMC_SPEED], GPS_NMEA_MAX_WORD_SIZE) * GPS_KNOTS2MPS;
 		return TRUE;
 	}
 
@@ -456,7 +455,7 @@ void SendTMFrame(TM_Frame_t* pFrame)
 		//Slow down every 10 frames to give receiver time to process
 		if (i % 10 == 0)
 		{
-			SysCtlDelay(SysCtlClockGet() / 10 / 3);
+			SysCtlDelay(SysCtlClockGet() / 1000);
 		}
 	}
 }

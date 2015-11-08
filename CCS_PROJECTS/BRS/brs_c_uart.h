@@ -90,14 +90,14 @@ uint8_t ASCII2HEX(char asciiChar);
 // Convert ASCII word to Number, read until '\0' is seen
 //
 //*****************************************************************************
-uint32_t ASCII2UINT(const uint8_t* pui8buffer);
+uint32_t ASCII2UINT(const uint8_t* pui8buffer, uint32_t length);
 
 //*****************************************************************************
 //
 // Convert ASCII word to Number, read until count or '\0' is seen
 //
 //*****************************************************************************
-float ASCII2FLOAT(const uint8_t* pui8buffer);
+float ASCII2FLOAT(const uint8_t* pui8buffer, uint32_t length);
 
 //*****************************************************************************
 //

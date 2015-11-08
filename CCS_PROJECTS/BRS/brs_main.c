@@ -54,6 +54,9 @@ void vApplicationStackOverflowHook(xTaskHandle *pxTask, char *pcTaskName)
 //GPS Sentence Buffer
 char GPS_NMEA_SENTENCE[GPS_NMEA_MAX_WORD_SIZE][GPS_NMEA_MAX_SENTENCE_SIZE];
 
+//Test Everything
+#undef DEBUG_ONLY
+
 int main(void)
 {
 	uint8_t      tmFrameReceived = FALSE;
@@ -91,6 +94,15 @@ int main(void)
     //Execute BRS Code Forever
     while (1)
     {
+//    	while (ROM_UARTCharsAvail(USF_UART))
+//    	{
+//    		ROM_UARTCharPutNonBlocking(CONSOLE_UART, ROM_UARTCharGetNonBlocking(USF_UART));
+//    	}
+//
+//    	while (ROM_UARTCharsAvail(USR_UART))
+//    	{
+//    		ROM_UARTCharPutNonBlocking(CONSOLE_UART, ROM_UARTCharGetNonBlocking(USR_UART));
+//    	}
     	//Check for TM Frame
     	if (ROM_UARTCharsAvail(BCI_UART))
     	{
@@ -102,17 +114,18 @@ int main(void)
     	brsFrame.remoteCommand = "frbl"[rand() % 4];
 
     	#else //Actually Get the Data
+
     	//Check for Bluetooth Characters
     	if (ROM_UARTCharsAvail(BT_UART))
     	{
         	currByte = ROM_UARTCharGetNonBlocking(BT_UART);
 
-        	#ifdef ENABLE_CONSOLE
-			UARTprintf("Bluetooth Received %c\r\n", currByte);
-			#endif
-
 			//Update Remote Command
 	   		brsFrame.remoteCommand = currByte;
+
+			#ifdef ENABLE_CONSOLE
+			UARTprintf("Bluetooth Received %c\r\n", brsFrame.remoteCommand);
+			#endif
     	}
     	else //Remote Command
     	{
@@ -145,7 +158,7 @@ int main(void)
     	}
 
     	//Once we receive the first TM Frame start sending out a TM Stream to the Bluetooth device
-    	if (tmFrameReceived)
+    	if (1)//(tmFrameReceived)
     	{
     		//Change Message Id and send through Bluetooth Module
     		memcpy(&tmFrame.MsgId, BRS2MD_MSG_ID, MSG_ID_SIZE);
@@ -157,7 +170,7 @@ int main(void)
     	currByte = PCC_CMD_NONE;
 
     	//Relax for a bit
-    	//SysCtlDelay(SysCtlClockGet() / 10 / 5);
+    	SysCtlDelay(SysCtlClockGet() / 10 / 5);
     	iterations++;
     }
 }
