@@ -8,8 +8,13 @@
 #include "brs_c_uart.h"
 #include "utils/uartstdio.h"
 #include <string.h>
+#include <math.h>
 
-volatile uint8_t RECEIVE_BUFFER[MAX_BUFFER_SIZE];
+//Buffer to hold the GPS NMEA Sentences and indices to access it
+extern char GPS_NMEA_SENTENCE[GPS_NMEA_MAX_WORD_SIZE][GPS_NMEA_MAX_SENTENCE_SIZE];
+unsigned int currWordIndex = 0;
+unsigned int currCharIndex = 0;
+
 
 //*****************************************************************************
 //
@@ -87,6 +92,9 @@ void ConfigureUARTs(void)
     // Initialize the CONSOLE UART for console I/O.
     //
     UARTStdioConfig(0, 115200, 16000000);
+
+    //Initialize the GPS NMEA Sentence Buffer
+    memset((void*) &GPS_NMEA_SENTENCE[0][0], 0, GPS_NMEA_MAX_WORD_SIZE * GPS_NMEA_MAX_SENTENCE_SIZE);
 }
 
 //*****************************************************************************
@@ -144,7 +152,7 @@ uint16_t UARTReceive(UART_ID uartID, volatile uint8_t *pui8Buffer, uint32_t ui32
 // Retrieve a string from the UART until a delimeter is found, return bytes actually read
 //
 //*****************************************************************************
-uint16_t UARTReceiveUntil(UART_ID uartID, volatile uint8_t *pui8Buffer, uint8_t delim)
+uint16_t UARTReceiveUntil(UART_ID uartID, volatile uint8_t *pui8Buffer, char delim)
 {
 	uint16_t bytesReceived = 0;
 
@@ -178,13 +186,131 @@ uint16_t UARTReceiveUntil(UART_ID uartID, volatile uint8_t *pui8Buffer, uint8_t 
 
 //*****************************************************************************
 //
-// Return true  (1) if there is a BCI Message ready in the UART, otherwise
-// return false (0)
+// Retrieve all the delimeted words until a CRLF is seen and place in a buffer.
+// Return the number of words read
 //
 //*****************************************************************************
-int BCIMessageAvailable()
+uint16_t UARTReadDelimetedLine(UART_ID uartID, volatile uint8_t** pui8DoubleBuffer, char delim)
 {
-	return (ROM_UARTCharsAvail(BCI_UART));
+	uint8_t           currByte  = 0x00;
+	uint16_t          wordsRead = 0;
+	volatile uint8_t* pCurrWord = NULL;
+
+	//Read the sentence into a buffer
+	while (ROM_UARTCharsAvail(uartID) && currByte != '\n')
+	{
+		//Get a pointer to the current word in the buffer
+		pCurrWord = (volatile uint8_t*) &pui8DoubleBuffer[wordsRead][0];
+
+		//Get a word from the UART
+		UARTReceiveUntil(uartID, pCurrWord, delim);
+
+		//Keep Track of Words Actually Read
+		wordsRead++;
+	}
+
+	return wordsRead;
+}
+
+//*****************************************************************************
+//
+// Convert ASCII Character to Hexadecimal
+//
+//*****************************************************************************
+uint8_t ASCII2HEX(char asciiChar)
+{
+	uint8_t hexVal = 0x00;
+
+	//0-9
+	if (asciiChar >= 0x30 && asciiChar <= 0x39)
+	{
+		hexVal = asciiChar - 0x30;
+	}
+	//A-F
+	else if (asciiChar >= 0x41 && asciiChar <= 0x46)
+	{
+		hexVal = asciiChar - 0x41;
+	}
+	//a-f
+	else if (asciiChar >= 0x61 && asciiChar <= 0x66)
+	{
+		hexVal = asciiChar - 0x61;
+	}
+
+	return hexVal;
+}
+
+//*****************************************************************************
+//
+// Convert ASCII word to Number, read until '\0' is seen
+//
+//*****************************************************************************
+uint32_t ASCII2UINT(const uint8_t* pui8buffer)
+{
+	uint32_t ui32Val = 0;
+	int index = 0, digit = 0;
+	const uint8_t* tmp = pui8buffer;
+
+	if (pui8buffer == NULL)
+	{
+		return 0;
+	}
+
+	//Find length of string
+	while (*tmp++ != '/0')
+	{
+		index++;
+	}
+
+	//Calculate Long Value
+	for ( ; index >= 0; index--)
+	{
+		ui32Val += ASCII2HEX(pui8buffer[index]) * (pow(10, digit++));
+	}
+
+	return ui32Val;
+}
+
+//*****************************************************************************
+//
+// Convert ASCII word to Number, read until count or '\0' is seen
+//
+//*****************************************************************************
+float ASCII2FLOAT(const uint8_t* pui8buffer)
+{
+	if (pui8buffer == NULL)
+	{
+		return 0.0;
+	}
+
+	int   i = 0, j = 0, len = 0, decLoc = 0;
+	float fVal = 0.0;
+	const uint8_t* tmp = pui8buffer;
+
+	//Find length of buffer
+	while (*tmp != '\0' && *tmp != '\r' && *tmp != '\n')
+	{
+		if (*tmp == '.')
+		{
+			decLoc = len;
+		}
+
+		len++;
+	}
+
+	//Get numbers to right of decimal
+	for (i = len; i > decLoc; i--)
+	{
+		fVal += ASCII2HEX(pui8buffer[i]) * (pow(10,decLoc - i));
+	}
+
+	//Get numbers to left of decimal
+	for (i = decLoc; i >= 0; i--)
+	{
+		fVal += ASCII2HEX(pui8buffer[i]) * (pow(10,j++));
+	}
+
+	return fVal;
 }
 
 //*****************************************************************************
@@ -205,52 +331,53 @@ void ReadBCI2BRSMsg(TM_Frame_t* pFrame)
 
 //*****************************************************************************
 //
-// Check for a GPS Frame in the UART
-//
-//*****************************************************************************
-int GPSDataAvailable()
-{
-	return (ROM_UARTCharsAvail(GPS_UART));
-}
-
-//*****************************************************************************
-//
-// Read Incoming GPS Data
+// Read Incoming GPS Data, return TRUE if it is available
 //
 //*****************************************************************************
 int ReadGPSData(GPS_Data_t* pData)
 {
-	if (pData == NULL)
+    char c = 0x00;
+    uint16_t wordsRead = 0;
+
+    //Read all the current data in the GPS UART
+	while (ROM_UARTCharsAvail(GPS_UART))
 	{
-		return;
-	}
-	uint8_t           delim         = (uint8_t) GPS_DATA_DELIM;
-	uint16_t          bytesReceived = 0;
-	volatile uint8_t* ptr           = (volatile uint8_t*) &RECEIVE_BUFFER[0];
+		c = ROM_UARTCharGetNonBlocking(GPS_UART);
 
-	//Prepare the Receive Buffer
-	memset(&RECEIVE_BUFFER, 0, MAX_BUFFER_SIZE);
-
-	//Check if we're looking at the correct message
-	bytesReceived = UARTReceiveUntil(GPS_UART,ptr, delim);
-	if (strcmp((const char*)ptr,GPS_NAV_MSG_ID) == 0)
-	{
-		//Skip Time
-		ptr += bytesReceived;
-		bytesReceived = UARTReceiveUntil(GPS_UART,ptr, delim);
-
-		//Check Status
-		ptr += bytesReceived;
-		bytesReceived = UARTReceiveUntil(GPS_UART,ptr, delim);
-		if (strcmp((const char*)ptr, "V") == 0)
+		if (c == GPS_DATA_DELIM)
 		{
-			return FALSE;
+			//Go to the Next Word
+			currWordIndex = (currWordIndex + 1) % GPS_NMEA_MAX_SENTENCE_SIZE;
+			currCharIndex = 0;
+		}
+		else if (c == '\r' || c == '\n') //One full sentence was read successfully
+		{
+			wordsRead = currWordIndex;
+			currWordIndex = 0;
+			currCharIndex = 0;
+
+			//Reset the sentence and break
+		    memset((void*) &GPS_NMEA_SENTENCE[0][0], 0, GPS_NMEA_MAX_SENTENCE_SIZE * GPS_NMEA_MAX_WORD_SIZE);
+		    break;
 		}
 
-		//Latitude
-		ptr += bytesReceived;
-		bytesReceived = UARTReceiveUntil(GPS_UART,ptr, delim);
+		else //Read one character into the buffer
+		{
+			GPS_NMEA_SENTENCE[currWordIndex][currCharIndex] = c;
+			currCharIndex = (currCharIndex + 1) % GPS_NMEA_MAX_WORD_SIZE;
+		}
 	}
+
+	//We only care about the "RMC" sentence
+	if (strcmp((const char*) &GPS_NMEA_SENTENCE[RMC_MSG_ID], GPS_RMC_MSG_ID) == 0)
+	{
+		pData->longitude   = ASCII2FLOAT((const uint8_t*) &GPS_NMEA_SENTENCE[RMC_LONGITUDE]);
+		pData->latitude    = ASCII2FLOAT((const uint8_t*) &GPS_NMEA_SENTENCE[RMC_LATITUDE]);
+		pData->groundSpeed = ASCII2FLOAT((const uint8_t*) &GPS_NMEA_SENTENCE[RMC_SPEED]) * GPS_KNOTS2MPS;
+		return TRUE;
+	}
+
+	return FALSE;
 }
 
 //*****************************************************************************
@@ -313,10 +440,23 @@ int BluetoothFrameAvailable()
 //*****************************************************************************
 void SendTMFrame(TM_Frame_t* pFrame)
 {
+	volatile unsigned int i = 0;
+	const unsigned int size = sizeof(TM_Frame_t);
+	const uint8_t* pData = (const uint8_t*) pFrame;
 	if (pFrame == NULL)
 	{
 		return;
 	}
 
-	UARTSend(BT_UART, (const uint8_t*) pFrame, sizeof(TM_Frame_t));
+	for (i = 0; i < size; i++)
+	{
+		//Write on byte to the Bluetoooth UART
+		ROM_UARTCharPutNonBlocking(BT_UART, pData[i]);
+
+		//Slow down every 10 frames to give receiver time to process
+		if (i % 10 == 0)
+		{
+			SysCtlDelay(SysCtlClockGet() / 10 / 3);
+		}
+	}
 }

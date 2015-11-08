@@ -16,64 +16,12 @@
 #include "utils/uartstdio.h"
 #include "brs_c_uart.h"
 #include "../../smart_data_types.h"
-#include "led_task.h"
-#include "switch_task.h"
-#include "brs_c_uart_task.h"
-#include "brs_c_data_bridge_task.h"
-#include "brs_c_sensor_task.h"
 #include "brs_c_led.h"
-#include "brs_c_bt_task.h"
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
 #include "semphr.h"
 
-//*****************************************************************************
-//
-//! \addtogroup example_list
-//! <h1>FreeRTOS Example (freertos_demo)</h1>
-//!
-//! This application demonstrates the use of FreeRTOS on Launchpad.
-//!
-//! The application blinks the user-selected LED at a user-selected frequency.
-//! To select the LED press the left button and to select the frequency press
-//! the right button.  The UART outputs the application status at 115,200 baud,
-//! 8-n-1 mode.
-//!
-//! This application utilizes FreeRTOS to perform the tasks in a concurrent
-//! fashion.  The following tasks are created:
-//!
-//! - An LED task, which blinks the user-selected on-board LED at a
-//!   user-selected rate (changed via the buttons).
-//!
-//! - A Switch task, which monitors the buttons pressed and passes the
-//!   information to LED task.
-//!
-//! In addition to the tasks, this application also uses the following FreeRTOS
-//! resources:
-//!
-//! - A Queue to enable information transfer between tasks.
-//!
-//! - A Semaphore to guard the resource, UART, from access by multiple tasks at
-//!   the same time.
-//!
-//! - A non-blocking FreeRTOS Delay to put the tasks in blocked state when they
-//!   have nothing to do.
-//!
-//! For additional details on FreeRTOS, refer to the FreeRTOS web page at:
-//! http://www.freertos.org/
-//
-//*****************************************************************************
-
-
-//*****************************************************************************
-//
-// The mutex that protects concurrent access of UART from multiple tasks.
-//
-//*****************************************************************************
-xSemaphoreHandle g_pUARTSemaphore;
-
-//*****************************************************************************
 //
 // The error routine that is called if the driver library encounters an error.
 //
@@ -103,8 +51,8 @@ void vApplicationStackOverflowHook(xTaskHandle *pxTask, char *pcTaskName)
     }
 }
 
-//Begin all the FreeRTOS Tasks
-void StartTasks();
+//GPS Sentence Buffer
+char GPS_NMEA_SENTENCE[GPS_NMEA_MAX_WORD_SIZE][GPS_NMEA_MAX_SENTENCE_SIZE];
 
 int main(void)
 {
@@ -112,8 +60,7 @@ int main(void)
 	uint8_t      currByte = 0x00;
 	BRS_Frame_t  brsFrame;
 	TM_Frame_t   tmFrame;
-	SensorData_t sensorData;
-	volatile unsigned int iterations = 0;
+	volatile unsigned int iterations = 1;
 
     //
     // Set the clocking to run at 50 MHz from the PLL.
@@ -132,11 +79,14 @@ int main(void)
 	#endif
 
     //Initialize Buffers
-    memset(&tmFrame, 0, sizeof(TM_Frame_t));
-    memset(&sensorData, 0, sizeof(SensorData_t));
-    memset(&brsFrame,   0, sizeof(BRS_Frame_t));
+    memset(&tmFrame , 0, sizeof(TM_Frame_t));
+    memset(&brsFrame, 0, sizeof(BRS_Frame_t));
+
+    //Initialize Default Values
     memcpy(&brsFrame.MsgId, BRS2BCI_MSG_ID, MSG_ID_SIZE);
-    memset(&brsFrame.remoteCommand, PCC_CMD_NONE, 1);
+    brsFrame.remoteCommand = PCC_CMD_NONE;
+    brsFrame.sensorData.rangeFinderData.rangeBack  = MAX_RANGE_TO_OBJECT;
+    brsFrame.sensorData.rangeFinderData.rangeFront = MAX_RANGE_TO_OBJECT;
 
     //Execute BRS Code Forever
     while (1)
@@ -148,6 +98,10 @@ int main(void)
     		tmFrameReceived = TRUE; //latch
     	}
 
+		#ifdef DEBUG_ONLY
+    	brsFrame.remoteCommand = "frbl"[rand() % 4];
+
+    	#else //Actually Get the Data
     	//Check for Bluetooth Characters
     	if (ROM_UARTCharsAvail(BT_UART))
     	{
@@ -164,21 +118,22 @@ int main(void)
     	{
     		brsFrame.remoteCommand = PCC_CMD_NONE;
     	}
+		#endif
 
-    	//Check for GPS Data
-    	if (GPSDataAvailable())
-    	{
-    		ReadGPSData(&sensorData.gpsData);
-    	}
+		#ifdef DEBUG_ONLY
+    	brsFrame.sensorData.gpsData.altitude           = rand() % 100 * 3.14;
+		brsFrame.sensorData.gpsData.latitude           = rand() % 100 * 3.14;
+		brsFrame.sensorData.gpsData.longitude          = rand() % 100 * 3.14;
+		brsFrame.sensorData.gpsData.groundSpeed        = rand() % 100 * 3.14;
+		brsFrame.sensorData.rangeFinderData.rangeFront = rand() % 100 * 3.14;
+		brsFrame.sensorData.rangeFinderData.rangeBack  = rand() % 100 * 3.14;
 
-    	//Read Range Finder Data
-    	if (ROM_UARTCharsAvail(USF_UART) || ROM_UARTCharsAvail(USR_UART))
-    	{
-    		ReadUSData(&sensorData.rangeFinderData);
-    	}
+		#else //Actually Get the Data
 
-    	//Combine Sensor Data and Remote Data
-    	memcpy(&brsFrame.sensorData, &sensorData, sizeof(SensorData_t));
+		ReadGPSData(&brsFrame.sensorData.gpsData);
+		ReadUSData(&brsFrame.sensorData.rangeFinderData);
+
+		#endif
 
     	//Send Frame to BCI Processor if it is not a TM Request
     	if (currByte != 'T' && currByte != 'M')
@@ -202,46 +157,7 @@ int main(void)
     	currByte = PCC_CMD_NONE;
 
     	//Relax for a bit
-    	SysCtlDelay(SysCtlClockGet() / 10 / 5);
+    	//SysCtlDelay(SysCtlClockGet() / 10 / 5);
     	iterations++;
-    }
-}
-
-void StartTasks()
-{
-	// Create the UART task.
-    if(UARTTaskInit() != 0)
-    {
-    	UARTprintf("Couldn't Start UART Task:(");
-        while(1)
-        {
-        }
-    }
-
-    // Create the Bluetooth task.
-    if(BluetoothTaskInit() != 0)
-    {
-    	UARTprintf("Couldn't Start BT Task:(");
-        while(1)
-        {
-        }
-    }
-
-    // Create the Sensor task.
-    if(SensorTaskInit() != 0)
-    {
-    	UARTprintf("Couldn't Start Sensor Task:(");
-        while(1)
-        {
-        }
-    }
-
-    // Create the Data Bridge task.
-    if(DataBridgeTaskInit() != 0)
-    {
-    	UARTprintf("Couldn't Start Data Bridge Task:(");
-        while(1)
-        {
-        }
     }
 }

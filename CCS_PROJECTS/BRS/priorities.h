@@ -30,8 +30,6 @@
 // The priorities of the various tasks.
 //
 //*****************************************************************************
-#define PRIORITY_SWITCH_TASK      9 //Remove Me
-#define PRIORITY_LED_TASK         8 //Remove Me
 #define PRIORITY_UART_TASK        1
 #define PRIORITY_SENSOR_TASK      2
 #define PRIORITY_BT_TASK          3
