@@ -68,6 +68,9 @@ typedef enum
 //#define TACTICAL
 #define DEBUG_ONLY
 
+//Allow Prints to Console
+#define VERBOSE 
+
 //The Actual Configuration for a real setup
 #ifdef TACTICAL
     #define USE_EEG_DATA //Start the EEG Thread
@@ -78,11 +81,10 @@ typedef enum
 
 //Debug Configuration for testing
 #else
-    #define VERBOSE //Allow Prints to Console
     #define DEFAULT_EEG_TYPE EEG_TYPE_DEBUG
-    #define DEFAULT_BRS_TYPE BRS_TYPE_TIVA   //BRS_TYPE_TIVA
+    #define DEFAULT_BRS_TYPE BRS_TYPE_TIVA
     #define BRS_DEBUG                        //For BRS Code on CCS
-    #define DEFAULT_PCC_TYPE PCC_TYPE_MSP  //PCC_TYPE_DEBUG
+    #define DEFAULT_PCC_TYPE PCC_TYPE_MSP
 #endif
 
 //==========================================================

@@ -53,6 +53,7 @@ void C_PortNames::findPortNames_WIN()
 void C_PortNames::findPortNames_UNIX()
 {
     QStringList ttyACMNames;
+    QStringList ttyAMANames;
     QStringList ttyUSBNames;
     QString portName;
 
@@ -67,23 +68,38 @@ void C_PortNames::findPortNames_UNIX()
         {
             ttyACMNames.append(portName);
         }
+        else if (portName.contains("AMA"))
+        {
+            ttyAMANames.append(portName);
+        }
     }
 
     //Guess the Port Name
     if (ttyACMNames.size() >= 2)
     {
-        brsPortName = ttyACMNames[0];
-        pccPortName = ttyACMNames[1];
+        brsPortName = ttyACMNames.first();
+        pccPortName = ttyACMNames.last();
     }
-    else if (ttyACMNames.size() == 1)
-    {
-        brsPortName = ttyACMNames[0];
-        pccPortName = ttyUSBNames.first();
-    }
-    else
+    else if (ttyUSBNames.size() >= 2)
     {
         brsPortName = ttyUSBNames.first();
         pccPortName = ttyUSBNames.last();
+    }
+    else if (ttyAMANames.size() >= 2)
+    {
+        brsPortName = ttyAMANames.first();
+        pccPortName = ttyAMANames.last();
+    }
+
+    //We have to just guess what the port names are....
+    else
+    {
+        if (ttyUSBNames.size() > 0)
+        {
+            pccPortName = ttyUSBNames.last();
+
+            brsPortName = (ttyACMNames.size() > 0) ? ttyACMNames.last() : ttyAMANames.last();
+        }
     }
 }
 
