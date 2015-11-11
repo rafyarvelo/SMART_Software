@@ -155,7 +155,12 @@ typedef enum GPSVTGMessageIndex
 // Ultrasonic Sensor Formats
 //
 //*****************************************************************************
+#define US_UART_MSG_SIZE 5 //FORMAT: 'R' 000-255 \n
+#define US_UART_DATA_START 'R'  //'R' for Range
+#define US_UART_DATA_END   0x13 //ASCII Carriage Return
 
+//UART Ranges come out in meters
+#define INCHES2METERS 0.0254
 
 //*****************************************************************************
 

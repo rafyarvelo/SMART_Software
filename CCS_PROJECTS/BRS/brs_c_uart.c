@@ -84,7 +84,7 @@ void ConfigureUARTs(void)
     UARTClockSourceSet (UART0_BASE, UART_CLOCK_PIOSC);
     UARTConfigSetExpClk(UART1_BASE, SysCtlClockGet(), BAUD_RATE , (UART_CONFIG_PAR_NONE | UART_CONFIG_STOP_ONE | UART_CONFIG_WLEN_8));
     UARTConfigSetExpClk(UART2_BASE, SysCtlClockGet(), BAUD_RATE , (UART_CONFIG_PAR_NONE | UART_CONFIG_STOP_ONE | UART_CONFIG_WLEN_8));
-    UARTConfigSetExpClk(UART3_BASE, SysCtlClockGet(), 115200 , (UART_CONFIG_PAR_NONE | UART_CONFIG_STOP_ONE | UART_CONFIG_WLEN_8));
+    UARTConfigSetExpClk(UART3_BASE, SysCtlClockGet(), 115200    , (UART_CONFIG_PAR_NONE | UART_CONFIG_STOP_ONE | UART_CONFIG_WLEN_8));
     UARTConfigSetExpClk(UART5_BASE, SysCtlClockGet(), BAUD_RATE , (UART_CONFIG_PAR_NONE | UART_CONFIG_STOP_ONE | UART_CONFIG_WLEN_8));
     UARTConfigSetExpClk(UART6_BASE, SysCtlClockGet(), BAUD_RATE , (UART_CONFIG_PAR_NONE | UART_CONFIG_STOP_ONE | UART_CONFIG_WLEN_8));
 
@@ -263,7 +263,7 @@ uint32_t ASCII2UINT(const uint8_t* pui8buffer, uint32_t length)
 	}
 
 	//Calculate Long Value
-	for ( ; index >= 0; index--)
+	for (index = index - 1 ; index >= 0; index--)
 	{
 		ui32Val += ASCII2HEX(pui8buffer[index]) * (pow(10, digit++));
 	}
@@ -295,6 +295,7 @@ float ASCII2FLOAT(const uint8_t* pui8buffer, uint32_t length)
 		}
 
 		len++;
+		tmp++;
 	}
 
 	//Get numbers to right of decimal
@@ -389,6 +390,47 @@ void ReadUSData(US_Data_t* pData)
 	if (pData == NULL)
 	{
 		return;
+	}
+
+	//Buffers for UART data
+	char c = 0x00;
+	char usfData[US_UART_MSG_SIZE];
+	char usrData[US_UART_MSG_SIZE];
+	memset(&usrData[0], 0, US_UART_MSG_SIZE);
+	memset(&usfData[0], 0, US_UART_MSG_SIZE);
+
+	//Get Front Range Finder Data
+	if (ROM_UARTCharsAvail(USF_UART))
+	{
+		c = ROM_UARTCharGetNonBlocking(USF_UART);
+
+		//Get the Range from the UART as an ASCII Value of 000 - 255
+		if (c == US_UART_DATA_START)
+		{
+			usfData[0] = ROM_UARTCharGetNonBlocking(USF_UART);
+			usfData[1] = ROM_UARTCharGetNonBlocking(USF_UART);
+			usfData[2] = ROM_UARTCharGetNonBlocking(USF_UART);
+
+			//Update Range Finder Data
+			pData->rangeFront = (float) ASCII2UINT((const uint8_t*) &usfData[0], US_UART_MSG_SIZE) * INCHES2METERS;
+		}
+	}
+
+	//Get Rear Range Finder Data
+	if (ROM_UARTCharsAvail(USR_UART))
+	{
+		c = ROM_UARTCharGetNonBlocking(USR_UART);
+
+		//Get the Range from the UART as an ASCII Value of 000 - 255
+		if (c == US_UART_DATA_START)
+		{
+			usrData[0] = ROM_UARTCharGetNonBlocking(USR_UART);
+			usrData[1] = ROM_UARTCharGetNonBlocking(USR_UART);
+			usrData[2] = ROM_UARTCharGetNonBlocking(USR_UART);
+
+			//Update Range Finder Data
+			pData->rangeBack = (float) ASCII2UINT((const uint8_t*) &usrData[0], US_UART_MSG_SIZE) * INCHES2METERS;
+		}
 	}
 }
 

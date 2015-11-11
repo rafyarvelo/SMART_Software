@@ -40,7 +40,7 @@ typedef enum UART_ID
 } UART_ID;
 
 //Default BAUD_RATE for all the boards
-#define BAUD_RATE      9600
+#define BAUD_RATE 9600
 
 //*****************************************************************************
 //

@@ -2,10 +2,10 @@
 
 C_RVS::C_RVS()
 {
-    for (int id = LED_FORWARD; id < NUM_LED_GROUPS; id++)
-    {
-        ledGroups[id] = createLEDGroup(static_cast<LED_Group_ID>(id));
-    }
+    ledGroups[LED_FORWARD]  = createLEDGroup(LED_FORWARD);
+    ledGroups[LED_BACKWARD] = createLEDGroup(LED_BACKWARD);
+    ledGroups[LED_RIGHT]    = createLEDGroup(LED_RIGHT);
+    ledGroups[LED_LEFT]     = createLEDGroup(LED_LEFT);
 }
 
 C_RVS::~C_RVS()

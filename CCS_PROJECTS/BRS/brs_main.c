@@ -56,10 +56,10 @@ char GPS_NMEA_SENTENCE[GPS_NMEA_MAX_WORD_SIZE][GPS_NMEA_MAX_SENTENCE_SIZE];
 
 //Test Everything
 #undef DEBUG_ONLY
+//#define ENABLE_CONSOLE
 
 int main(void)
 {
-	uint8_t      tmFrameReceived = FALSE;
 	uint8_t      currByte = 0x00;
 	BRS_Frame_t  brsFrame;
 	TM_Frame_t   tmFrame;
@@ -91,23 +91,26 @@ int main(void)
     brsFrame.sensorData.rangeFinderData.rangeBack  = MAX_RANGE_TO_OBJECT;
     brsFrame.sensorData.rangeFinderData.rangeFront = MAX_RANGE_TO_OBJECT;
 
+//    while (1)
+//    {
+//			while (ROM_UARTCharsAvail(USF_UART))
+//			{
+//				ROM_UARTCharPutNonBlocking(CONSOLE_UART, ROM_UARTCharGetNonBlocking(USF_UART));
+//			}
+//
+//			while (ROM_UARTCharsAvail(USR_UART))
+//			{
+//				ROM_UARTCharPutNonBlocking(CONSOLE_UART, ROM_UARTCharGetNonBlocking(USR_UART));
+//			}
+//    }
+
     //Execute BRS Code Forever
     while (1)
     {
-//    	while (ROM_UARTCharsAvail(USF_UART))
-//    	{
-//    		ROM_UARTCharPutNonBlocking(CONSOLE_UART, ROM_UARTCharGetNonBlocking(USF_UART));
-//    	}
-//
-//    	while (ROM_UARTCharsAvail(USR_UART))
-//    	{
-//    		ROM_UARTCharPutNonBlocking(CONSOLE_UART, ROM_UARTCharGetNonBlocking(USR_UART));
-//    	}
     	//Check for TM Frame
     	if (ROM_UARTCharsAvail(BCI_UART))
     	{
     		ReadBCI2BRSMsg(&tmFrame);
-    		tmFrameReceived = TRUE; //latch
     	}
 
 		#ifdef DEBUG_ONLY
@@ -149,20 +152,19 @@ int main(void)
 		#endif
 
     	//Send Frame to BCI Processor if it is not a TM Request
-    	if (currByte != 'T' && currByte != 'M')
-    	{
-			#ifdef ENABLE_CONSOLE
-			UARTprintf("Sending %c\r\n", brsFrame.remoteCommand);
-			#endif
-        	SendBRSFrame(&brsFrame);
-    	}
-
-    	//Once we receive the first TM Frame start sending out a TM Stream to the Bluetooth device
-    	if (1)//(tmFrameReceived)
+    	if (currByte == 'T' || currByte == 'M')
     	{
     		//Change Message Id and send through Bluetooth Module
     		memcpy(&tmFrame.MsgId, BRS2MD_MSG_ID, MSG_ID_SIZE);
         	SendTMFrame(&tmFrame);
+    	}
+
+    	else //Must be a remote command
+    	{
+			#ifdef ENABLE_CONSOLE
+			UARTprintf("Sending %c\r\n", brsFrame.remoteCommand);
+			#endif
+			SendBRSFrame(&brsFrame);
     	}
 
     	//Reset default values

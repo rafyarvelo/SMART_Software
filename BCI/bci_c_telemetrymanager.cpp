@@ -50,10 +50,18 @@ const TM_Frame_t& C_TelemetryManager::updateTM(BRS_Frame_t& brsFrame)
     memcpy(&mCurrentTMFrame.brsFrame, &brsFrame, sizeof(BRS_Frame_t));
 
     //Update the Rest of the Data
+    mCurrentTMFrame.ledForward.id           = mRVSPtr->GetLEDGroup(LED_FORWARD) ->id;
     mCurrentTMFrame.ledForward.frequency    = mRVSPtr->GetLEDGroup(LED_FORWARD) ->frequency;
+
+    mCurrentTMFrame.ledBackward.id          = mRVSPtr->GetLEDGroup(LED_BACKWARD)->id;
     mCurrentTMFrame.ledBackward.frequency   = mRVSPtr->GetLEDGroup(LED_BACKWARD)->frequency;
+
+    mCurrentTMFrame.ledRight.id             = mRVSPtr->GetLEDGroup(LED_RIGHT)   ->id;
     mCurrentTMFrame.ledRight.frequency      = mRVSPtr->GetLEDGroup(LED_RIGHT)   ->frequency;
+
+    mCurrentTMFrame.ledLeft.id              = mRVSPtr->GetLEDGroup(LED_LEFT)    ->id;
     mCurrentTMFrame.ledLeft.frequency       = mRVSPtr->GetLEDGroup(LED_LEFT)    ->frequency;
+
     mCurrentTMFrame.eegConnectionStatus     = mBCIPackagePtr->eegConnectionStatus;
     mCurrentTMFrame.brsConnectionStatus     = mBCIPackagePtr->brshConnectionStatus;
     mCurrentTMFrame.pccConnectionStatus     = mBCIPackagePtr->pccConnectionStatus;
