@@ -57,6 +57,11 @@ char GPS_NMEA_SENTENCE[GPS_NMEA_MAX_WORD_SIZE][GPS_NMEA_MAX_SENTENCE_SIZE];
 //Test Everything
 #undef DEBUG_ONLY
 //#define ENABLE_CONSOLE
+#define TM_FRAME_DEBUG
+
+#ifdef TM_FRAME_DEBUG
+void GenerateRandomTM(TM_Frame_t* pFrame);
+#endif
 
 int main(void)
 {
@@ -156,6 +161,21 @@ int main(void)
     	{
     		//Change Message Id and send through Bluetooth Module
     		memcpy(&tmFrame.MsgId, BRS2MD_MSG_ID, MSG_ID_SIZE);
+
+    		#ifdef TM_FRAME_DEBUG
+    		//GenerateRandomTM(&tmFrame);
+			int i, size = sizeof(TM_Frame_t);
+			for (i = 0; i < size / 2;i++)
+			{
+				((unsigned char*) &tmFrame)[i] = 0xff;
+			}
+			for (i = size / 2; i < size;i++)
+			{
+				((unsigned char*) &tmFrame)[i] = 'X';
+			}
+			memset(&tmFrame.flasherConnectionStatus, 'Y', sizeof(ConnectionStatusType));
+    		#endif
+
         	SendTMFrame(&tmFrame);
     	}
 
@@ -176,3 +196,38 @@ int main(void)
     	iterations++;
     }
 }
+
+#ifdef TM_FRAME_DEBUG
+void GenerateRandomTM(TM_Frame_t* pFrame)
+{
+	const char* pccCommands = "fbrl";
+	float floats[] = { 1.2, 12.3, 121.4, 23.1 };
+
+	pFrame->timeStamp = rand() % 5;
+	pFrame->bciState  = rand() % 5;
+	pFrame->lastCommand = pccCommands[rand() % 4];
+	pFrame->lastConfidence = rand() % 4;
+	pFrame->processingResult.command = pccCommands[rand() % 4];
+	pFrame->processingResult.confidence = rand() % 4;
+	pFrame->brsFrame.remoteCommand = pccCommands[rand() % 4];
+	pFrame->brsFrame.sensorData.gpsData.altitude = floats[rand() % 4];
+	pFrame->brsFrame.sensorData.gpsData.latitude = floats[rand() % 4];
+	pFrame->brsFrame.sensorData.gpsData.longitude = floats[rand() % 4];
+	pFrame->brsFrame.sensorData.gpsData.groundSpeed = floats[rand() % 4];
+	pFrame->brsFrame.sensorData.rangeFinderData.rangeFront = floats[rand() % 4];
+	pFrame->brsFrame.sensorData.rangeFinderData.rangeBack = floats[rand() % 4];
+	pFrame->ledForward.id = LED_FORWARD;
+	pFrame->ledForward.frequency = LED_FORWARD_FREQ_DEFAULT;
+	pFrame->ledBackward.id = LED_BACKWARD;
+	pFrame->ledBackward.frequency = LED_BACKWARD_FREQ_DEFAULT;
+	pFrame->ledRight.id = LED_RIGHT;
+	pFrame->ledRight.frequency = LED_RIGHT_FREQ_DEFAULT;
+	pFrame->ledLeft.id = LED_LEFT;
+	pFrame->ledLeft.frequency = LED_LEFT_FREQ_DEFAULT;
+
+	pFrame->pccConnectionStatus = CONNECTED;
+	pFrame->brsConnectionStatus = CONNECTED;
+	pFrame->eegConnectionStatus = CONNECTED;
+	pFrame->flasherConnectionStatus = CONNECTED;
+}
+#endif
