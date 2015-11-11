@@ -1,5 +1,8 @@
 #include "bci_c_brsh_io_serial.h"
+#include "bci_c_binary_parser.h"
 #include "bci_c_portnames.h"
+#include <iostream>
+using namespace std;
 
 C_BRSH_IO_Serial::C_BRSH_IO_Serial()
 {
@@ -15,6 +18,39 @@ C_BRSH_IO_Serial::~C_BRSH_IO_Serial()
 
 }
 
+void printTMFrame(const TM_Frame_t* frame, std::ostream& stream)
+{
+	const char* delimeter = " ";
+
+	//Write all the Data to the text File
+	using namespace FILE_FORMAT;
+	stream << (float) frame->timeStamp / 1000.0 << delimeter;
+	stream << Int2String(BCI_STATES, BCI_STATES_SIZE, frame->bciState).toStdString()  << delimeter;
+	stream << static_cast<char>(frame->lastCommand)     << delimeter;
+	stream << Int2String(CONFIDENCES,CONFIDENCES_SIZE, frame->lastConfidence).toStdString() << delimeter;
+	stream << static_cast<char>(frame->processingResult.command)           << delimeter;
+	stream << Int2String(CONFIDENCES,CONFIDENCES_SIZE,frame->processingResult.confidence).toStdString() << delimeter;
+
+	stream << frame->brsFrame.sensorData.gpsData.altitude     << delimeter;
+	stream << frame->brsFrame.sensorData.gpsData.longitude    << delimeter;
+	stream << frame->brsFrame.sensorData.gpsData.altitude     << delimeter;
+	stream << frame->brsFrame.sensorData.gpsData.groundSpeed  << delimeter;
+	stream << frame->brsFrame.sensorData.rangeFinderData.rangeFront << delimeter;
+	stream << frame->brsFrame.sensorData.rangeFinderData.rangeBack  << delimeter;
+	stream << (char) frame->brsFrame.remoteCommand << delimeter;
+
+	stream << frame->ledForward .frequency   << delimeter;
+	stream << frame->ledBackward.frequency   << delimeter;
+	stream << frame->ledRight   .frequency   << delimeter;
+	stream << frame->ledLeft    .frequency   << delimeter;
+	stream << Int2String(CONN_STATUSES, CONN_STATUSES_SIZE, frame->eegConnectionStatus).toStdString()     << delimeter;
+	stream << Int2String(CONN_STATUSES, CONN_STATUSES_SIZE, frame->pccConnectionStatus).toStdString()     << delimeter;
+	stream << Int2String(CONN_STATUSES, CONN_STATUSES_SIZE, frame->brsConnectionStatus).toStdString()     << delimeter;
+	stream << Int2String(CONN_STATUSES, CONN_STATUSES_SIZE, frame->flasherConnectionStatus).toStdString() << delimeter;
+
+	stream << endl;
+}
+
 //Send TM to the BRSH
 void C_BRSH_IO_Serial::SendTMFrame(tmFrameBufferType* pBuffer)
 {
@@ -27,7 +63,11 @@ void C_BRSH_IO_Serial::SendTMFrame(tmFrameBufferType* pBuffer)
     {
         //Write the TM Frame to the BRS through the UART Serial Port
         mSerialPortPtr->sendToSerialPort(reinterpret_cast<const TM_Frame_t*>(&frame));
+        mSerialPortPtr->sendToSerialPort(QByteArray("END"));
+        mSerialPortPtr->sendToSerialPort(C_BinaryParser::TM_FRAME_START);
         debugLog->println(BRS_LOG, "Sending TM Frame");
+
+        //printTMFrame(reinterpret_cast<const TM_Frame_t*>(&frame), cerr);
     }
 }
 
