@@ -57,9 +57,10 @@ char GPS_NMEA_SENTENCE[GPS_NMEA_MAX_WORD_SIZE][GPS_NMEA_MAX_SENTENCE_SIZE];
 //Test Everything
 #undef DEBUG_ONLY
 //#define ENABLE_CONSOLE
-//#define TM_FRAME_DEBUG
+//#define FRAME_DEBUG
 
-#ifdef TM_FRAME_DEBUG
+#ifdef FRAME_DEBUG
+void GenerateRandomSensorData(SensorData_t* pFrame);
 void GenerateRandomTM(TM_Frame_t* pFrame);
 #endif
 
@@ -95,6 +96,10 @@ int main(void)
     brsFrame.remoteCommand = PCC_CMD_NONE;
     brsFrame.sensorData.rangeFinderData.rangeBack  = MAX_RANGE_TO_OBJECT;
     brsFrame.sensorData.rangeFinderData.rangeFront = MAX_RANGE_TO_OBJECT;
+    brsFrame.sensorData.gpsData.altitude    = GPS_DEFAULT_ALTITUDE;
+    brsFrame.sensorData.gpsData.latitude    = GPS_DEFAULT_LATITUDE;
+    brsFrame.sensorData.gpsData.longitude   = GPS_DEFAULT_LONGITUDE;
+    brsFrame.sensorData.gpsData.groundSpeed = GPS_DEFAULT_SPEED;
 
     //Execute BRS Code Forever
     while (1)
@@ -113,7 +118,7 @@ int main(void)
     	//Check for Bluetooth Characters
     	if (ROM_UARTCharsAvail(BT_UART))
     	{
-        	currByte = ROM_UARTCharGetNonBlocking(BT_UART);
+        	currByte = ROM_UARTCharGet(BT_UART);
 
 			//Update Remote Command
 	   		brsFrame.remoteCommand = currByte;
@@ -129,12 +134,9 @@ int main(void)
 		#endif
 
 		#ifdef DEBUG_ONLY
-    	brsFrame.sensorData.gpsData.altitude           = rand() % 100 * 3.14;
-		brsFrame.sensorData.gpsData.latitude           = rand() % 100 * 3.14;
-		brsFrame.sensorData.gpsData.longitude          = rand() % 100 * 3.14;
-		brsFrame.sensorData.gpsData.groundSpeed        = rand() % 100 * 3.14;
-		brsFrame.sensorData.rangeFinderData.rangeFront = rand() % 100 * 3.14;
-		brsFrame.sensorData.rangeFinderData.rangeBack  = rand() % 100 * 3.14;
+
+    	//Create Random Sensor Data
+    	GenerateRandomSensorData(&brsFrame.sensorData);
 
 		#else //Actually Get the Data
 
@@ -149,7 +151,7 @@ int main(void)
     		//Change Message Id and send through Bluetooth Module
     		memcpy(&tmFrame.MsgId, BRS2MD_MSG_ID, MSG_ID_SIZE);
 
-    		#ifdef TM_FRAME_DEBUG
+    		#ifdef FRAME_DEBUG
     		GenerateRandomTM(&tmFrame);
     		#endif
 
@@ -161,6 +163,11 @@ int main(void)
 			#ifdef ENABLE_CONSOLE
 			UARTprintf("Sending %c\r\n", brsFrame.remoteCommand);
 			#endif
+
+			#ifdef FRAME_DEBUG
+			GenerateRandomSensorData(&brsFrame.sensorData);
+			#endif
+
 			SendBRSFrame(&brsFrame);
     	}
 
@@ -174,11 +181,22 @@ int main(void)
     }
 }
 
-#ifdef TM_FRAME_DEBUG
+#ifdef FRAME_DEBUG
+void GenerateRandomSensorData(SensorData_t* pFrame)
+{
+	float floats[] = { 1.2, 12.3, 121.4, 23.1 };
+
+	pFrame->gpsData.altitude = floats[rand() % 4];
+	pFrame->gpsData.latitude = floats[rand() % 4];
+	pFrame->gpsData.longitude = floats[rand() % 4];
+	pFrame->gpsData.groundSpeed = floats[rand() % 4];
+	pFrame->rangeFinderData.rangeFront = floats[rand() % 4];
+	pFrame->rangeFinderData.rangeBack = floats[rand() % 4];
+}
+
 void GenerateRandomTM(TM_Frame_t* pFrame)
 {
 	const char* pccCommands = "fbrl";
-	float floats[] = { 1.2, 12.3, 121.4, 23.1 };
 
 	pFrame->timeStamp = rand() % 5;
 	pFrame->bciState  = rand() % 5;
@@ -187,12 +205,7 @@ void GenerateRandomTM(TM_Frame_t* pFrame)
 	pFrame->processingResult.command = pccCommands[rand() % 4];
 	pFrame->processingResult.confidence = rand() % 4;
 	pFrame->brsFrame.remoteCommand = pccCommands[rand() % 4];
-	pFrame->brsFrame.sensorData.gpsData.altitude = floats[rand() % 4];
-	pFrame->brsFrame.sensorData.gpsData.latitude = floats[rand() % 4];
-	pFrame->brsFrame.sensorData.gpsData.longitude = floats[rand() % 4];
-	pFrame->brsFrame.sensorData.gpsData.groundSpeed = floats[rand() % 4];
-	pFrame->brsFrame.sensorData.rangeFinderData.rangeFront = floats[rand() % 4];
-	pFrame->brsFrame.sensorData.rangeFinderData.rangeBack = floats[rand() % 4];
+	GenerateRandomSensorData(&pFrame->brsFrame.sensorData);
 	pFrame->ledForward.id = LED_FORWARD;
 	pFrame->ledForward.frequency = LED_FORWARD_FREQ_DEFAULT;
 	pFrame->ledBackward.id = LED_BACKWARD;

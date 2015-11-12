@@ -15,6 +15,8 @@ extern char GPS_NMEA_SENTENCE[GPS_NMEA_MAX_WORD_SIZE][GPS_NMEA_MAX_SENTENCE_SIZE
 unsigned int currWordIndex = 0;
 unsigned int currCharIndex = 0;
 
+//#define ENABLE_CONSOLE
+
 //*****************************************************************************
 //
 // The error routine that is called if the driver library encounters an error.
@@ -116,7 +118,7 @@ void UARTSend(UART_ID uartID, const uint8_t *pui8Buffer, uint32_t ui32Count)
         //
         // Write the next character to the UART.
         //
-        ROM_UARTCharPutNonBlocking(uartID, *pui8Buffer++);
+        ROM_UARTCharPut(uartID, *pui8Buffer++);
     }
 }
 
@@ -137,7 +139,7 @@ uint16_t UARTReceive(UART_ID uartID, volatile uint8_t *pui8Buffer, uint32_t ui32
         //
         // Read the next character from the UART and put it in the buffer
         //
-    	*pui8Buffer++ = ROM_UARTCharGetNonBlocking(uartID);
+    	*pui8Buffer++ = ROM_UARTCharGet(uartID);
 
         //Increment the Number of Bytes Received
     	bytesReceived++;
@@ -163,7 +165,7 @@ uint16_t UARTReceiveUntil(UART_ID uartID, volatile uint8_t *pui8Buffer, char del
         //
         // Read the next character from the UART and put it in the buffer
         //
-    	*pui8Buffer = ROM_UARTCharGetNonBlocking(uartID);
+    	*pui8Buffer = ROM_UARTCharGet(uartID);
 
     	//Continue until delimeter is found
     	if (*pui8Buffer == delim || *pui8Buffer == '\r' || *pui8Buffer == '\n' || *pui8Buffer == '\0')
@@ -340,7 +342,7 @@ int ReadGPSData(GPS_Data_t* pData)
     //Read all the current data in the GPS UART
 	while (ROM_UARTCharsAvail(GPS_UART))
 	{
-		currChar = ROM_UARTCharGetNonBlocking(GPS_UART);
+		currChar = ROM_UARTCharGet(GPS_UART);
 
 		if (currChar == GPS_DATA_DELIM)
 		{
@@ -353,7 +355,7 @@ int ReadGPSData(GPS_Data_t* pData)
 		else if (currChar == '\r')
 		{
 			//Skip the '\n' Character
-			ROM_UARTCharGetNonBlocking(GPS_UART);
+			ROM_UARTCharGet(GPS_UART);
 
 			//Reset the sentence
 			currWordIndex = 0;
@@ -409,7 +411,7 @@ void ReadUSData(US_Data_t* pData)
 	//Get Front Range Finder Data
 	if (ROM_UARTCharsAvail(USF_UART))
 	{
-		c = ROM_UARTCharGetNonBlocking(USF_UART);
+		c = ROM_UARTCharGet(USF_UART);
 
 		//Get the Range from the UART as an ASCII Value of 000 - 255
 		if (c == US_UART_DATA_START)
@@ -422,15 +424,20 @@ void ReadUSData(US_Data_t* pData)
 			UARTprintf("Front Range Detected: %s Inches\r\n", usfData);
 			#endif
 
-			//Update Range Finder Data
-			pData->rangeFront = (float) ASCII2UINT((const uint8_t*) &usfData[0], US_UART_MSG_SIZE) * INCHES2METERS;
+			//Update Range Finder Data if there was not a read error
+			if (usfData[0] != US_UART_DATA_START &&
+				usfData[1] != US_UART_DATA_START &&
+				usfData[2] != US_UART_DATA_START)
+			{
+				pData->rangeFront = (float) ASCII2UINT((const uint8_t*) &usfData[0], US_UART_MSG_SIZE) * INCHES2METERS;
+			}
 		}
 	}
 
 	//Get Rear Range Finder Data
 	if (ROM_UARTCharsAvail(USR_UART))
 	{
-		c = ROM_UARTCharGetNonBlocking(USR_UART);
+		c = ROM_UARTCharGet(USR_UART);
 
 		//Get the Range from the UART as an ASCII Value of 000 - 255
 		if (c == US_UART_DATA_START)
@@ -443,8 +450,13 @@ void ReadUSData(US_Data_t* pData)
 			UARTprintf("Rear Range Detected: %s Inches\r\n", usrData);
 			#endif
 
-			//Update Range Finder Data
-			pData->rangeBack = (float) ASCII2UINT((const uint8_t*) &usrData[0], US_UART_MSG_SIZE) * INCHES2METERS;
+			//Update Range Finder Data if there was not a read error
+			if (usrData[0] != US_UART_DATA_START &&
+				usrData[1] != US_UART_DATA_START &&
+				usrData[2] != US_UART_DATA_START)
+			{
+				pData->rangeBack = (float) ASCII2UINT((const uint8_t*) &usrData[0], US_UART_MSG_SIZE) * INCHES2METERS;
+			}
 		}
 	}
 }

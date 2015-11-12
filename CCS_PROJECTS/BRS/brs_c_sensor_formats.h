@@ -19,6 +19,12 @@
 #define GPS_DATA_EOL   '\n'
 #define GPS_ID_START   '$'
 
+//Default Location is UCF SU
+#define GPS_DEFAULT_LATITUDE  28.6016
+#define GPS_DEFAULT_LONGITUDE 81.2005
+#define GPS_DEFAULT_ALTITUDE  2.4
+#define GPS_DEFAULT_SPEED     0.04
+
 //National Marine Electronics Association (NMEA) Output Sentences
 #define GPS_NMEA_MAX_WORD_SIZE     15
 #define GPS_NMEA_MAX_SENTENCE_SIZE 30
