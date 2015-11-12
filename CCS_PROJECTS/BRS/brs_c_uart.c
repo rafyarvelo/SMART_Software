@@ -15,7 +15,6 @@ extern char GPS_NMEA_SENTENCE[GPS_NMEA_MAX_WORD_SIZE][GPS_NMEA_MAX_SENTENCE_SIZE
 unsigned int currWordIndex = 0;
 unsigned int currCharIndex = 0;
 
-
 //*****************************************************************************
 //
 // The error routine that is called if the driver library encounters an error.
@@ -336,45 +335,53 @@ void ReadBCI2BRSMsg(TM_Frame_t* pFrame)
 //*****************************************************************************
 int ReadGPSData(GPS_Data_t* pData)
 {
-    char c = 0x00;
-    uint16_t wordsRead = 0;
+	uint8_t currChar = 0x00;
 
     //Read all the current data in the GPS UART
 	while (ROM_UARTCharsAvail(GPS_UART))
 	{
-		c = ROM_UARTCharGetNonBlocking(GPS_UART);
+		currChar = ROM_UARTCharGetNonBlocking(GPS_UART);
 
-		if (c == GPS_DATA_DELIM)
+		if (currChar == GPS_DATA_DELIM)
 		{
 			//Go to the Next Word
 			currWordIndex = (currWordIndex + 1) % GPS_NMEA_MAX_SENTENCE_SIZE;
 			currCharIndex = 0;
 		}
-		else if (c == '\r' || c == '\n') //One full sentence was read successfully
+
+		//One full sentence was read successfully
+		else if (currChar == '\r')
 		{
-			wordsRead = currWordIndex;
+			//Skip the '\n' Character
+			ROM_UARTCharGetNonBlocking(GPS_UART);
+
+			//Reset the sentence
 			currWordIndex = 0;
 			currCharIndex = 0;
 
-			//Reset the sentence and break
-		    memset((void*) &GPS_NMEA_SENTENCE[0][0], 0, GPS_NMEA_MAX_SENTENCE_SIZE * GPS_NMEA_MAX_WORD_SIZE);
-		    break;
+			//We only care about the "RMC" sentence
+			if (strcmp(GPS_NMEA_SENTENCE[0], GPS_RMC_MSG_ID) == 0)
+			{
+				pData->longitude   = ASCII2FLOAT((const uint8_t*) &GPS_NMEA_SENTENCE[RMC_LONGITUDE], GPS_NMEA_MAX_WORD_SIZE);
+				pData->latitude    = ASCII2FLOAT((const uint8_t*) &GPS_NMEA_SENTENCE[RMC_LATITUDE] , GPS_NMEA_MAX_WORD_SIZE);
+				pData->groundSpeed = ASCII2FLOAT((const uint8_t*) &GPS_NMEA_SENTENCE[RMC_SPEED], GPS_NMEA_MAX_WORD_SIZE) * GPS_KNOTS2MPS;
+
+				#ifdef ENABLE_CONSOLE
+				UARTprintf("GPS Data Updated!\r\n");
+				#endif
+
+				//Reset the sentence
+			    memset(&GPS_NMEA_SENTENCE[0][0], 0, GPS_NMEA_MAX_SENTENCE_SIZE * GPS_NMEA_MAX_WORD_SIZE);
+
+				return TRUE;
+			}
 		}
 
 		else //Read one character into the buffer
 		{
-			GPS_NMEA_SENTENCE[currWordIndex][currCharIndex] = c;
+			GPS_NMEA_SENTENCE[currWordIndex][currCharIndex] = currChar;
 			currCharIndex = (currCharIndex + 1) % GPS_NMEA_MAX_WORD_SIZE;
 		}
-	}
-
-	//We only care about the "RMC" sentence
-	if (strcmp((const char*) &GPS_NMEA_SENTENCE[RMC_MSG_ID], GPS_RMC_MSG_ID) == 0)
-	{
-		pData->longitude   = ASCII2FLOAT((const uint8_t*) &GPS_NMEA_SENTENCE[RMC_LONGITUDE], GPS_NMEA_MAX_WORD_SIZE);
-		pData->latitude    = ASCII2FLOAT((const uint8_t*) &GPS_NMEA_SENTENCE[RMC_LATITUDE] , GPS_NMEA_MAX_WORD_SIZE);
-		pData->groundSpeed = ASCII2FLOAT((const uint8_t*) &GPS_NMEA_SENTENCE[RMC_SPEED], GPS_NMEA_MAX_WORD_SIZE) * GPS_KNOTS2MPS;
-		return TRUE;
 	}
 
 	return FALSE;
@@ -407,9 +414,13 @@ void ReadUSData(US_Data_t* pData)
 		//Get the Range from the UART as an ASCII Value of 000 - 255
 		if (c == US_UART_DATA_START)
 		{
-			usfData[0] = ROM_UARTCharGetNonBlocking(USF_UART);
-			usfData[1] = ROM_UARTCharGetNonBlocking(USF_UART);
-			usfData[2] = ROM_UARTCharGetNonBlocking(USF_UART);
+			usfData[0] = ROM_UARTCharGet(USF_UART);
+			usfData[1] = ROM_UARTCharGet(USF_UART);
+			usfData[2] = ROM_UARTCharGet(USF_UART);
+
+			#ifdef ENABLE_CONSOLE
+			UARTprintf("Front Range Detected: %s Inches\r\n", usfData);
+			#endif
 
 			//Update Range Finder Data
 			pData->rangeFront = (float) ASCII2UINT((const uint8_t*) &usfData[0], US_UART_MSG_SIZE) * INCHES2METERS;
@@ -424,9 +435,13 @@ void ReadUSData(US_Data_t* pData)
 		//Get the Range from the UART as an ASCII Value of 000 - 255
 		if (c == US_UART_DATA_START)
 		{
-			usrData[0] = ROM_UARTCharGetNonBlocking(USR_UART);
-			usrData[1] = ROM_UARTCharGetNonBlocking(USR_UART);
-			usrData[2] = ROM_UARTCharGetNonBlocking(USR_UART);
+			usrData[0] = ROM_UARTCharGet(USR_UART);
+			usrData[1] = ROM_UARTCharGet(USR_UART);
+			usrData[2] = ROM_UARTCharGet(USR_UART);
+
+			#ifdef ENABLE_CONSOLE
+			UARTprintf("Rear Range Detected: %s Inches\r\n", usrData);
+			#endif
 
 			//Update Range Finder Data
 			pData->rangeBack = (float) ASCII2UINT((const uint8_t*) &usrData[0], US_UART_MSG_SIZE) * INCHES2METERS;

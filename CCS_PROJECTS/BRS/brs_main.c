@@ -57,7 +57,7 @@ char GPS_NMEA_SENTENCE[GPS_NMEA_MAX_WORD_SIZE][GPS_NMEA_MAX_SENTENCE_SIZE];
 //Test Everything
 #undef DEBUG_ONLY
 //#define ENABLE_CONSOLE
-#define TM_FRAME_DEBUG
+//#define TM_FRAME_DEBUG
 
 #ifdef TM_FRAME_DEBUG
 void GenerateRandomTM(TM_Frame_t* pFrame);
@@ -95,19 +95,6 @@ int main(void)
     brsFrame.remoteCommand = PCC_CMD_NONE;
     brsFrame.sensorData.rangeFinderData.rangeBack  = MAX_RANGE_TO_OBJECT;
     brsFrame.sensorData.rangeFinderData.rangeFront = MAX_RANGE_TO_OBJECT;
-
-//    while (1)
-//    {
-//			while (ROM_UARTCharsAvail(USF_UART))
-//			{
-//				ROM_UARTCharPutNonBlocking(CONSOLE_UART, ROM_UARTCharGetNonBlocking(USF_UART));
-//			}
-//
-//			while (ROM_UARTCharsAvail(USR_UART))
-//			{
-//				ROM_UARTCharPutNonBlocking(CONSOLE_UART, ROM_UARTCharGetNonBlocking(USR_UART));
-//			}
-//    }
 
     //Execute BRS Code Forever
     while (1)
@@ -163,17 +150,7 @@ int main(void)
     		memcpy(&tmFrame.MsgId, BRS2MD_MSG_ID, MSG_ID_SIZE);
 
     		#ifdef TM_FRAME_DEBUG
-    		//GenerateRandomTM(&tmFrame);
-			int i, size = sizeof(TM_Frame_t);
-			for (i = 0; i < size / 2;i++)
-			{
-				((unsigned char*) &tmFrame)[i] = 0xff;
-			}
-			for (i = size / 2; i < size;i++)
-			{
-				((unsigned char*) &tmFrame)[i] = 'X';
-			}
-			memset(&tmFrame.flasherConnectionStatus, 'Y', sizeof(ConnectionStatusType));
+    		GenerateRandomTM(&tmFrame);
     		#endif
 
         	SendTMFrame(&tmFrame);

@@ -17,6 +17,7 @@
 //*****************************************************************************
 #define GPS_DATA_DELIM ','
 #define GPS_DATA_EOL   '\n'
+#define GPS_ID_START   '$'
 
 //National Marine Electronics Association (NMEA) Output Sentences
 #define GPS_NMEA_MAX_WORD_SIZE     15
