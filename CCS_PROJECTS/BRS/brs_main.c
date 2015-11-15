@@ -17,10 +17,6 @@
 #include "brs_c_uart.h"
 #include "../../smart_data_types.h"
 #include "brs_c_led.h"
-#include "FreeRTOS.h"
-#include "task.h"
-#include "queue.h"
-#include "semphr.h"
 
 //
 // The error routine that is called if the driver library encounters an error.
@@ -33,23 +29,6 @@ __error__(char *pcFilename, uint32_t ui32Line)
 }
 
 #endif
-
-//*****************************************************************************
-//
-// This hook is called by FreeRTOS when an stack overflow error is detected.
-//
-//*****************************************************************************
-void vApplicationStackOverflowHook(xTaskHandle *pxTask, char *pcTaskName)
-{
-    //
-    // This function can not return, so loop forever.  Interrupts are disabled
-    // on entry to this function, so no processor interrupts will interrupt
-    // this loop.
-    //
-    while(1)
-    {
-    }
-}
 
 //GPS Sentence Buffer
 char GPS_NMEA_SENTENCE[GPS_NMEA_MAX_WORD_SIZE][GPS_NMEA_MAX_SENTENCE_SIZE];
@@ -100,6 +79,9 @@ int main(void)
     brsFrame.sensorData.gpsData.latitude    = GPS_DEFAULT_LATITUDE;
     brsFrame.sensorData.gpsData.longitude   = GPS_DEFAULT_LONGITUDE;
     brsFrame.sensorData.gpsData.groundSpeed = GPS_DEFAULT_SPEED;
+
+    //Copy the Default BRS frame to the TM Frame
+    memcpy(&tmFrame.brsFrame, &brsFrame, sizeof(BRS_Frame_t));
 
     //Execute BRS Code Forever
     while (1)

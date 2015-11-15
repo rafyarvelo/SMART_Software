@@ -15,11 +15,6 @@
 #include "drivers/rgb.h"
 #include "drivers/buttons.h"
 #include "utils/uartstdio.h"
-#include "priorities.h"
-#include "FreeRTOS.h"
-#include "task.h"
-#include "queue.h"
-#include "semphr.h"
 
 #include "driverlib/debug.h"
 #include "driverlib/fpu.h"
