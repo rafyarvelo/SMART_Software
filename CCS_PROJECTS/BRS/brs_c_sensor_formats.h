@@ -26,8 +26,7 @@
 #define GPS_DEFAULT_SPEED     0.04
 
 //National Marine Electronics Association (NMEA) Output Sentences
-#define GPS_NMEA_MAX_WORD_SIZE     15
-#define GPS_NMEA_MAX_SENTENCE_SIZE 30
+#define GPS_NMEA_MAX_CHARS 100 //100 Characters per one sentence
 
 //NMEA Sentence Formats
 #define GPS_NMEA_ID_LEN 7 //6 Characters and a NULL Terminator

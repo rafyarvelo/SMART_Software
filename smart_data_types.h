@@ -86,7 +86,8 @@ typedef enum Confidence_Type
 typedef struct ProcessingResult_t
 {
     PCC_Command_Type command;
-    Confidence_Type  confidence;
+    char             pad_0[3];
+    unsigned int     confidence;
 
 #ifdef __cplusplus
     ProcessingResult_t()
@@ -118,6 +119,7 @@ typedef struct EEG_Frame_t
 
     //Percentage of Full Battery Charge
     uint8_t batteryPercentage;
+    char    pad_0[3]; //To be 4 byte aligned
 
 #ifdef __cplusplus
     EEG_Frame_t()
@@ -176,6 +178,8 @@ typedef struct SensorData_t
 typedef struct BluetoothFrame_t
 {
 	PCC_Command_Type remoteCommand;
+    char             pad_0[3];
+
 #ifdef __cplusplus
     BluetoothFrame_t()
     {
@@ -188,7 +192,9 @@ typedef struct BluetoothFrame_t
 typedef struct BRS_Frame_t
 {
 	MsgIdType        MsgId; //Message Sent from BRS to BCI
+    char             pad_0[3];
     PCC_Command_Type remoteCommand;
+    char             pad_1[3];
 	SensorData_t     sensorData;
 #ifdef __cplusplus
     BRS_Frame_t()
@@ -212,8 +218,9 @@ typedef enum
 
 typedef struct LED_Group_t
 {
-	LED_Group_ID id;
+	unsigned int id;
 	uint16_t     frequency;
+    char         pad_0[2]; //To Be 4 byte aligned
 } LED_Group_t;
 
 //=================================================
@@ -256,10 +263,12 @@ typedef enum BCIState
 typedef struct TM_Frame_t
 {
     MsgIdType            MsgId; //Message Sent From BCI -> BRS -> MD
-    int                  timeStamp;
-    BCIState             bciState;
+    char                 pad_0[3];
+    unsigned int         timeStamp;
+    unsigned int         bciState;
     PCC_Command_Type     lastCommand;
-    Confidence_Type      lastConfidence;
+    char                 pad_1[3];
+    unsigned int         lastConfidence;
     ProcessingResult_t   processingResult;
     BRS_Frame_t          brsFrame;
     LED_Group_t          ledForward;

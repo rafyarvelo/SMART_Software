@@ -30,13 +30,10 @@ __error__(char *pcFilename, uint32_t ui32Line)
 
 #endif
 
-//GPS Sentence Buffer
-char GPS_NMEA_SENTENCE[GPS_NMEA_MAX_WORD_SIZE][GPS_NMEA_MAX_SENTENCE_SIZE];
-
 //Test Everything
 #undef DEBUG_ONLY
 //#define ENABLE_CONSOLE
-//#define FRAME_DEBUG
+#define FRAME_DEBUG
 
 #ifdef FRAME_DEBUG
 void GenerateRandomSensorData(SensorData_t* pFrame);
@@ -80,12 +77,33 @@ int main(void)
     brsFrame.sensorData.gpsData.longitude   = GPS_DEFAULT_LONGITUDE;
     brsFrame.sensorData.gpsData.groundSpeed = GPS_DEFAULT_SPEED;
 
-    //Copy the Default BRS frame to the TM Frame
+    //Initialize the TM Frame
+    tmFrame.timeStamp = 0;
+    tmFrame.bciState = BCI_OFF;
     memcpy(&tmFrame.brsFrame, &brsFrame, sizeof(BRS_Frame_t));
+    tmFrame.lastCommand = PCC_CMD_NONE;
+    tmFrame.lastConfidence = UNSURE;
+    tmFrame.processingResult.command = PCC_CMD_NONE;
+    tmFrame.processingResult.confidence = UNSURE;
+    tmFrame.ledForward.frequency  = LED_FORWARD_FREQ_DEFAULT;
+    tmFrame.ledBackward.frequency = LED_BACKWARD_FREQ_DEFAULT;
+    tmFrame.ledRight.frequency    = LED_RIGHT_FREQ_DEFAULT;
+    tmFrame.ledLeft.frequency     = LED_LEFT_FREQ_DEFAULT;
+
+    while (0)
+    {
+    	ReadGPSData(&brsFrame.sensorData.gpsData);
+//    	while (ROM_UARTCharsAvail(GPS_UART))
+//    	{
+//    		ROM_UARTCharPut(CONSOLE_UART,ROM_UARTCharGet(GPS_UART));
+//    	}
+    }
 
     //Execute BRS Code Forever
     while (1)
     {
+    	ReadGPSData(&brsFrame.sensorData.gpsData);
+
     	//Check for TM Frame
     	if (ROM_UARTCharsAvail(BCI_UART))
     	{
@@ -114,6 +132,8 @@ int main(void)
     		brsFrame.remoteCommand = PCC_CMD_NONE;
     	}
 		#endif
+
+    	ReadGPSData(&brsFrame.sensorData.gpsData);
 
 		#ifdef DEBUG_ONLY
 
@@ -152,6 +172,8 @@ int main(void)
 
 			SendBRSFrame(&brsFrame);
     	}
+
+    	ReadGPSData(&brsFrame.sensorData.gpsData);
 
     	//Reset default values
     	brsFrame.remoteCommand = PCC_CMD_NONE;

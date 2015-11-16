@@ -11,9 +11,8 @@
 #include <math.h>
 
 //Buffer to hold the GPS NMEA Sentences and indices to access it
-extern char GPS_NMEA_SENTENCE[GPS_NMEA_MAX_WORD_SIZE][GPS_NMEA_MAX_SENTENCE_SIZE];
-unsigned int currWordIndex = 0;
-unsigned int currCharIndex = 0;
+char GPSReceiveBuff[GPS_NMEA_MAX_CHARS];
+uint32_t buffIndex = 0;
 
 //#define ENABLE_CONSOLE
 
@@ -95,7 +94,7 @@ void ConfigureUARTs(void)
     UARTStdioConfig(0, 115200, 16000000);
 
     //Initialize the GPS NMEA Sentence Buffer
-    memset((void*) &GPS_NMEA_SENTENCE[0][0], 0, GPS_NMEA_MAX_WORD_SIZE * GPS_NMEA_MAX_SENTENCE_SIZE);
+    memset((void*) &GPSReceiveBuff, 0, GPS_NMEA_MAX_CHARS);
 }
 
 //*****************************************************************************
@@ -215,6 +214,58 @@ uint16_t UARTReadDelimetedLine(UART_ID uartID, volatile uint8_t** pui8DoubleBuff
 
 //*****************************************************************************
 //
+// Retrieve a pointer to a substring inside a delimeted string, return NULL
+// if offset is invalid or delim not found.
+// * offset is the WORD INDEX of the desired delimeted word.
+// * wordSize is a reference to a variable where the size of the word will be put
+//*****************************************************************************
+char* extractDelimetedString(char* delimetedString, uint32_t size, uint32_t offset, char delim, uint32_t* wordSize)
+{
+	//Check arguments
+	if (delimetedString == NULL || wordSize == NULL || offset > size)
+	{
+		return NULL;
+	}
+
+	char*    tmp1 = delimetedString;
+	char*    tmp2 = NULL;
+
+	uint32_t wordsSeen = 0;
+	uint32_t charsSeen = 0;
+
+	//Loop until desired word is found
+	while (wordsSeen < offset)
+	{
+		if (*tmp1 == delim)
+		{
+			wordsSeen++;
+		}
+
+		//Move to next Character
+		tmp1++;
+		charsSeen++;
+
+		//We have reached the end of the string without finding the substr
+		if (charsSeen >= size)
+		{
+			return NULL;
+		}
+	}
+
+	//Find the Size of the extracted word
+	tmp2 = tmp1;
+	while (*tmp2 != delim && *tmp2 != '\0' && *tmp2 != '\n' && charsSeen < size)
+	{
+		tmp2++;
+		charsSeen++;
+		*wordSize++;
+	}
+
+	return tmp1;
+}
+
+//*****************************************************************************
+//
 // Convert ASCII Character to Hexadecimal
 //
 //*****************************************************************************
@@ -274,17 +325,18 @@ uint32_t ASCII2UINT(const uint8_t* pui8buffer, uint32_t length)
 
 //*****************************************************************************
 //
-// Convert ASCII word to Number, read until count or '\0' is seen
+// Convert ASCII word to Number, read until count or '\0' is seen, return status
 //
 //*****************************************************************************
-float ASCII2FLOAT(const uint8_t* pui8buffer, uint32_t length)
+uint8_t ASCII2FLOAT(const uint8_t* pui8buffer, uint32_t length, float* pFloat)
 {
 	if (pui8buffer == NULL)
 	{
-		return 0.0;
+		return FALSE;
 	}
 
 	int   i = 0, j = 0, len = 0, decLoc = 0;
+	uint8_t decFound = FALSE;
 	float fVal = 0.0;
 	const uint8_t* tmp = pui8buffer;
 
@@ -293,10 +345,20 @@ float ASCII2FLOAT(const uint8_t* pui8buffer, uint32_t length)
 		if (*tmp == '.')
 		{
 			decLoc = len;
+			decFound = TRUE;
 		}
 
 		len++;
 		tmp++;
+	}
+
+	//Use integer method if no decimal is found
+	if (!decFound)
+	{
+		fVal    = (float) ASCII2UINT(pui8buffer, length);
+		*pFloat = fVal;
+
+		return TRUE;
 	}
 
 	//Get numbers to right of decimal
@@ -311,7 +373,8 @@ float ASCII2FLOAT(const uint8_t* pui8buffer, uint32_t length)
 		fVal += ASCII2HEX(pui8buffer[i]) * (pow(10,j++));
 	}
 
-	return fVal;
+	*pFloat = fVal;
+	return TRUE;
 }
 
 //*****************************************************************************
@@ -337,52 +400,69 @@ void ReadBCI2BRSMsg(TM_Frame_t* pFrame)
 //*****************************************************************************
 int ReadGPSData(GPS_Data_t* pData)
 {
-	uint8_t currChar = 0x00;
+	uint8_t  currChar    = 0x00;
+	char*    word        = NULL;
+	uint32_t wordSize    = 0x0;
+	char*    rmcSentence = NULL;
+	uint32_t rmcSentenceLen = 0x0;
+	float    tmp = 0.0;
 
     //Read all the current data in the GPS UART
 	while (ROM_UARTCharsAvail(GPS_UART))
 	{
 		currChar = ROM_UARTCharGet(GPS_UART);
-
-		if (currChar == GPS_DATA_DELIM)
-		{
-			//Go to the Next Word
-			currWordIndex = (currWordIndex + 1) % GPS_NMEA_MAX_SENTENCE_SIZE;
-			currCharIndex = 0;
-		}
+		GPSReceiveBuff[buffIndex++ % GPS_NMEA_MAX_CHARS] = currChar;
 
 		//One full sentence was read successfully
-		else if (currChar == '\r')
+		if (currChar == '\n')
 		{
-			//Skip the '\n' Character
-			ROM_UARTCharGet(GPS_UART);
-
-			//Reset the sentence
-			currWordIndex = 0;
-			currCharIndex = 0;
-
 			//We only care about the "RMC" sentence
-			if (strcmp(GPS_NMEA_SENTENCE[0], GPS_RMC_MSG_ID) == 0)
+			rmcSentence = strstr(GPSReceiveBuff, GPS_RMC_MSG_ID);
+			if ( rmcSentence != NULL)
 			{
-				pData->longitude   = ASCII2FLOAT((const uint8_t*) &GPS_NMEA_SENTENCE[RMC_LONGITUDE], GPS_NMEA_MAX_WORD_SIZE);
-				pData->latitude    = ASCII2FLOAT((const uint8_t*) &GPS_NMEA_SENTENCE[RMC_LATITUDE] , GPS_NMEA_MAX_WORD_SIZE);
-				pData->groundSpeed = ASCII2FLOAT((const uint8_t*) &GPS_NMEA_SENTENCE[RMC_SPEED], GPS_NMEA_MAX_WORD_SIZE) * GPS_KNOTS2MPS;
+				//Find the size of the new string
+				rmcSentenceLen = GPS_NMEA_MAX_CHARS - (rmcSentence - &GPSReceiveBuff[0]);
+
+				//Extract the Longitude
+				word = extractDelimetedString(rmcSentence, rmcSentenceLen, (uint32_t) RMC_LONGITUDE, GPS_DATA_DELIM, &wordSize);
+				if (word != NULL)
+				{
+					ASCII2FLOAT((const uint8_t*) word, wordSize, &pData->longitude);
+					word = NULL;
+				}
+
+				//Extract the Longitude
+				word = extractDelimetedString(rmcSentence, rmcSentenceLen, (uint32_t) RMC_LATITUDE, GPS_DATA_DELIM, &wordSize);
+				if (word != NULL)
+				{
+					ASCII2FLOAT((const uint8_t*) word , wordSize, &pData->latitude);
+					word = NULL;
+				}
+
+				//Extract the Ground Speed
+				word = extractDelimetedString(rmcSentence, rmcSentenceLen, (uint32_t) RMC_SPEED, GPS_DATA_DELIM, &wordSize);
+				if (word != NULL)
+				{
+					ASCII2FLOAT((const uint8_t*) word, wordSize, &tmp);
+
+					if (tmp != 0.0)
+					{
+						pData->groundSpeed = tmp * GPS_KNOTS2MPS;
+						tmp = 0.0;
+					}
+					word = NULL;
+				}
 
 				#ifdef ENABLE_CONSOLE
 				UARTprintf("GPS Data Updated!\r\n");
 				#endif
 
-				//Reset the sentence
-			    memset(&GPS_NMEA_SENTENCE[0][0], 0, GPS_NMEA_MAX_SENTENCE_SIZE * GPS_NMEA_MAX_WORD_SIZE);
-
 				return TRUE;
 			}
-		}
 
-		else //Read one character into the buffer
-		{
-			GPS_NMEA_SENTENCE[currWordIndex][currCharIndex] = currChar;
-			currCharIndex = (currCharIndex + 1) % GPS_NMEA_MAX_WORD_SIZE;
+			//Reset the Sentence
+			memset(&GPSReceiveBuff[0], 0, GPS_NMEA_MAX_CHARS);
+			buffIndex = 0;
 		}
 	}
 

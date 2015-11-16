@@ -80,6 +80,15 @@ uint16_t UARTReadDelimetedLine(UART_ID uartID, volatile uint8_t** pui8DoubleBuff
 
 //*****************************************************************************
 //
+// Retrieve a pointer to a substring inside a delimeted string, return NULL
+// if offset is invalid or delim not found. offset is the WORD INDEX of the
+// desired delimeted word
+//
+//*****************************************************************************
+char* extractDelimetedString(char* delimetedString, uint32_t size, uint32_t offset, char delim, uint32_t* wordSize);
+
+//*****************************************************************************
+//
 // Convert ASCII Character to Hexadecimal
 //
 //*****************************************************************************
@@ -94,16 +103,10 @@ uint32_t ASCII2UINT(const uint8_t* pui8buffer, uint32_t length);
 
 //*****************************************************************************
 //
-// Convert ASCII word to Number, read until count or '\0' is seen
+// Convert ASCII word to Number, read until count or '\0' is seen, return status
 //
 //*****************************************************************************
-float ASCII2FLOAT(const uint8_t* pui8buffer, uint32_t length);
-
-//*****************************************************************************
-//
-// Read Incoming BCI Message from UART
-//
-//*****************************************************************************
+uint8_t ASCII2FLOAT(const uint8_t* pui8buffer, uint32_t length, float* pFloat);
 
 //*****************************************************************************
 //
