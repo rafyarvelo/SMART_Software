@@ -16,6 +16,8 @@ uint32_t buffIndex = 0;
 
 //#define ENABLE_CONSOLE
 
+#define MAX_TRIES 500
+
 //*****************************************************************************
 //
 // The error routine that is called if the driver library encounters an error.
@@ -155,29 +157,34 @@ uint16_t UARTReceive(UART_ID uartID, volatile uint8_t *pui8Buffer, uint32_t ui32
 uint16_t UARTReceiveUntil(UART_ID uartID, volatile uint8_t *pui8Buffer, char delim)
 {
 	uint16_t bytesReceived = 0;
-
+	uint16_t timesTried = 0;
 	//
     // Loop while there are characters in the receive FIFO.
     //
-    while(ROM_UARTCharsAvail(uartID))
+    while(timesTried++ < MAX_TRIES)
     {
-        //
-        // Read the next character from the UART and put it in the buffer
-        //
-    	*pui8Buffer = ROM_UARTCharGet(uartID);
-
-    	//Continue until delimeter is found
-    	if (*pui8Buffer == delim || *pui8Buffer == '\r' || *pui8Buffer == '\n' || *pui8Buffer == '\0')
+    	if (ROM_UARTCharsAvail(uartID))
     	{
-    		break;
-    	}
-    	else
-    	{
-    		//Move to the Next Spot in the buffer
-    		pui8Buffer++;
+            //
+            // Read the next character from the UART and put it in the buffer
+            //
+        	*pui8Buffer = ROM_UARTCharGet(uartID);
 
-    		//Increment the Number of Bytes Received
-        	bytesReceived++;
+        	//Continue until delimeter is found
+        	if (*pui8Buffer == delim || *pui8Buffer == '\r' || *pui8Buffer == '\n' || *pui8Buffer == '\0')
+        	{
+        		break;
+        	}
+        	else
+        	{
+        		//Move to the Next Spot in the buffer
+        		pui8Buffer++;
+
+        		//Increment the Number of Bytes Received
+            	bytesReceived++;
+        	}
+
+        	timesTried = 0;
     	}
     }
 
@@ -382,7 +389,7 @@ uint8_t ASCII2FLOAT(const uint8_t* pui8buffer, uint32_t length, float* pFloat)
 // Read Incoming BCI Message
 //
 //*****************************************************************************
-void ReadBCI2BRSMsg(TM_Frame_t* pFrame)
+uint8_t ReadBCI2BRSMsg(TM_Frame_t* pFrame)
 {
 	if (pFrame == NULL)
 	{
@@ -391,6 +398,8 @@ void ReadBCI2BRSMsg(TM_Frame_t* pFrame)
 
 	//Get the Message
 	UARTReceive(BCI_UART, (volatile uint8_t*) pFrame, sizeof(TM_Frame_t));
+
+	return checkMsgID(pFrame->MsgId, BCI2BRS_MSG_ID);
 }
 
 //*****************************************************************************
@@ -398,7 +407,7 @@ void ReadBCI2BRSMsg(TM_Frame_t* pFrame)
 // Read Incoming GPS Data, return TRUE if it is available
 //
 //*****************************************************************************
-int ReadGPSData(GPS_Data_t* pData)
+uint8_t ReadGPSData(GPS_Data_t* pData)
 {
 	uint8_t  currChar    = 0x00;
 	char*    word        = NULL;
@@ -406,65 +415,136 @@ int ReadGPSData(GPS_Data_t* pData)
 	char*    rmcSentence = NULL;
 	uint32_t rmcSentenceLen = 0x0;
 	float    tmp = 0.0;
+	char     gpsNMEA_ID[GPS_NMEA_ID_LEN];
+	uint8_t  index = 0;
+	uint8_t  numTries = 0;
 
-    //Read all the current data in the GPS UART
-	while (ROM_UARTCharsAvail(GPS_UART))
+	//Wait for the Beginning of a message ID
+	while (currChar != GPS_ID_START && numTries++ < 103) //LOL
 	{
 		currChar = ROM_UARTCharGet(GPS_UART);
-		GPSReceiveBuff[buffIndex++ % GPS_NMEA_MAX_CHARS] = currChar;
-
-		//One full sentence was read successfully
-		if (currChar == '\n')
-		{
-			//We only care about the "RMC" sentence
-			rmcSentence = strstr(GPSReceiveBuff, GPS_RMC_MSG_ID);
-			if ( rmcSentence != NULL)
-			{
-				//Find the size of the new string
-				rmcSentenceLen = GPS_NMEA_MAX_CHARS - (rmcSentence - &GPSReceiveBuff[0]);
-
-				//Extract the Longitude
-				word = extractDelimetedString(rmcSentence, rmcSentenceLen, (uint32_t) RMC_LONGITUDE, GPS_DATA_DELIM, &wordSize);
-				if (word != NULL)
-				{
-					ASCII2FLOAT((const uint8_t*) word, wordSize, &pData->longitude);
-					word = NULL;
-				}
-
-				//Extract the Longitude
-				word = extractDelimetedString(rmcSentence, rmcSentenceLen, (uint32_t) RMC_LATITUDE, GPS_DATA_DELIM, &wordSize);
-				if (word != NULL)
-				{
-					ASCII2FLOAT((const uint8_t*) word , wordSize, &pData->latitude);
-					word = NULL;
-				}
-
-				//Extract the Ground Speed
-				word = extractDelimetedString(rmcSentence, rmcSentenceLen, (uint32_t) RMC_SPEED, GPS_DATA_DELIM, &wordSize);
-				if (word != NULL)
-				{
-					ASCII2FLOAT((const uint8_t*) word, wordSize, &tmp);
-
-					if (tmp != 0.0)
-					{
-						pData->groundSpeed = tmp * GPS_KNOTS2MPS;
-						tmp = 0.0;
-					}
-					word = NULL;
-				}
-
-				#ifdef ENABLE_CONSOLE
-				UARTprintf("GPS Data Updated!\r\n");
-				#endif
-
-				return TRUE;
-			}
-
-			//Reset the Sentence
-			memset(&GPSReceiveBuff[0], 0, GPS_NMEA_MAX_CHARS);
-			buffIndex = 0;
-		}
 	}
+
+	//Get the Message ID
+	if (currChar == GPS_ID_START)
+	{
+		numTries = 0;
+		index    = 0;
+		gpsNMEA_ID[index++] = currChar;
+
+		while (currChar != GPS_DATA_DELIM && numTries++ < 502) //heheheh
+		{
+			if (ROM_UARTCharsAvail(GPS_UART))
+			{
+				currChar = ROM_UARTCharGet(GPS_UART);
+
+				if (currChar == GPS_DATA_DELIM)
+				{
+					if (strcmp(gpsNMEA_ID, GPS_RMC_MSG_ID) == 0)
+					{
+						UARTprintf("Victory is ours!\r\n");
+					}
+					else
+					{
+						UARTprintf("ID = %s\r\n", gpsNMEA_ID);
+					}
+					break;
+				}
+				else
+				{
+					gpsNMEA_ID[index++] = currChar;
+				}
+			}
+		}
+
+	}
+	else
+	{
+		return FALSE; //BARNACLES
+	}
+
+    //Read all the current data in the GPS UART
+//	while (ROM_UARTCharsAvail(GPS_UART))
+//	{
+//		currChar = ROM_UARTCharGet(GPS_UART);
+//
+//		//Wait for an ID to Come through the UART
+//		if (currChar == GPS_ID_START)
+//		{
+//			index = 0; numTries = 0;
+//			gpsNMEA_ID[index++] = currChar;
+//			while (numTries++ < 100)
+//			{
+//				if (ROM_UARTCharsAvail(GPS_UART))
+//				{
+//					currChar = ROM_UARTCharGet(GPS_UART);
+//					if (currChar == GPS_DATA_DELIM)
+//					{
+//						UARTprintf("GPS MSG ID: %s\r\n", gpsNMEA_ID);
+//						return FALSE;
+//					}
+//					else
+//					{
+//						gpsNMEA_ID[index++] = currChar;
+//					}
+//				}
+//			}
+//		}
+//
+//		GPSReceiveBuff[buffIndex++ % GPS_NMEA_MAX_CHARS] = currChar;
+//
+//		//One full sentence was read successfully
+//		if (currChar == '\n')
+//		{
+//			//We only care about the "RMC" sentence
+//			rmcSentence = strstr(GPSReceiveBuff, GPS_RMC_MSG_ID);
+//			if ( rmcSentence != NULL)
+//			{
+//				//Find the size of the new string
+//				rmcSentenceLen = GPS_NMEA_MAX_CHARS - (rmcSentence - &GPSReceiveBuff[0]);
+//
+//				//Extract the Longitude
+//				word = extractDelimetedString(rmcSentence, rmcSentenceLen, (uint32_t) RMC_LONGITUDE, GPS_DATA_DELIM, &wordSize);
+//				if (word != NULL)
+//				{
+//					ASCII2FLOAT((const uint8_t*) word, wordSize, &pData->longitude);
+//					word = NULL;
+//				}
+//
+//				//Extract the Longitude
+//				word = extractDelimetedString(rmcSentence, rmcSentenceLen, (uint32_t) RMC_LATITUDE, GPS_DATA_DELIM, &wordSize);
+//				if (word != NULL)
+//				{
+//					ASCII2FLOAT((const uint8_t*) word , wordSize, &pData->latitude);
+//					word = NULL;
+//				}
+//
+//				//Extract the Ground Speed
+//				word = extractDelimetedString(rmcSentence, rmcSentenceLen, (uint32_t) RMC_SPEED, GPS_DATA_DELIM, &wordSize);
+//				if (word != NULL)
+//				{
+//					ASCII2FLOAT((const uint8_t*) word, wordSize, &tmp);
+//
+//					if (tmp != 0.0)
+//					{
+//						pData->groundSpeed = tmp * GPS_KNOTS2MPS;
+//						tmp = 0.0;
+//					}
+//					word = NULL;
+//				}
+//
+//				#ifdef ENABLE_CONSOLE
+//				UARTprintf("GPS Data Updated!\r\n");
+//				#endif
+//
+//				return TRUE;
+//			}
+//
+//			//Reset the Sentence
+//			memset(&GPSReceiveBuff[0], 0, GPS_NMEA_MAX_CHARS);
+//			buffIndex = 0;
+//		}
+//	}
 
 	return FALSE;
 }
@@ -474,11 +554,13 @@ int ReadGPSData(GPS_Data_t* pData)
 // Read Range Finder data
 //
 //*****************************************************************************
-void ReadUSData(US_Data_t* pData)
+uint8_t ReadUSData(US_Data_t* pData)
 {
+	uint8_t dataValid = FALSE;
+
 	if (pData == NULL)
 	{
-		return;
+		return FALSE;
 	}
 
 	//Buffers for UART data
@@ -510,6 +592,7 @@ void ReadUSData(US_Data_t* pData)
 				usfData[2] != US_UART_DATA_START)
 			{
 				pData->rangeFront = (float) ASCII2UINT((const uint8_t*) &usfData[0], US_UART_MSG_SIZE) * INCHES2METERS;
+				dataValid = TRUE;
 			}
 		}
 	}
@@ -536,9 +619,12 @@ void ReadUSData(US_Data_t* pData)
 				usrData[2] != US_UART_DATA_START)
 			{
 				pData->rangeBack = (float) ASCII2UINT((const uint8_t*) &usrData[0], US_UART_MSG_SIZE) * INCHES2METERS;
+				dataValid = TRUE;
 			}
 		}
 	}
+
+	return dataValid;
 }
 
 //*****************************************************************************
@@ -554,31 +640,6 @@ void SendBRSFrame(BRS_Frame_t* pFrame)
 	}
 
 	UARTSend(BCI_UART, (const uint8_t*) pFrame, sizeof(BRS_Frame_t));
-}
-
-//*****************************************************************************
-//
-// Retrieve a Bluetooth Frame from the UART
-//
-//*****************************************************************************
-void ReadBluetoothFrame(BluetoothFrame_t* pFrame)
-{
-	if (pFrame == NULL)
-	{
-		return;
-	}
-
-	UARTReceive(BT_UART, (volatile uint8_t*) pFrame, sizeof(BluetoothFrame_t));
-}
-
-//*****************************************************************************
-//
-// Check for a Bluetooth Frame in the UART
-//
-//*****************************************************************************
-int BluetoothFrameAvailable()
-{
-	return ROM_UARTCharsAvail(BT_UART);
 }
 
 //*****************************************************************************

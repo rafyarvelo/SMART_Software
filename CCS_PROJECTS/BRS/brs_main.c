@@ -32,8 +32,8 @@ __error__(char *pcFilename, uint32_t ui32Line)
 
 //Test Everything
 #undef DEBUG_ONLY
-//#define ENABLE_CONSOLE
-#define FRAME_DEBUG
+#define ENABLE_CONSOLE
+//#define FRAME_DEBUG
 
 #ifdef FRAME_DEBUG
 void GenerateRandomSensorData(SensorData_t* pFrame);
@@ -45,6 +45,7 @@ int main(void)
 	uint8_t      currByte = 0x00;
 	BRS_Frame_t  brsFrame;
 	TM_Frame_t   tmFrame;
+	uint8_t      newDataAvailable = FALSE;
 	volatile unsigned int iterations = 1;
 
     //
@@ -95,19 +96,17 @@ int main(void)
     	ReadGPSData(&brsFrame.sensorData.gpsData);
 //    	while (ROM_UARTCharsAvail(GPS_UART))
 //    	{
-//    		ROM_UARTCharPut(CONSOLE_UART,ROM_UARTCharGet(GPS_UART));
+//    		ROM_UARTCharPut(CONSOLE_UART, ROM_UARTCharGet(GPS_UART));
 //    	}
     }
 
     //Execute BRS Code Forever
     while (1)
     {
-    	ReadGPSData(&brsFrame.sensorData.gpsData);
-
     	//Check for TM Frame
     	if (ROM_UARTCharsAvail(BCI_UART))
     	{
-    		ReadBCI2BRSMsg(&tmFrame);
+    		newDataAvailable = ReadBCI2BRSMsg(&tmFrame);
     	}
 
 		#ifdef DEBUG_ONLY
@@ -126,6 +125,8 @@ int main(void)
 			#ifdef ENABLE_CONSOLE
 			UARTprintf("Bluetooth Received %c\r\n", brsFrame.remoteCommand);
 			#endif
+
+			newDataAvailable = TRUE;
     	}
     	else //Remote Command
     	{
@@ -133,55 +134,69 @@ int main(void)
     	}
 		#endif
 
-    	ReadGPSData(&brsFrame.sensorData.gpsData);
-
 		#ifdef DEBUG_ONLY
 
     	//Create Random Sensor Data
     	GenerateRandomSensorData(&brsFrame.sensorData);
+		newDataAvailable = TRUE;
 
-		#else //Actually Get the Data
+		#else
 
-		ReadGPSData(&brsFrame.sensorData.gpsData);
-		ReadUSData(&brsFrame.sensorData.rangeFinderData);
+    	//Check for US Data
+		if (ReadUSData(&brsFrame.sensorData.rangeFinderData))
+		{
+			newDataAvailable = TRUE;
+		}
+
+		//Only Read GPS Data when TM is being requested
+    	if (currByte == 'T' || currByte == 'M')
+    	{
+    		if (ReadGPSData(&brsFrame.sensorData.gpsData))
+    		{
+    			newDataAvailable = TRUE;
+    		}
+    	}
 
 		#endif
 
-    	//Send Frame to BCI Processor if it is not a TM Request
-    	if (currByte == 'T' || currByte == 'M')
-    	{
-    		//Change Message Id and send through Bluetooth Module
-    		memcpy(&tmFrame.MsgId, BRS2MD_MSG_ID, MSG_ID_SIZE);
+		//Don't Bother Sending duplicate frames
+		if (newDataAvailable)
+		{
+	    	//Send Frame to BCI Processor if it is not a TM Request
+	    	if (currByte == 'T' || currByte == 'M')
+	    	{
+	    		//Change Message Id and send through Bluetooth Module
+	    		memcpy(&tmFrame.MsgId, BRS2MD_MSG_ID, MSG_ID_SIZE);
 
-    		#ifdef FRAME_DEBUG
-    		GenerateRandomTM(&tmFrame);
-    		#endif
+	    		#ifdef FRAME_DEBUG
+	    		GenerateRandomTM(&tmFrame);
+	    		#endif
 
-        	SendTMFrame(&tmFrame);
-    	}
+	        	SendTMFrame(&tmFrame);
+	    	}
 
-    	else //Must be a remote command
-    	{
-			#ifdef ENABLE_CONSOLE
-			UARTprintf("Sending %c\r\n", brsFrame.remoteCommand);
-			#endif
+	    	else //Must be a remote command
+	    	{
+				#ifdef ENABLE_CONSOLE
+				UARTprintf("Sending %c\r\n", brsFrame.remoteCommand);
+				#endif
 
-			#ifdef FRAME_DEBUG
-			GenerateRandomSensorData(&brsFrame.sensorData);
-			#endif
+				#ifdef FRAME_DEBUG
+				GenerateRandomSensorData(&brsFrame.sensorData);
+				#endif
 
-			SendBRSFrame(&brsFrame);
-    	}
-
-    	ReadGPSData(&brsFrame.sensorData.gpsData);
+				SendBRSFrame(&brsFrame);
+	    	}
+		}
 
     	//Reset default values
     	brsFrame.remoteCommand = PCC_CMD_NONE;
     	currByte = PCC_CMD_NONE;
+    	newDataAvailable = FALSE;
 
-    	//Relax for a bit
-    	SysCtlDelay(SysCtlClockGet() / 10 / 5);
-    	iterations++;
+		#ifdef DEBUG_ONLY
+    	SysCtlDelay(SysClockGet() / 5);
+		#endif
     }
 }
 
