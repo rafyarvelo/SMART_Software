@@ -72,7 +72,7 @@ private:
 
     //Final Scores from Data Processing
     ProcessingScore_t finalScores[NUM_PCC_DIRECTIONS];
-    Confidence_Type   finalConfidences[NUM_PCC_DIRECTIONS];
+    unsigned int      finalConfidences[NUM_PCC_DIRECTIONS];
 
     //Count of how many frames we've processed
     uint64t framesProcessed;

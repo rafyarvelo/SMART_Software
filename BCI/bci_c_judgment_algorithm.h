@@ -17,7 +17,7 @@ class C_JudgmentAlgorithm : public QObject, public C_Singleton<C_JudgmentAlgorit
 public:
 	//The Signal Processing class with deliver the processed data to the JA
      C_JudgmentAlgorithm();
-	~C_JudgmentAlgorithm();
+    ~C_JudgmentAlgorithm();
 
     PCC_Command_Type GetFinalCommand();
 
@@ -52,7 +52,7 @@ private:
 
     PCC_Command_Type    finalCommand;
     PCC_Command_Type    prevCommand;
-    Confidence_Type     cmdConfidence;
+    unsigned int        cmdConfidence;
 
     bool commandFinalized; //Just in case user forgets to call computeCommand()
 };

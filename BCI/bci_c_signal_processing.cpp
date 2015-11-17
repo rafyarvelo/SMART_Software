@@ -27,7 +27,7 @@ void C_SignalProcessing::resetData()
     memset(&normalizedData  [0], 0, sizeof(uint32_t) * MAX_EEG_ELECTRODES);
 
     memset(&finalScores     [0], 0, sizeof(ProcessingScore_t) * NUM_PCC_DIRECTIONS);
-    memset(&finalConfidences[0], 0, sizeof(Confidence_Type)   * NUM_PCC_DIRECTIONS);
+    memset(&finalConfidences[0], 0, sizeof(unsigned int     ) * NUM_PCC_DIRECTIONS);
 
     resultReady        = false;
     scoresCalculated   = false;
@@ -57,10 +57,10 @@ void C_SignalProcessing::calculateFinalScores()
     finalScores[RIGHT]    = (normalizedData[FC5] + normalizedData[FC6]) / 2;
     finalScores[LEFT]     = (normalizedData[F3]  + normalizedData[F4] ) / 2;
 
-    finalConfidences[FORWARD]  = static_cast<Confidence_Type>(finalScores[FORWARD]  % NUM_CONFIDENCE_TYPES);
-    finalConfidences[BACKWARD] = static_cast<Confidence_Type>(finalScores[BACKWARD] % NUM_CONFIDENCE_TYPES);
-    finalConfidences[RIGHT]    = static_cast<Confidence_Type>(finalScores[RIGHT]    % NUM_CONFIDENCE_TYPES);
-    finalConfidences[LEFT]     = static_cast<Confidence_Type>(finalScores[LEFT]     % NUM_CONFIDENCE_TYPES);
+    finalConfidences[FORWARD]  = finalScores[FORWARD]  % NUM_CONFIDENCE_TYPES;
+    finalConfidences[BACKWARD] = finalScores[BACKWARD] % NUM_CONFIDENCE_TYPES;
+    finalConfidences[RIGHT]    = finalScores[RIGHT]    % NUM_CONFIDENCE_TYPES;
+    finalConfidences[LEFT]     = finalScores[LEFT]     % NUM_CONFIDENCE_TYPES;
 
     scoresCalculated = true;
 }

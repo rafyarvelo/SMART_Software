@@ -64,12 +64,14 @@ bool C_EEG_IO_EMOTIV::fetchEEGFrame()
     EmotivReadStatus readStatus;
     int timeout_count = 0;
 
-    //Connect if we aren't connected yet
+    //Try to Connect if we aren't connected yet
     if (m_resource != 0 || connectionStatus == NOT_CONNECTED)
     {
-        this->connect();
+        if (!this->connect())
+	{
+          return false;
+	}
     }
-
     //Execute Thread Mainloop
     while (timeout_count < MAX_TIMEOUTS)
     {
