@@ -32,7 +32,7 @@ __error__(char *pcFilename, uint32_t ui32Line)
 
 //Test Everything
 #undef DEBUG_ONLY
-#define ENABLE_CONSOLE
+//#define ENABLE_CONSOLE
 //#define FRAME_DEBUG
 
 #ifdef FRAME_DEBUG
@@ -91,13 +91,13 @@ int main(void)
     tmFrame.ledRight.frequency    = LED_RIGHT_FREQ_DEFAULT;
     tmFrame.ledLeft.frequency     = LED_LEFT_FREQ_DEFAULT;
 
+    //For GPS Testing, REMOVE ME
     while (0)
     {
-    	ReadGPSData(&brsFrame.sensorData.gpsData);
-//    	while (ROM_UARTCharsAvail(GPS_UART))
-//    	{
-//    		ROM_UARTCharPut(CONSOLE_UART, ROM_UARTCharGet(GPS_UART));
-//    	}
+    	while (ROM_UARTCharsAvail(GPS_UART))
+    	{
+    		ROM_UARTCharPut(CONSOLE_UART, ROM_UARTCharGet(GPS_UART));
+    	}
     }
 
     //Execute BRS Code Forever

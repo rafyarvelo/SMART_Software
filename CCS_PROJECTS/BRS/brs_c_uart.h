@@ -68,7 +68,7 @@ uint16_t UARTReceive(UART_ID uartID, volatile uint8_t *pui8Buffer, uint32_t ui32
 // Retrieve a string from the UART until a delimeter is found, return bytes actually read
 //
 //*****************************************************************************
-uint16_t UARTReceiveUntil(UART_ID uartID, volatile uint8_t *pui8Buffer, char delim);
+uint16_t UARTReceiveUntil(UART_ID uartID, char *pui8Buffer, char delim, uint32_t maxSize);
 
 //*****************************************************************************
 //
@@ -76,7 +76,7 @@ uint16_t UARTReceiveUntil(UART_ID uartID, volatile uint8_t *pui8Buffer, char del
 // Return the number of words read
 //
 //*****************************************************************************
-uint16_t UARTReadDelimetedLine(UART_ID uartID, volatile uint8_t** pui8DoubleBuffer, char delim);
+uint16_t UARTReadDelimetedLine(UART_ID uartID, char** pui8DoubleBuffer, char delim);
 
 //*****************************************************************************
 //

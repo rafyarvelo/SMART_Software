@@ -10,13 +10,10 @@
 #include <string.h>
 #include <math.h>
 
-//Buffer to hold the GPS NMEA Sentences and indices to access it
-char GPSReceiveBuff[GPS_NMEA_MAX_CHARS];
-uint32_t buffIndex = 0;
-
 //#define ENABLE_CONSOLE
 
 #define MAX_TRIES 500
+char GPS_Sentence[GPS_NMEA_MAX_WORD_SIZE][GSV_NUM_WORDS + 1];
 
 //*****************************************************************************
 //
@@ -94,9 +91,6 @@ void ConfigureUARTs(void)
     // Initialize the CONSOLE UART for console I/O.
     //
     UARTStdioConfig(0, 115200, 16000000);
-
-    //Initialize the GPS NMEA Sentence Buffer
-    memset((void*) &GPSReceiveBuff, 0, GPS_NMEA_MAX_CHARS);
 }
 
 //*****************************************************************************
@@ -154,10 +148,12 @@ uint16_t UARTReceive(UART_ID uartID, volatile uint8_t *pui8Buffer, uint32_t ui32
 // Retrieve a string from the UART until a delimeter is found, return bytes actually read
 //
 //*****************************************************************************
-uint16_t UARTReceiveUntil(UART_ID uartID, volatile uint8_t *pui8Buffer, char delim)
+uint16_t UARTReceiveUntil(UART_ID uartID, char *pui8Buffer, char delim, uint32_t maxSize)
 {
 	uint16_t bytesReceived = 0;
 	uint16_t timesTried = 0;
+	uint8_t   currChar = 0xFF;
+
 	//
     // Loop while there are characters in the receive FIFO.
     //
@@ -168,23 +164,27 @@ uint16_t UARTReceiveUntil(UART_ID uartID, volatile uint8_t *pui8Buffer, char del
             //
             // Read the next character from the UART and put it in the buffer
             //
-        	*pui8Buffer = ROM_UARTCharGet(uartID);
+      		currChar = ROM_UARTCharGet(uartID);
 
         	//Continue until delimeter is found
-        	if (*pui8Buffer == delim || *pui8Buffer == '\r' || *pui8Buffer == '\n' || *pui8Buffer == '\0')
+        	if (currChar == delim || currChar == '\r' || currChar == '\n' || currChar == '\0')
         	{
         		break;
         	}
         	else
         	{
-        		//Move to the Next Spot in the buffer
-        		pui8Buffer++;
+        		//Update the buffer
+         		 if (pui8Buffer != NULL)
+         		 {
+         			 *pui8Buffer++ = currChar;
+         		 }
 
         		//Increment the Number of Bytes Received
-            	bytesReceived++;
+            	if (bytesReceived++ >= maxSize)
+            	{
+            		return bytesReceived;
+            	}
         	}
-
-        	timesTried = 0;
     	}
     }
 
@@ -197,20 +197,20 @@ uint16_t UARTReceiveUntil(UART_ID uartID, volatile uint8_t *pui8Buffer, char del
 // Return the number of words read
 //
 //*****************************************************************************
-uint16_t UARTReadDelimetedLine(UART_ID uartID, volatile uint8_t** pui8DoubleBuffer, char delim)
+uint16_t UARTReadDelimetedLine(UART_ID uartID, char** pui8DoubleBuffer, char delim)
 {
 	uint8_t           currByte  = 0x00;
 	uint16_t          wordsRead = 0;
-	volatile uint8_t* pCurrWord = NULL;
+	char* pCurrWord = NULL;
 
 	//Read the sentence into a buffer
 	while (ROM_UARTCharsAvail(uartID) && currByte != '\n')
 	{
 		//Get a pointer to the current word in the buffer
-		pCurrWord = (volatile uint8_t*) &pui8DoubleBuffer[wordsRead][0];
+		pCurrWord = (char*) &pui8DoubleBuffer[wordsRead][0];
 
 		//Get a word from the UART
-		UARTReceiveUntil(uartID, pCurrWord, delim);
+		UARTReceiveUntil(uartID, pCurrWord, delim, GPS_NMEA_MAX_WORD_SIZE);
 
 		//Keep Track of Words Actually Read
 		wordsRead++;
@@ -409,15 +409,24 @@ uint8_t ReadBCI2BRSMsg(TM_Frame_t* pFrame)
 //*****************************************************************************
 uint8_t ReadGPSData(GPS_Data_t* pData)
 {
-	uint8_t  currChar    = 0x00;
-	char*    word        = NULL;
-	uint32_t wordSize    = 0x0;
-	char*    rmcSentence = NULL;
-	uint32_t rmcSentenceLen = 0x0;
-	float    tmp = 0.0;
-	char     gpsNMEA_ID[GPS_NMEA_ID_LEN];
-	uint8_t  index = 0;
+	uint8_t  i        = 0;
+	uint8_t  index    = 0;
 	uint8_t  numTries = 0;
+	uint8_t  currChar = 0x00;
+	char     gpsNMEA_ID[GPS_NMEA_ID_LEN];
+	char     dataValid[GPS_NMEA_MAX_WORD_SIZE];
+	char     gpsLat[GPS_NMEA_MAX_WORD_SIZE];
+	char     gpsLng[GPS_NMEA_MAX_WORD_SIZE];
+	char     gpsSpd[GPS_NMEA_MAX_WORD_SIZE];
+	char     gpsAlt[GPS_NMEA_MAX_WORD_SIZE];
+
+	//Initialize Buffers
+	memset(&gpsNMEA_ID[0], 0, GPS_NMEA_ID_LEN);
+	memset(&dataValid[0], 0, GPS_NMEA_MAX_WORD_SIZE);
+	memset(&gpsLat[0], 0, GPS_NMEA_MAX_WORD_SIZE);
+	memset(&gpsLng[0], 0, GPS_NMEA_MAX_WORD_SIZE);
+	memset(&gpsSpd[0], 0, GPS_NMEA_MAX_WORD_SIZE);
+	memset(&gpsAlt[0], 0, GPS_NMEA_MAX_WORD_SIZE);
 
 	//Wait for the Beginning of a message ID
 	while (currChar != GPS_ID_START && numTries++ < 103) //LOL
@@ -432,24 +441,84 @@ uint8_t ReadGPSData(GPS_Data_t* pData)
 		index    = 0;
 		gpsNMEA_ID[index++] = currChar;
 
-		while (currChar != GPS_DATA_DELIM && numTries++ < 502) //heheheh
+		while (currChar != GPS_DATA_DELIM && numTries++ < MAX_TRIES)
 		{
 			if (ROM_UARTCharsAvail(GPS_UART))
 			{
 				currChar = ROM_UARTCharGet(GPS_UART);
 
+				//See if we have read the entire ID
 				if (currChar == GPS_DATA_DELIM)
 				{
+
+					#ifdef ENABLE_CONSOLE
+					UARTprintf("GPS MSG ID = %s\r\n", gpsNMEA_ID);
+					#endif
+
+					//We only care about Recommended Min Nav Coordinates
 					if (strcmp(gpsNMEA_ID, GPS_RMC_MSG_ID) == 0)
 					{
-						UARTprintf("Victory is ours!\r\n");
+						//Skip UTC Time
+						//UARTReadDelimetedLine(GPS_UART, &GPS_Sentence[0][0], GPS_DATA_DELIM);
+						UARTReceiveUntil(GPS_UART, NULL, GPS_DATA_DELIM, GPS_NMEA_MAX_WORD_SIZE);
+
+						//Get Status
+						UARTReceiveUntil(GPS_UART, &dataValid[0], GPS_DATA_DELIM, GPS_NMEA_MAX_WORD_SIZE);
+
+						//Get Latitude
+						UARTReceiveUntil(GPS_UART, &gpsLat[0], GPS_DATA_DELIM, GPS_NMEA_MAX_WORD_SIZE);
+
+						//Skip N/S Indicator
+						UARTReceiveUntil(GPS_UART, NULL, GPS_DATA_DELIM, GPS_NMEA_MAX_WORD_SIZE);
+
+						//Get Longitude
+						UARTReceiveUntil(GPS_UART, &gpsLng[0], GPS_DATA_DELIM, GPS_NMEA_MAX_WORD_SIZE);
+
+						//Skip E/W Indicator
+						UARTReceiveUntil(GPS_UART, NULL, GPS_DATA_DELIM, GPS_NMEA_MAX_WORD_SIZE);
+
+						//Get Speed
+						UARTReceiveUntil(GPS_UART, &gpsSpd[0], GPS_DATA_DELIM, GPS_NMEA_MAX_WORD_SIZE);
+
+						if (strcmp(dataValid,GPS_RMC_DATA_VALID) == 0)
+						{
+							#ifdef ENABLE_CONSOLE
+							UARTprintf("Latitude  = %s \r\n", gpsLat);
+							UARTprintf("Longitude = %s \r\n", gpsLng);
+							UARTprintf("Speed     = %s \r\n", gpsSpd);
+							#endif
+
+							//Update GPS Values in Struct
+							ASCII2FLOAT((const uint8_t*)&gpsLat[0],GPS_NMEA_MAX_WORD_SIZE, &pData->latitude);
+							ASCII2FLOAT((const uint8_t*)&gpsLng[0],GPS_NMEA_MAX_WORD_SIZE, &pData->longitude);
+							ASCII2FLOAT((const uint8_t*)&gpsSpd[0],GPS_NMEA_MAX_WORD_SIZE, &pData->groundSpeed);
+						}
+					}
+					else if (strcmp(gpsNMEA_ID, GPS_GGA_MSG_ID) == 0)
+					{
+						//Skip All the words until the altitude
+						for (i = 1; i < GGA_MSL_ALT; i++)
+						{
+							UARTReceiveUntil(GPS_UART, NULL, GPS_DATA_DELIM, GPS_NMEA_MAX_WORD_SIZE);
+						}
+
+						//Get Altitude
+						UARTReceiveUntil(GPS_UART, &gpsAlt[0], GPS_DATA_DELIM, GPS_NMEA_MAX_WORD_SIZE);
+						ASCII2FLOAT((const uint8_t*) &gpsAlt[0],GPS_NMEA_MAX_WORD_SIZE,&pData->altitude);
+
+						#ifdef ENABLE_CONSOLE
+						UARTprintf("Altitude = %s \r\n", gpsAlt);
+						#endif
 					}
 					else
 					{
-						UARTprintf("ID = %s\r\n", gpsNMEA_ID);
+						;//Msg is not Supported
 					}
+
 					break;
 				}
+
+				//Get the Next Character in the ID
 				else
 				{
 					gpsNMEA_ID[index++] = currChar;
@@ -462,89 +531,6 @@ uint8_t ReadGPSData(GPS_Data_t* pData)
 	{
 		return FALSE; //BARNACLES
 	}
-
-    //Read all the current data in the GPS UART
-//	while (ROM_UARTCharsAvail(GPS_UART))
-//	{
-//		currChar = ROM_UARTCharGet(GPS_UART);
-//
-//		//Wait for an ID to Come through the UART
-//		if (currChar == GPS_ID_START)
-//		{
-//			index = 0; numTries = 0;
-//			gpsNMEA_ID[index++] = currChar;
-//			while (numTries++ < 100)
-//			{
-//				if (ROM_UARTCharsAvail(GPS_UART))
-//				{
-//					currChar = ROM_UARTCharGet(GPS_UART);
-//					if (currChar == GPS_DATA_DELIM)
-//					{
-//						UARTprintf("GPS MSG ID: %s\r\n", gpsNMEA_ID);
-//						return FALSE;
-//					}
-//					else
-//					{
-//						gpsNMEA_ID[index++] = currChar;
-//					}
-//				}
-//			}
-//		}
-//
-//		GPSReceiveBuff[buffIndex++ % GPS_NMEA_MAX_CHARS] = currChar;
-//
-//		//One full sentence was read successfully
-//		if (currChar == '\n')
-//		{
-//			//We only care about the "RMC" sentence
-//			rmcSentence = strstr(GPSReceiveBuff, GPS_RMC_MSG_ID);
-//			if ( rmcSentence != NULL)
-//			{
-//				//Find the size of the new string
-//				rmcSentenceLen = GPS_NMEA_MAX_CHARS - (rmcSentence - &GPSReceiveBuff[0]);
-//
-//				//Extract the Longitude
-//				word = extractDelimetedString(rmcSentence, rmcSentenceLen, (uint32_t) RMC_LONGITUDE, GPS_DATA_DELIM, &wordSize);
-//				if (word != NULL)
-//				{
-//					ASCII2FLOAT((const uint8_t*) word, wordSize, &pData->longitude);
-//					word = NULL;
-//				}
-//
-//				//Extract the Longitude
-//				word = extractDelimetedString(rmcSentence, rmcSentenceLen, (uint32_t) RMC_LATITUDE, GPS_DATA_DELIM, &wordSize);
-//				if (word != NULL)
-//				{
-//					ASCII2FLOAT((const uint8_t*) word , wordSize, &pData->latitude);
-//					word = NULL;
-//				}
-//
-//				//Extract the Ground Speed
-//				word = extractDelimetedString(rmcSentence, rmcSentenceLen, (uint32_t) RMC_SPEED, GPS_DATA_DELIM, &wordSize);
-//				if (word != NULL)
-//				{
-//					ASCII2FLOAT((const uint8_t*) word, wordSize, &tmp);
-//
-//					if (tmp != 0.0)
-//					{
-//						pData->groundSpeed = tmp * GPS_KNOTS2MPS;
-//						tmp = 0.0;
-//					}
-//					word = NULL;
-//				}
-//
-//				#ifdef ENABLE_CONSOLE
-//				UARTprintf("GPS Data Updated!\r\n");
-//				#endif
-//
-//				return TRUE;
-//			}
-//
-//			//Reset the Sentence
-//			memset(&GPSReceiveBuff[0], 0, GPS_NMEA_MAX_CHARS);
-//			buffIndex = 0;
-//		}
-//	}
 
 	return FALSE;
 }
