@@ -7,12 +7,28 @@ C_Flasher_IO_GPIO::C_Flasher_IO_GPIO()
 
 C_Flasher_IO_GPIO::~C_Flasher_IO_GPIO()
 {
-
+    /*
+     * Disable GPIO pins
+     */
+    GPIOUnexport(POUT);
+    GPIOUnexport(PIN);
 }
 
 ConnectionStatusType C_Flasher_IO_GPIO::connect()
 {
-    return setup_io();
+    /*
+     * Enable GPIO pins
+     */
+    if (GPIO_FAILURE == GPIOExport(POUT) || GPIO_FAILURE == GPIOExport(PIN))
+        return(GPIO_FAILURE);
+
+    /*
+     * Set GPIO directions
+     */
+    if (GPIO_FAILURE == GPIODirection(POUT, OUT) || GPIO_FAILURE == GPIODirection(PIN, IN))
+        return(GPIO_FAILURE);
+
+    return CONNECTED;
 }
 
 void C_Flasher_IO_GPIO::SendRVS(C_RVS *pRVS)
@@ -20,52 +36,107 @@ void C_Flasher_IO_GPIO::SendRVS(C_RVS *pRVS)
 
 }
 
-ConnectionStatusType C_Flasher_IO_GPIO::setup_io()
+int C_Flasher_IO_GPIO::GPIOExport(int pin)
 {
-    connectionStatus = NOT_CONNECTED;
-#ifndef WIN32
-   /* open /dev/mem */
-   if ((mem_fd = open("/dev/mem", O_RDWR|O_SYNC) ) < 0)
-   {
-      debugLog->println(FLASHER_LOG, "Can't open /dev/mem", false, true);
-      return NOT_CONNECTED;
-   }
-
-   /* mmap GPIO */
-   gpio_map = mmap(
-      NULL,             //Any adddress in our space will do
-      BLOCK_SIZE,       //Map length
-      PROT_READ|PROT_WRITE,// Enable reading & writting to mapped memory
-      MAP_SHARED,       //Shared with other processes
-      mem_fd,           //File to map
-      GPIO_BASE         //Offset to GPIO peripheral
-   );
-
-   close(mem_fd); //No need to keep mem_fd open after mmap
-
-   if (gpio_map == MAP_FAILED) {
-      debugLog->println(FLASHER_LOG, "mmap error %d\n", (int)gpio_map);//errno also set!
-      return NOT_CONNECTED;
-   }
-
-   // Always use volatile pointer!
-   gpio = (volatile unsigned *)gpio_map;
-#endif
-
-   connectionStatus = CONNECTED;
-   return connectionStatus;
-} // setup_io
-
-bool C_Flasher_IO_GPIO::checkPin(int pin)
-{
-    return (bool) GET_GPIO(pin);
+	char buffer[BUFFER_MAX];
+	ssize_t bytes_written;
+	int fd;
+ 
+	fd = open("/sys/class/gpio/export", O_WRONLY);
+	if (GPIO_FAILURE == fd) {
+		debugLog->println(FLASHER_LOG, stderr, "Failed to open export for writing!");
+		return GPIO_FAILURE;
+	}
+ 
+	bytes_written = snprintf(buffer, BUFFER_MAX, "%d", pin);
+	write(fd, buffer, bytes_written);
+	close(fd);
+	return(0);
 }
-
-void C_Flasher_IO_GPIO::printButton(int g)
+ 
+int C_Flasher_IO_GPIO::GPIOUnexport(int pin)
 {
-  if (GET_GPIO(g)) // !=0 <-> bit is 1 <- port is HIGH=3.3V
-    debugLog->println(FLASHER_LOG, "Button pressed!\n");
-  else // port is LOW=0V
-    debugLog->println(FLASHER_LOG, "Button released!\n");
+	char buffer[BUFFER_MAX];
+	ssize_t bytes_written;
+	int fd;
+ 
+	fd = open("/sys/class/gpio/unexport", O_WRONLY);
+	if (GPIO_FAILURE == fd) {
+		debugLog->println(FLASHER_LOG, stderr, "Failed to open unexport for writing!");
+		return GPIO_FAILURE;
+	}
+ 
+	bytes_written = snprintf(buffer, BUFFER_MAX, "%d", pin);
+	write(fd, buffer, bytes_written);
+	close(fd);
+	return(0);
 }
-
+ 
+int C_Flasher_IO_GPIO::GPIODirection(int pin, int dir)
+{
+	static const char s_directions_str[]  = "in\0out";
+ 
+	char path[DIRECTION_MAX];
+	int fd;
+ 
+	snprintf(path, DIRECTION_MAX, "/sys/class/gpio/gpio%d/direction", pin);
+	fd = open(path, O_WRONLY);
+	if (GPIO_FAILURE == fd) {
+		debugLog->println(FLASHER_LOG, stderr, "Failed to open gpio direction for writing!");
+		return GPIO_FAILURE;
+	}
+ 
+	if (GPIO_FAILURE == write(fd, &s_directions_str[IN == dir ? 0 : 3], IN == dir ? 2 : 3)) {
+		debugLog->println(FLASHER_LOG, stderr, "Failed to set direction!");
+		return GPIO_FAILURE;
+	}
+ 
+	close(fd);
+	return(0);
+}
+ 
+int C_Flasher_IO_GPIO::GPIORead(int pin)
+{
+	char path[VALUE_MAX];
+	char value_str[3];
+	int fd;
+ 
+	snprintf(path, VALUE_MAX, "/sys/class/gpio/gpio%d/value", pin);
+	fd = open(path, O_RDONLY);
+	if (GPIO_FAILURE == fd) {
+		debugLog->println(FLASHER_LOG, stderr, "Failed to open gpio value for reading!");
+		return GPIO_FAILURE;
+	}
+ 
+	if (GPIO_FAILURE == read(fd, value_str, 3)) {
+		debugLog->println(FLASHER_LOG, stderr, "Failed to read value!");
+		return GPIO_FAILURE;
+	}
+ 
+	close(fd);
+ 
+	return(atoi(value_str));
+}
+ 
+int C_Flasher_IO_GPIO::GPIOWrite(int pin, int value)
+{
+	static const char s_values_str[] = "01";
+ 
+	char path[VALUE_MAX];
+	int fd;
+ 
+	snprintf(path, VALUE_MAX, "/sys/class/gpio/gpio%d/value", pin);
+	fd = open(path, O_WRONLY);
+	if (GPIO_FAILURE == fd) {
+		debugLog->println(FLASHER_LOG, stderr, "Failed to open gpio value for writing!");
+		return GPIO_FAILURE;
+	}
+ 
+	if (1 != write(fd, &s_values_str[LOW == value ? 0 : 1], 1)) {
+		debugLog->println(FLASHER_LOG, stderr, "Failed to write value!");
+		return GPIO_FAILURE;
+	}
+ 
+	close(fd);
+	return(0);
+}

@@ -1,36 +1,30 @@
 #ifndef C_FLASHER_IO_GPIO_H
 #define C_FLASHER_IO_GPIO_H
 
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <fcntl.h>
-
-#ifndef WIN32
-#include <sys/mman.h>
-#endif
-
 #include <unistd.h>
 #include "bci_c_flasher_io.h"
 
-// Access from ARM Running Linux
-#define BCM2708_PERI_BASE    0x3F000000
-#define GPIO_BASE            (BCM2708_PERI_BASE + 0x200000) /* GPIO controller */
-#define PAGE_SIZE (4*1024)
-#define BLOCK_SIZE (4*1024)
+#define GPIO_IN  0
+#define GPIO_OUT 1
 
-// GPIO setup macros. Always use INP_GPIO(x) before using OUT_GPIO(x) or SET_GPIO_ALT(x,y)
-#define INP_GPIO(g) *(gpio+((g)/10)) &= ~(7<<(((g)%10)*3))
-#define OUT_GPIO(g) *(gpio+((g)/10)) |=  (1<<(((g)%10)*3))
-#define SET_GPIO_ALT(g,a) *(gpio+(((g)/10))) |= (((a)<=3?(a)+4:(a)==4?3:2)<<(((g)%10)*3))
+#define GPIO_LOW  0
+#define GPIO_HIGH 1
 
-#define GPIO_SET *(gpio+7)  // sets   bits which are 1 ignores bits which are 0
-#define GPIO_CLR *(gpio+10) // clears bits which are 1 ignores bits which are 0
+#define GPIO_INPUT_PIN  24 /* P1-18 */
+#define GPIO_OUTPUT_PIN 4  /* P1-07 */
 
-#define GET_GPIO(g) (*(gpio+13)&(1<<g)) // 0 if LOW, (1<<g) if HIGH
+#define BUFFER_MAX 3
+#define DIRECTION_MAX 35
+#define VALUE_MAX 30
 
-#define GPIO_PULL *(gpio+37) // Pull up/pull down
-#define GPIO_PULLCLK0 *(gpio+38) // Pull up/pull down clock
+#define GPIO_FAILURE -1
 
+//Communicate with Flasher Board through GPIO Pins on Raspberry Pi
 class C_Flasher_IO_GPIO : public C_Flasher_IO, public C_Singleton<C_Flasher_IO_GPIO>
 {
 public:
@@ -41,16 +35,11 @@ public:
     virtual void SendRVS(C_RVS* pRVS);
 
 private:
-    bool checkPin(int pin);
-    void printButton(int g);
-    ConnectionStatusType setup_io();
-
-    //GPIO Map
-    int  mem_fd;
-    void *gpio_map;
-
-    // I/O access
-    volatile unsigned *gpio;
+    int GPIOExport(int pin);
+    int GPIOUnexport(int pin);
+    int GPIODirection(int pin, int dir);
+    int GPIORead(int pin); 
+    int GPIOWrite(int pin, int value);
 };
 
 #endif // C_FLASHER_IO_GPIO_H

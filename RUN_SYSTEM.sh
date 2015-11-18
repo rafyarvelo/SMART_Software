@@ -3,14 +3,12 @@
 #Executable Names
 export BCI_EXECUTABLE="BCI/BCI"
 export TM_EXTRACT_TOOL="TOOLS/TM_EXTRACT/TelemetryExtractTool"
-export FILE_UNLOCK_TOOL="TOOLS/unlockDevices"
 
 #Shared Libraries are included in the Build, Not usually a good idea but hey whatever man
 export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/usr/lib:/usr/local/lib:$HOME/SENIOR_DESIGN/SMART_Software/LIB_DESKTOP:$HOME/SENIOR_DESIGN/SMART_Software/LIB_PI"
 
 #Gotta change permissions for those stupid serial ports
-chmod +x $FILE_UNLOCK_TOOL
-$FILE_UNLOCK_TOOL
+sudo chmod -R 777 /dev
 
 #Compile Source Using Top Level MakeFile
 make
