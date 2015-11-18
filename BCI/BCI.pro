@@ -39,7 +39,9 @@ HEADERS += \
     bci_c_pcc_io_debug.h \
     bci_c_singleton.h \
     bci_c_framegenerator.h \
-    ../smart_data_types.h
+    ../smart_data_types.h \
+    bci_c_flasher_io_debug.h \
+    bci_c_flasher_io_gpio.h
 
     unix{
     HEADERS += bci_c_eeg_io_emotiv.h
@@ -68,7 +70,9 @@ SOURCES += \
     bci_c_eeg_io.cpp \
     bci_c_framegenerator.cpp \
     ../smart_data_types.c \
-    bci_c_pcc_io.cpp
+    bci_c_pcc_io.cpp \
+    bci_c_flasher_io_debug.cpp \
+    bci_c_flasher_io_gpio.cpp
 
     unix{
     SOURCES += bci_c_eeg_io_emotiv.cpp
