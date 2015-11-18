@@ -2,20 +2,10 @@
 
 C_Flasher_IO::C_Flasher_IO()
 {
+    //Setup Pointer for Log Files
+    debugLog = SMART_DEBUG_LOG::Instance();
 }
 
 C_Flasher_IO::~C_Flasher_IO()
-{
-	
-}
-
-ConnectionStatusType C_Flasher_IO::connect()
-{
-    connectionStatus = CONNECTED;
-    return connectionStatus;
-}
-
-void C_Flasher_IO::SendRVS(C_RVS* pRVS)
-{
-
+{	
 }

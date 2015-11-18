@@ -10,6 +10,8 @@ class C_JudgmentAlgorithm;
 #include <QDir>
 #include "bci_c_rvs.h"
 #include "bci_c_flasher_io.h"
+#include "bci_c_flasher_io_debug.h"
+#include "bci_c_flasher_io_gpio.h"
 #include "bci_c_signal_processing.h"
 #include "bci_c_eeg_io_debug.h"
 #include "bci_c_safequeue.h"
@@ -46,9 +48,10 @@ private:
     void createDebugDirectory();
 
     //Factory Constructors for our IO Classes
-    C_EEG_IO*  createEEG_IO(eegTypeEnum type=DEFAULT_EEG_TYPE);
-    C_BRSH_IO* createBRS_IO(brsTypeEnum type=DEFAULT_BRS_TYPE);
-    C_PCC_IO*  createPCC_IO(pccTypeEnum type=DEFAULT_PCC_TYPE);
+    C_EEG_IO*     createEEG_IO(eegTypeEnum type=DEFAULT_EEG_TYPE);
+    C_BRSH_IO*    createBRS_IO(brsTypeEnum type=DEFAULT_BRS_TYPE);
+    C_PCC_IO*     createPCC_IO(pccTypeEnum type=DEFAULT_PCC_TYPE);
+    C_Flasher_IO* createFlasher_IO(flasherTypeEnum type=DEFAULT_FLASHER_TYPE);
 
 private slots:
     void onEEGDataProcessed(resultsBufferType*  pResults);

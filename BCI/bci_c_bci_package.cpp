@@ -16,13 +16,13 @@ C_BCI_Package::C_BCI_Package()
     debugLog->BCI_Log() << "Instantiating BCI Package..." << endl;
 
     //Repetitive Visual Stimulus API
-    pRVS              = C_RVS::Instance();
-    pFlasherIO        = C_Flasher_IO::Instance();
+    pRVS = C_RVS::Instance();
 
     //Device Input/Output
     pEEG_IO           = createEEG_IO(DEFAULT_EEG_TYPE);
     pBRS_IO           = createBRS_IO(DEFAULT_BRS_TYPE);
     pPCC_IO           = createPCC_IO(DEFAULT_PCC_TYPE);
+    pFlasherIO        = createFlasher_IO(DEFAULT_FLASHER_TYPE);
 
     //Signal Processing, Judgement Algorithm, and Telemetry Management
     pSignalProcessing = C_SignalProcessing ::Instance();
@@ -154,6 +154,24 @@ C_PCC_IO* C_BCI_Package::createPCC_IO(pccTypeEnum type)
 
     return ptr;
 }
+
+C_Flasher_IO* C_BCI_Package::createFlasher_IO(flasherTypeEnum type)
+{
+    C_Flasher_IO* ptr = 0;
+
+    switch (type)
+    {
+        case FLASHER_TYPE_ATMEL:
+            ptr = C_Flasher_IO_GPIO::Instance();
+        break;
+        default:
+            ptr = C_Flasher_IO_Debug::Instance();
+        break;
+    }
+
+    return ptr;
+}
+
 
 bool C_BCI_Package::checkConnections()
 {
