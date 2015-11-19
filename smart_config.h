@@ -82,9 +82,9 @@ typedef enum
 //Debug Configuration for testing
 #else
     #define DEFAULT_EEG_TYPE     EEG_TYPE_DEBUG
-    #define DEFAULT_BRS_TYPE     BRS_TYPE_TIVA
+    #define DEFAULT_BRS_TYPE     BRS_TYPE_DEBUG
     #define DEFAULT_PCC_TYPE     PCC_TYPE_MSP
-    #define DEFAULT_FLASHER_TYPE FLASHER_TYPE_DEBUG
+    #define DEFAULT_FLASHER_TYPE FLASHER_TYPE_ATMEL
 
     //Allow Prints to Console
     #define VERBOSE

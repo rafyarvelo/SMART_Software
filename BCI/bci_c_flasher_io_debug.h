@@ -9,8 +9,9 @@ public:
     C_Flasher_IO_Debug();
     virtual ~C_Flasher_IO_Debug();
 
+public slots:
     virtual ConnectionStatusType connect();
-    virtual void SendRVS(C_RVS* pRVS);
+    virtual void SendRVS();
 };
 
 #endif // C_FLASHER_IO_DEBUG_H

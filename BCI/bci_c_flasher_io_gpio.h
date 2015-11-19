@@ -31,8 +31,9 @@ public:
     C_Flasher_IO_GPIO();
     virtual ~C_Flasher_IO_GPIO();
 
+public slots:
     virtual ConnectionStatusType connect();
-    virtual void SendRVS(C_RVS* pRVS);
+    virtual void SendRVS();
 
 private:
     int GPIOExport(int pin);
@@ -40,6 +41,8 @@ private:
     int GPIODirection(int pin, int dir);
     int GPIORead(int pin); 
     int GPIOWrite(int pin, int value);
+
+    int currGPIOVal;
 };
 
 #endif // C_FLASHER_IO_GPIO_H

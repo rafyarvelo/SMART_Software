@@ -228,7 +228,7 @@ void C_BCI_Package::Run()
 
     //Configure Repetitive Visual Stimulus and send to Flasher
     pRVS->Generate();
-    pFlasherIO->SendRVS(pRVS);
+    pFlasherIO->SendRVS();
 
     //Record our TM to an output file
     pTelemetryManager->RecordTMToFile(TM_DATA_OUTPUTFILE_BIN);
@@ -320,6 +320,7 @@ void C_BCI_Package::startThreads()
     #endif
 
     pBRS_IO->begin();
+    pFlasherIO->begin();        
 }
 
 //This is the entire routine of the BCI_Processing State

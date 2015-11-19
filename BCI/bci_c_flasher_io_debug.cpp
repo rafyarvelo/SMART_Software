@@ -17,7 +17,7 @@ ConnectionStatusType C_Flasher_IO_Debug::connect()
     return connectionStatus;
 }
 
-void C_Flasher_IO_Debug::SendRVS(C_RVS* pRVS)
+void C_Flasher_IO_Debug::SendRVS()
 {
     debugLog->println(FLASHER_LOG, "Sending Repetitve Visual Stiumlus...", true);
 }
