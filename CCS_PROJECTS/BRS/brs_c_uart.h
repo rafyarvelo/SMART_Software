@@ -27,12 +27,7 @@ typedef enum UART_ID
 	CONSOLE_UART = UART0_BASE, //Console I/0 UART
 	GPS_UART     = UART1_BASE, //GPS Sensor UART
 
-	//Hack For Now
-#ifndef BRS_DEBUG
-	BCI_UART     = UART2_BASE, //BCI Comm UART
-#else
 	BCI_UART     = UART0_BASE, //BCI Comm UART
-#endif
 
 	BT_UART      = UART3_BASE, //Bluetooth UART
 	USF_UART     = UART5_BASE, //Ultrasonic Range Finder - Front
