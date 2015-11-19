@@ -41,11 +41,13 @@ void GenerateRandomTM(TM_Frame_t* pFrame);
 #endif
 
 int main(void)
+
 {
 	uint8_t      currByte = 0x00;
 	BRS_Frame_t  brsFrame;
 	TM_Frame_t   tmFrame;
 	uint8_t      newDataAvailable = FALSE;
+	uint8_t      tmFrameRequested = FALSE;
 	volatile unsigned int iterations = 1;
 
     //
@@ -103,10 +105,18 @@ int main(void)
     //Execute BRS Code Forever
     while (1)
     {
+    	if (iterations++ % 100000 == 0)
+    	{
+    		newDataAvailable = TRUE;
+    	}
+
     	//Check for TM Frame
     	if (ROM_UARTCharsAvail(BCI_UART))
     	{
-    		newDataAvailable = ReadBCI2BRSMsg(&tmFrame);
+    		if (ReadBCI2BRSMsg(&tmFrame))
+    		{
+    			newDataAvailable = TRUE;
+    		}
     	}
 
 		#ifdef DEBUG_ONLY
@@ -120,7 +130,14 @@ int main(void)
         	currByte = ROM_UARTCharGet(BT_UART);
 
 			//Update Remote Command
-	   		brsFrame.remoteCommand = currByte;
+        	if (currByte == 'T' || currByte == 'M')
+        	{
+        		tmFrameRequested = TRUE;
+        	}
+        	else
+        	{
+    	   		brsFrame.remoteCommand = currByte;
+        	}
 
 			#ifdef ENABLE_CONSOLE
 			UARTprintf("Bluetooth Received %c\r\n", brsFrame.remoteCommand);
@@ -163,7 +180,7 @@ int main(void)
 		if (newDataAvailable)
 		{
 	    	//Send Frame to BCI Processor if it is not a TM Request
-	    	if (currByte == 'T' || currByte == 'M')
+	    	if (tmFrameRequested)
 	    	{
 	    		//Change Message Id and send through Bluetooth Module
 	    		memcpy(&tmFrame.MsgId, BRS2MD_MSG_ID, MSG_ID_SIZE);
@@ -173,6 +190,7 @@ int main(void)
 	    		#endif
 
 	        	SendTMFrame(&tmFrame);
+        		tmFrameRequested = FALSE;
 	    	}
 
 	    	else //Must be a remote command
