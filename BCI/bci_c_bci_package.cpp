@@ -27,7 +27,7 @@ C_BCI_Package::C_BCI_Package()
     //Signal Processing, Judgement Algorithm, and Telemetry Management
     pSignalProcessing = C_SignalProcessing ::Instance();
     pJA               = C_JudgmentAlgorithm::Instance();
-    pTelemetryManager = C_TelemetryManager ::Instance(this, pEEG_IO, pBRS_IO, pRVS, pJA);
+    pTelemetryManager = C_TelemetryManager ::Instance(this, pEEG_IO, pBRS_IO, pRVS, pPCC_IO, pJA);
 
     //Connection Status of Peripherals
     eegConnectionStatus      = NOT_CONNECTED;

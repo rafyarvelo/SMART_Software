@@ -21,12 +21,12 @@
 #define	LED_LEFT_FREQ_DEFAULT     40    //Hertz
 
 //====================EEG Types====================
-typedef enum Emotiv_Electrodes
+enum Emotiv_Electrodes
 {
     F3=0, FC6, P7, T8 , F7,
     F8  , T7 , P8, AF4, F4,
     AF3 , O2 , O1, FC5, NUM_EMOTIV_ELECTRODES
-} Emotiv_Electrodes;
+};
 
 #if DEFAULT_EEG_TYPE == EEG_TYPE_EMOTIV
     #define MAX_EEG_ELECTRODES  NUM_EMOTIV_ELECTRODES
@@ -73,14 +73,14 @@ typedef struct MsgIdType { uint8_t id[MSG_ID_SIZE]; } MsgIdType;
 //*****************************************************************************
 
 //Use to see how sure we are that the command is correct
-typedef enum Confidence_Type
+enum Confidence_Type
 {
     UNSURE=0,
     MODERATE,
     LIKELY,
     ABSOLUTE,
     NUM_CONFIDENCE_TYPES
-}Confidence_Type;
+};
 
 //The Final Result of our EEG Processing
 typedef struct ProcessingResult_t
@@ -207,14 +207,14 @@ typedef struct BRS_Frame_t
 //===============================================
 
 //==================Flasher Types==================
-typedef enum
+enum LED_Group_ID
 {
     LED_FORWARD=0,
     LED_BACKWARD,
     LED_RIGHT,
     LED_LEFT,
     NUM_LED_GROUPS
-} LED_Group_ID;
+};
 
 typedef struct LED_Group_t
 {
@@ -225,7 +225,7 @@ typedef struct LED_Group_t
 
 //=================================================
 
-typedef enum BCIState
+enum BCIState
 {
     BCI_OFF=0,
     /*
@@ -257,7 +257,30 @@ typedef enum BCIState
      * 1) Send the Command
      * 2) Revert to BCI_STANDBY
      */
-}BCIState;
+};
+
+//Need a small messsage to send through the UART
+typedef struct BCI2BRS_MSG
+{
+	unsigned int timeStamp;
+	unsigned int bciState;
+	unsigned char lastCommand;
+	unsigned int  lastConfidence;
+	unsigned char eegCmd;
+	unsigned int  eegConfidence;
+
+#ifdef __cplusplus
+	BCI2BRS_MSG()
+	{
+		timeStamp      = 0;
+		bciState       = BCI_OFF;
+		lastCommand    = PCC_CMD_NONE;
+		lastConfidence = UNSURE;
+		eegCmd         = PCC_CMD_NONE;
+		eegConfidence  = UNSURE;
+	}
+#endif
+} BCI2BRS_MSG;
 
 //Full Telemetry Frame
 typedef struct TM_Frame_t
@@ -317,7 +340,7 @@ typedef struct TM_Frame_t
 TM_Frame_t*         createTMFrame();
 EEG_Frame_t*        createEEGFrame();
 BRS_Frame_t*        createBRSFrame();
-LED_Group_t*        createLEDGroup(LED_Group_ID id);
+LED_Group_t*        createLEDGroup(unsigned int id);
 BluetoothFrame_t*   createBluetoothFrame();
 ProcessingResult_t* createProcessingResult();
 

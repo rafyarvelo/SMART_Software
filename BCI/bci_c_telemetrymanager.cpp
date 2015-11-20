@@ -1,7 +1,7 @@
 #include "bci_c_telemetrymanager.h"
 
 C_TelemetryManager::C_TelemetryManager(C_BCI_Package* pBCI, C_EEG_IO* pEEG_IO, C_BRSH_IO* pBRS_IO,
-                                       C_RVS*         pRVS, C_JudgmentAlgorithm* pJA)
+                                       C_RVS*         pRVS, C_PCC_IO* pPCC_IO, C_JudgmentAlgorithm* pJA)
 {
     debugLog = SMART_DEBUG_LOG::Instance();
 
@@ -10,6 +10,7 @@ C_TelemetryManager::C_TelemetryManager(C_BCI_Package* pBCI, C_EEG_IO* pEEG_IO, C
     mEEG_IOPtr     = pEEG_IO;
     mBRS_IOPtr     = pBRS_IO;
     mRVSPtr        = pRVS;
+    mPCC_IOPtr     = pPCC_IO;
     mJA_Ptr        = pJA;
 
     //Don't Record TM By Default
@@ -26,9 +27,16 @@ C_TelemetryManager::~C_TelemetryManager()
 
 //Factory Constructor
 C_TelemetryManager* C_TelemetryManager::Instance(C_BCI_Package* pBCI, C_EEG_IO* pEEG_IO, C_BRSH_IO* pBRS_IO,
-                                                 C_RVS*         pRVS, C_JudgmentAlgorithm* pJA)
+                                                 C_RVS*         pRVS, C_PCC_IO* pPCC_IO, C_JudgmentAlgorithm* pJA)
 {
-    return new C_TelemetryManager(pBCI, pEEG_IO, pBRS_IO, pRVS, pJA);
+    static C_TelemetryManager* ptr = 0;
+
+    if (!ptr)
+    {
+        ptr = new C_TelemetryManager(pBCI, pEEG_IO, pBRS_IO, pRVS, pPCC_IO, pJA);
+    }
+
+    return ptr;
 }
 
 
@@ -39,7 +47,7 @@ const TM_Frame_t& C_TelemetryManager::updateTM(BRS_Frame_t& brsFrame)
     //Update TM from Interfaces
     mCurrentTMFrame.timeStamp        = mBCIPackagePtr->stopwatch.elapsed();
     mCurrentTMFrame.bciState         = mBCIPackagePtr->bciState;
-    mCurrentTMFrame.lastCommand      = mJA_Ptr->finalCommand;
+    mCurrentTMFrame.lastCommand      = mPCC_IOPtr->GetPrevCommand();
     mCurrentTMFrame.lastConfidence   = mJA_Ptr->cmdConfidence;
 
     //The Processing Result that the Judgment Algorithm is using

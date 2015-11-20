@@ -5,6 +5,7 @@
 class C_BCI_Package;
 
 #include "bci_c_bci_package.h"
+#include "bci_c_pcc_io.h"
 #include "bci_c_binary_parser.h"
 #include "bci_c_textparser.h"
 #include "bci_c_judgment_algorithm.h"
@@ -19,11 +20,11 @@ class C_TelemetryManager : public QObject
     Q_OBJECT
 public:
     C_TelemetryManager(C_BCI_Package* pBCI, C_EEG_IO* pEEG_IO, C_BRSH_IO* pBRS_IO,
-                       C_RVS*         pRVS, C_JudgmentAlgorithm* pJA);
+                       C_RVS*         pRVS, C_PCC_IO* pPCC_IO, C_JudgmentAlgorithm* pJA);
     ~C_TelemetryManager();
 
     static C_TelemetryManager* Instance(C_BCI_Package* pBCI, C_EEG_IO* pEEG_IO, C_BRSH_IO* pBRS_IO,
-                                        C_RVS*         pRVS, C_JudgmentAlgorithm* pJA);
+                                        C_RVS*         pRVS, C_PCC_IO* pPCC_IO, C_JudgmentAlgorithm* pJA);
 
     //Retrieve the Latest Frame
     const TM_Frame_t& GetLatestFrame() { return mCurrentTMFrame; }
@@ -45,6 +46,7 @@ private:
     C_EEG_IO*            mEEG_IOPtr;
     C_BRSH_IO*           mBRS_IOPtr;
     C_RVS*               mRVSPtr;
+    C_PCC_IO*            mPCC_IOPtr;
     C_JudgmentAlgorithm* mJA_Ptr;
 
     //Used to Record TM to File

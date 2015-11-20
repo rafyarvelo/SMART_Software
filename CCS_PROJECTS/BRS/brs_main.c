@@ -48,6 +48,7 @@ int main(void)
 	uint8_t      newDataAvailable = FALSE;
 	uint8_t      tmFrameRequested = FALSE;
 	volatile unsigned int iterations = 1;
+	BCI2BRS_MSG  bciMsg;
 
     //
     // Set the clocking to run at 50 MHz from the PLL.
@@ -67,6 +68,7 @@ int main(void)
 
     //Initialize Buffers
     memset(&tmFrame , 0, sizeof(TM_Frame_t));
+    memset(&bciMsg , 0, sizeof(BCI2BRS_MSG));
 
     //Initialize the TM Frame
 	//Change Message Id and send through Bluetooth Module
@@ -110,13 +112,44 @@ int main(void)
     	}
 
     	//Check for TM Frame
-//    	if (ROM_UARTCharsAvail(BCI_UART))
-//    	{
-//    		if (ReadBCI2BRSMsg(&tmFrame))
-//    		{
-//    			newDataAvailable = TRUE;
-//    		}
-//    	}
+    	if (ROM_UARTCharsAvail(BCI_UART))
+    	{
+    		UARTReceive(BCI_UART, (volatile uint8_t*) &bciMsg, sizeof(BCI2BRS_MSG));
+
+    		switch (bciMsg.eegCmd)
+    		{
+				case PCC_FORWARD:
+				case PCC_BACKWARD:
+				case PCC_RIGHT:
+				case PCC_LEFT:
+				case PCC_CMD_NONE:
+					tmFrame.processingResult.command = bciMsg.eegCmd;
+					tmFrame.lastCommand = bciMsg.eegCmd;
+				break;
+    		}
+
+    		switch (bciMsg.eegConfidence)
+    		{
+				case UNSURE:
+				case MODERATE:
+				case LIKELY:
+				case ABSOLUTE:
+					tmFrame.processingResult.confidence = bciMsg.eegConfidence;
+					tmFrame.lastConfidence              = bciMsg.eegConfidence;
+				break;
+    		}
+
+    		switch (bciMsg.bciState)
+    		{
+				case BCI_OFF:
+				case BCI_INITIALIZATION:
+				case BCI_STANDBY:
+				case BCI_PROCESSING:
+				case BCI_READY:
+					tmFrame.bciState = bciMsg.bciState;
+				break;
+    		}
+    	}
 
 		#ifdef DEBUG_ONLY
     	brsFrame.remoteCommand = "frbl"[rand() % 4];
@@ -137,6 +170,7 @@ int main(void)
         	{
     	   		tmFrame.brsFrame.remoteCommand = currByte;
     	   		tmFrame.lastCommand = currByte;
+    	   		tmFrame.bciState    = BCI_PROCESSING;
         	}
 
 			#ifdef ENABLE_CONSOLE
@@ -179,29 +213,32 @@ int main(void)
 		//Don't Bother Sending duplicate frames
 		if (newDataAvailable)
 		{
-	    	//Send Frame to BCI Processor if it is not a TM Request
-	    	if (tmFrameRequested)
-	    	{
-	    		#ifdef FRAME_DEBUG
-	    		GenerateRandomTM(&tmFrame);
-	    		#endif
+			switch(currByte)
+			{
+				case PCC_FORWARD:
+				case PCC_BACKWARD:
+				case PCC_RIGHT:
+				case PCC_LEFT:
+				case PCC_CMD_NONE:
+					#ifdef ENABLE_CONSOLE
+					UARTprintf("Sending %c\r\n", tmFrame.brsFrame.remoteCommand);
+					#endif
 
-	        	SendTMFrame(&tmFrame);
-        		tmFrameRequested = FALSE;
-	    	}
+					#ifdef FRAME_DEBUG
+					GenerateRandomSensorData(&tmFrame.brsFrame.sensorData);
+					#endif
 
-	    	else //Must be a remote command
-	    	{
-				#ifdef ENABLE_CONSOLE
-				UARTprintf("Sending %c\r\n", tmFrame.brsFrame.remoteCommand);
-				#endif
+					SendBRSFrame(&tmFrame.brsFrame);
+					break;
+				case 'T':
+				case 'M':
+					#ifdef FRAME_DEBUG
+					GenerateRandomTM(&tmFrame);
+					#endif
 
-				#ifdef FRAME_DEBUG
-				GenerateRandomSensorData(&tmFrame.brsFrame.sensorData);
-				#endif
-
-				SendBRSFrame(&tmFrame.brsFrame);
-	    	}
+					SendTMFrame(&tmFrame);
+					break;
+			}
 		}
 
     	//Reset default values

@@ -55,19 +55,29 @@ void printTMFrame(const TM_Frame_t* frame, std::ostream& stream)
 void C_BRSH_IO_Serial::SendTMFrame(tmFrameBufferType* pBuffer)
 {
     TM_Frame_t frame;
+    BCI2BRS_MSG tmp;
+    QString toPrint;
     bool status = false;
 
     frame = pBuffer->Get(&status);
 
     if (status)
     {
-        //Write the TM Frame to the BRS through the UART Serial Port
-        mSerialPortPtr->sendToSerialPort(reinterpret_cast<const TM_Frame_t*>(&frame));
-        mSerialPortPtr->sendToSerialPort(QByteArray("END"));
-        mSerialPortPtr->sendToSerialPort(C_BinaryParser::TM_FRAME_START);
-        debugLog->println(BRS_LOG, "Sending TM Frame");
+        //Can't Write the Entire TM Frame to the BRS through the UART Serial Port
+        //Because it's too big, send the important stuff
+        tmp.timeStamp      = frame.timeStamp;
+        tmp.bciState       = frame.bciState;
+        tmp.eegCmd         = frame.processingResult.command;
+        tmp.eegConfidence  = frame.processingResult.confidence;
+        tmp.lastCommand    = frame.lastCommand;
+        tmp.lastConfidence = frame.lastConfidence;
+        mSerialPortPtr->sendRawData((const char*)&tmp, sizeof(BCI2BRS_MSG));
+        //mSerialPortPtr->sendToSerialPort(&frame);
 
-        //printTMFrame(reinterpret_cast<const TM_Frame_t*>(&frame), cerr);
+        toPrint = "Sending TM Frame: " + QString::number(tmp.timeStamp);
+        debugLog->println(BRS_LOG, toPrint.toStdString());
+
+        printTMFrame(reinterpret_cast<const TM_Frame_t*>(&frame), cerr);
     }
 }
 
@@ -83,6 +93,14 @@ bool C_BRSH_IO_Serial::fetchBRSFrame()
     if (bytesAvailable < (sizeof(BRS_Frame_t)))
     {
         return false;
+    }
+
+    if (!mSerialPortPtr->Connected())
+    {
+        if (!mSerialPortPtr->openSerialPort())
+        {
+            return false;
+        }
     }
 
     //Read in all the bytes from the Serial Port

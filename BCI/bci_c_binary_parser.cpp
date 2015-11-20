@@ -94,7 +94,6 @@ void C_BinaryParser::writeTMFrame(TM_Frame_t* frame)
         tmDataStarted = true;
     }
 
-    cout << "Writing " << frame->timeStamp << endl;
     //Write the Frame enclosed in syncs
     writeRawData((char*) &TM_FRAME_START, sizeof(TelemetrySyncType));
     writeRawData(reinterpret_cast<char*>(frame), sizeof(TM_Frame_t));

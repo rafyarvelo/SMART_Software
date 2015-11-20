@@ -17,6 +17,10 @@ public:
 
     virtual ConnectionStatusType connect() = 0;
 
+
+public:
+    PCC_Command_Type GetPrevCommand() { return prevCommand; }
+
 public slots:
     virtual void SendCommand(PCC_Command_Type cmd) = 0;
     virtual void EmergencyStop() = 0;

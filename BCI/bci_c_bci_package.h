@@ -73,7 +73,7 @@ private:
     C_TelemetryManager*  pTelemetryManager;
 
     //Used to control event loop
-    BCIState bciState;
+    unsigned int bciState;
 
     //Mission Time
     QTime stopwatch;
