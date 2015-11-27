@@ -1,4 +1,15 @@
+#include <zmq.hpp>
+
+// TODO: Figure out what headers I need here...
+
 #include "bci_c_signal_processing.h"
+#include "seniordesign.pb.h"
+
+void doRun(C_SignalProcessing *sp);
+
+void doRun(C_SignalProcessing *sp) {
+    sp->recvLoop();
+}
 
 C_SignalProcessing::C_SignalProcessing()
 {
@@ -8,141 +19,80 @@ C_SignalProcessing::C_SignalProcessing()
     moveToThread(&mThread);
     mThread.start();
 
+    mIsAlive.store(true);
+
+    mRecvThread = std::thread(doRun, this);
+
     //Initialize Members
     resetData();
 }
 
 C_SignalProcessing::~C_SignalProcessing()
 {
+    mIsAlive.store(false);
+    mRecvThread.join();
 }
 
-void C_SignalProcessing::resetData()
+void C_SignalProcessing::recvLoop()
 {
-    //Reset Member to their Default Values
-    mCurrentProcessingResult.command    = PCC_CMD_NONE;
-    mCurrentProcessingResult.confidence = UNSURE;
-    memset(&voltageSums     [0], 0, sizeof(uint64t) * MAX_EEG_ELECTRODES);
-    memset(&qualitySums     [0], 0, sizeof(uint64t) * MAX_EEG_ELECTRODES);
-    memset(&averageCQ       [0], 0, sizeof(uint16_t) * MAX_EEG_ELECTRODES);
-    memset(&normalizedData  [0], 0, sizeof(uint32_t) * MAX_EEG_ELECTRODES);
-
-    memset(&finalScores     [0], 0, sizeof(ProcessingScore_t) * NUM_PCC_DIRECTIONS);
-    memset(&finalConfidences[0], 0, sizeof(unsigned int     ) * NUM_PCC_DIRECTIONS);
-
-    resultReady        = false;
-    scoresCalculated   = false;
-    averagesCalculated = false;
-    framesProcessed    = 0;
-}
-
-void C_SignalProcessing::calculateAverages()
-{
-    //Divide By the EEG Data Size to Get the Average
-    for (int k = 0; k < MAX_EEG_ELECTRODES; k++)
-    {
-        if (framesProcessed > 0)
-        {
-            normalizedData[k] =  voltageSums[k] / framesProcessed;
-            averageCQ[k]      =  qualitySums[k] / framesProcessed;
-        }
-    }
-
-    averagesCalculated = true;
-}
-
-void C_SignalProcessing::calculateFinalScores()
-{
-    finalScores[FORWARD]  = (normalizedData[P7]  + normalizedData[P8] ) / 2;
-    finalScores[BACKWARD] = (normalizedData[F7]  + normalizedData[F8] ) / 2;
-    finalScores[RIGHT]    = (normalizedData[FC5] + normalizedData[FC6]) / 2;
-    finalScores[LEFT]     = (normalizedData[F3]  + normalizedData[F4] ) / 2;
-
-    finalConfidences[FORWARD]  = finalScores[FORWARD]  % NUM_CONFIDENCE_TYPES;
-    finalConfidences[BACKWARD] = finalScores[BACKWARD] % NUM_CONFIDENCE_TYPES;
-    finalConfidences[RIGHT]    = finalScores[RIGHT]    % NUM_CONFIDENCE_TYPES;
-    finalConfidences[LEFT]     = finalScores[LEFT]     % NUM_CONFIDENCE_TYPES;
-
-    scoresCalculated = true;
-}
-
-//Calculate the Final Processing result
-void C_SignalProcessing::calculateResult()
-{
-    int max = -1;
-    PCC_Command_Type PCC_Commands[NUM_PCC_DIRECTIONS] =
-    {
-        PCC_FORWARD,
-        PCC_BACKWARD,
-        PCC_RIGHT,
-        PCC_LEFT
+    auto c = zmq::context_t(1);
+    auto s = zmq::socket_t(c, ZMQ_SUB);
+    zmq::pollitem_t polls[] = {
+        { s, 0, ZMQ_POLLIN, 0 }
     };
-
-
-    if (!averagesCalculated)
+    s.connect("tcp://localhost:9000");
+    while (mIsAlive.load())
     {
-        calculateAverages();
-    }
-
-    if (!scoresCalculated)
-    {
-        calculateFinalScores();
-    }
-
-    //Find out which command scored the highest
-    for (int i = 0; i < NUM_PCC_DIRECTIONS; i++)
-    {
-        if (finalScores[i] > max)
+        auto nMsgs = zmq::poll(polls, 1, 1000);
+        if (nMsgs > 0)
         {
-            max = finalScores[i];
-            mCurrentProcessingResult.command    = PCC_Commands[i];
-            mCurrentProcessingResult.confidence = finalConfidences[i];
+            for (size_t i = 0; i < nMsgs; ++i)
+            {
+                zmg::message_t r;
+                s.recv(&msg);
+                seniordesign::ProcessingResults r;
+                r.ParseFromString(std::string(
+                            static_cast<char*>(msg.data(), msg.size())));
+                if (mResultsBuf.spacesAvailable())
+                {
+                    ProcessingResult_t pr;
+                    switch (r.direction())
+                    {
+                        case seniordesign::NEUTRAL:
+                            pr.command = PCC_STOP;
+                            break;
+                        case seniordesign::FORWARD:
+                            pr.command = PCC_FORWARD;
+                            break;
+                        case seniordesign::BACKWARD:
+                            pr.command = PCC_BACKWARD;
+                            break;
+                        case seniordesign::LEFT:
+                            pr.command = PCC_LEFT;
+                            break;
+                        case seniordesign::RIGHT:
+                            pr.command = PCC_RIGHT;
+                            break;
+                        default:
+                            pr.command = PCC_STOP;
+                    }
+                    double confidence = pr.confidence();
+                    if (confidence > 0.5)
+                    {
+                        pr.confidence = LIKELY;
+                    }
+                    else
+                    {
+                        pr.confidence = UNSURE;
+                    }
+                    mResultsBuf.Put(pr);
+                    emit eggDataProcessed(mResultsBuf);
+                }
+            }
+        }
+        else
+        {
+            // TODO: log timeout
         }
     }
-
-    //TODO: Actually Do something here
-    mCurrentProcessingResult.confidence = static_cast<Confidence_Type>(max % NUM_CONFIDENCE_TYPES);
-
-    resultReady = true;
-}
-
-void C_SignalProcessing::processFrame(EEG_Frame_t& frame)
-{
-    //TODO: PROCESS FRAME HERE
-    for (int j = 0; j < MAX_EEG_ELECTRODES; j++)
-    {
-        voltageSums[j] += frame.electrodeData[j];
-        qualitySums[j] += frame.contactQuality[j];
-    }
-
-    //Perform Calculations when we have received enough frames
-    if (framesProcessed >= MIN_FRAMES_NEEDED)
-    {
-        performCalculations();
-        framesProcessed = 0;
-    }
-
-    framesProcessed++;
-}
-
-void C_SignalProcessing::performCalculations()
-{ 
-    //Calculate Average Contact Quality and Normalize Voltages
-    calculateAverages();
-
-    //Calculate the Final Scores for each Potential Command
-    calculateFinalScores();\
-
-    //Calculate the Final Result
-    calculateResult();
-
-    //If the Data was good, we would have set the "resultReady" Flag
-    if (resultReady && processingResults.spacesAvailable() > 0)
-    {
-        //Add the Result to the Buffer and Signal that it can now be retrieved
-        processingResults.Put(mCurrentProcessingResult);
-        emit eegDataProcessed(&processingResults);
-    }
-
-    //Reset Processing Data
-    resetData();
 }
