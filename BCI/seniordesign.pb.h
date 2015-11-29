@@ -38,15 +38,15 @@ class ProcessingResults;
 class ProcessingAck;
 
 enum Direction {
-  NEUTRAL = 0,
-  FORWARD = 1,
-  BACKWARD = 2,
-  LEFT = 3,
-  RIGHT = 4
+  SD_NEUTRAL = 0,
+  SD_FORWARD = 1,
+  SD_BACKWARD = 2,
+  SD_LEFT = 3,
+  SD_RIGHT = 4
 };
 bool Direction_IsValid(int value);
-const Direction Direction_MIN = NEUTRAL;
-const Direction Direction_MAX = RIGHT;
+const Direction Direction_MIN = SD_NEUTRAL;
+const Direction Direction_MAX = SD_RIGHT;
 const int Direction_ARRAYSIZE = Direction_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* Direction_descriptor();

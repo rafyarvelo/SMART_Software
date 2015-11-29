@@ -24,7 +24,7 @@ C_SignalProcessing::C_SignalProcessing()
     mRecvThread = std::thread(doRun, this);
 
     //Initialize Members
-    resetData();
+    // resetData();
 }
 
 C_SignalProcessing::~C_SignalProcessing()
@@ -48,35 +48,35 @@ void C_SignalProcessing::recvLoop()
         {
             for (size_t i = 0; i < nMsgs; ++i)
             {
-                zmg::message_t r;
+                zmq::message_t msg;
                 s.recv(&msg);
                 seniordesign::ProcessingResults r;
                 r.ParseFromString(std::string(
-                            static_cast<char*>(msg.data(), msg.size())));
+                            static_cast<char*>(msg.data()), msg.size()));
                 if (mResultsBuf.spacesAvailable())
                 {
                     ProcessingResult_t pr;
                     switch (r.direction())
                     {
-                        case seniordesign::NEUTRAL:
+                        case seniordesign::SD_NEUTRAL:
                             pr.command = PCC_STOP;
                             break;
-                        case seniordesign::FORWARD:
+                        case seniordesign::SD_FORWARD:
                             pr.command = PCC_FORWARD;
                             break;
-                        case seniordesign::BACKWARD:
+                        case seniordesign::SD_BACKWARD:
                             pr.command = PCC_BACKWARD;
                             break;
-                        case seniordesign::LEFT:
+                        case seniordesign::SD_LEFT:
                             pr.command = PCC_LEFT;
                             break;
-                        case seniordesign::RIGHT:
+                        case seniordesign::SD_RIGHT:
                             pr.command = PCC_RIGHT;
                             break;
                         default:
                             pr.command = PCC_STOP;
                     }
-                    double confidence = pr.confidence();
+                    double confidence = r.confidence();
                     if (confidence > 0.5)
                     {
                         pr.confidence = LIKELY;
@@ -86,7 +86,7 @@ void C_SignalProcessing::recvLoop()
                         pr.confidence = UNSURE;
                     }
                     mResultsBuf.Put(pr);
-                    emit eggDataProcessed(mResultsBuf);
+                    emit eegDataProcessed(&mResultsBuf);
                 }
             }
         }
@@ -95,4 +95,9 @@ void C_SignalProcessing::recvLoop()
             // TODO: log timeout
         }
     }
+}
+
+void C_SignalProcessing::processFrame(EEG_Frame_t& pFrame)
+{
+    //NOTHING SON!
 }

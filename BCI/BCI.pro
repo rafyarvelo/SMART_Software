@@ -1,5 +1,5 @@
-QMAKE_CC = gcc-4.8
-QMAKE_CXX = g++-4.8
+#QMAKE_CC = gcc-4.8
+#QMAKE_CXX = g++-4.8
 
 #Added Library from https://github.com/qextserialport/qextserialport
 CONFIG += extserialport
