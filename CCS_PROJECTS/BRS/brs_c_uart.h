@@ -26,12 +26,12 @@ typedef enum UART_ID
 
 	CONSOLE_UART = UART0_BASE, //Console I/0 UART
 	GPS_UART     = UART1_BASE, //GPS Sensor UART
+	USR_UART     = UART2_BASE,  //Ultrasonic Range Finder - Back
 
 	BCI_UART     = UART0_BASE, //BCI Comm UART
 
 	BT_UART      = UART3_BASE, //Bluetooth UART
-	USF_UART     = UART5_BASE, //Ultrasonic Range Finder - Front
-	USR_UART     = UART6_BASE  //Ultrasonic Range Finder - Back
+	USF_UART     = UART5_BASE  //Ultrasonic Range Finder - Front
 } UART_ID;
 
 //Default BAUD_RATE for all the boards

@@ -45,9 +45,11 @@ int main(void)
 {
 	uint8_t      currByte = 0x00;
 	TM_Frame_t   tmFrame;
+	uint8_t      okay2Send        = TRUE;
 	uint8_t      newDataAvailable = FALSE;
 	uint8_t      tmFrameRequested = FALSE;
 	volatile unsigned int iterations = 1;
+	uint8_t      gpsMisses = 0;
 	BCI2BRS_MSG  bciMsg;
 
     //
@@ -102,15 +104,22 @@ int main(void)
     	}
     }
 
+    //For GPS Testing, REMOVE ME
+    while (0)
+    {
+    	ReadGPSData(&tmFrame.brsFrame.sensorData.gpsData);
+    }
+
+
+    //For US Testing, REMOVE ME
+    while (0)
+    {
+    	ReadUSData(&tmFrame.brsFrame.sensorData.rangeFinderData);
+    }
+
     //Execute BRS Code Forever
     while (1)
     {
-    	if (iterations++ % 100000 == 0)
-    	{
-    		newDataAvailable = TRUE;
-    		tmFrame.timeStamp += 501;
-    	}
-
     	//Check for TM Frame
     	if (ROM_UARTCharsAvail(BCI_UART))
     	{
@@ -122,9 +131,14 @@ int main(void)
 				case PCC_BACKWARD:
 				case PCC_RIGHT:
 				case PCC_LEFT:
+				case PCC_STOP:
 				case PCC_CMD_NONE:
 					tmFrame.processingResult.command = bciMsg.eegCmd;
 					tmFrame.lastCommand = bciMsg.eegCmd;
+					tmFrame.eegConnectionStatus = CONNECTED;
+					tmFrame.brsConnectionStatus = CONNECTED;
+					tmFrame.pccConnectionStatus = CONNECTED;
+					tmFrame.flasherConnectionStatus = CONNECTED;
 				break;
     		}
 
@@ -178,6 +192,7 @@ int main(void)
 			#endif
 
 			newDataAvailable = TRUE;
+    		okay2Send = TRUE;
     	}
     	else //Remote Command
     	{
@@ -200,18 +215,22 @@ int main(void)
 		}
 
 		//Only Read GPS Data when TM is being requested
-    	if (currByte == 'T' || currByte == 'M')
+    	if (gpsMisses < 5 && (currByte == 'T' || currByte == 'M'))
     	{
     		if (ReadGPSData(&tmFrame.brsFrame.sensorData.gpsData))
     		{
     			newDataAvailable = TRUE;
+    		}
+    		else
+    		{
+    			gpsMisses++;
     		}
     	}
 
 		#endif
 
 		//Don't Bother Sending duplicate frames
-		if (newDataAvailable)
+		if (okay2Send && newDataAvailable)
 		{
 			switch(currByte)
 			{
@@ -219,6 +238,7 @@ int main(void)
 				case PCC_BACKWARD:
 				case PCC_RIGHT:
 				case PCC_LEFT:
+				case PCC_STOP:
 				case PCC_CMD_NONE:
 					#ifdef ENABLE_CONSOLE
 					UARTprintf("Sending %c\r\n", tmFrame.brsFrame.remoteCommand);
@@ -238,13 +258,25 @@ int main(void)
 
 					SendTMFrame(&tmFrame);
 					break;
+				default:
+					break;
 			}
+
+			okay2Send = FALSE;
 		}
 
     	//Reset default values
     	tmFrame.brsFrame.remoteCommand = PCC_CMD_NONE;
     	currByte = PCC_CMD_NONE;
     	newDataAvailable = FALSE;
+
+    	//Hack to Control Send Rate
+    	if (iterations++ % 100000 == 0)
+    	{
+    		okay2Send = TRUE;
+    		tmFrame.timeStamp += 501;
+    		iterations = 1;
+    	}
 
 		#ifdef DEBUG_ONLY
     	SysCtlDelay(SysClockGet() / 5);
