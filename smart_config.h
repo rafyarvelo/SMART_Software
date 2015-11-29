@@ -83,8 +83,9 @@ typedef enum
 #else
     #define DEFAULT_EEG_TYPE     EEG_TYPE_DEBUG
     #define DEFAULT_BRS_TYPE     BRS_TYPE_TIVA
-    #define DEFAULT_PCC_TYPE     PCC_TYPE_DEBUG
-    #define DEFAULT_FLASHER_TYPE FLASHER_TYPE_DEBUG
+    #define DEFAULT_PCC_TYPE     PCC_TYPE_MSP
+    #define DEFAULT_FLASHER_TYPE FLASHER_TYPE_ATMEL
+    #define ENABLE_EMERGENCY_STOP //Allow E-Stop signal from Range Finder Data
 
     //Allow Prints to Console
     #define VERBOSE
