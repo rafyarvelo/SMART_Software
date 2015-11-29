@@ -17,10 +17,16 @@
 //*****************************************************************************
 #define GPS_DATA_DELIM ','
 #define GPS_DATA_EOL   '\n'
+#define GPS_ID_START   '$'
+
+//Default Location is UCF SU
+#define GPS_DEFAULT_LATITUDE  28.6016
+#define GPS_DEFAULT_LONGITUDE 81.2005
+#define GPS_DEFAULT_ALTITUDE  2.4
+#define GPS_DEFAULT_SPEED     0.04
 
 //National Marine Electronics Association (NMEA) Output Sentences
-#define GPS_NMEA_MAX_WORD_SIZE     15
-#define GPS_NMEA_MAX_SENTENCE_SIZE 30
+#define GPS_NMEA_MAX_WORD_SIZE 15
 
 //NMEA Sentence Formats
 #define GPS_NMEA_ID_LEN 7 //6 Characters and a NULL Terminator
@@ -155,7 +161,12 @@ typedef enum GPSVTGMessageIndex
 // Ultrasonic Sensor Formats
 //
 //*****************************************************************************
+#define US_UART_MSG_SIZE 5 //FORMAT: 'R' 000-255 \n
+#define US_UART_DATA_START 'R'  //'R' for Range
+#define US_UART_DATA_END   0x13 //ASCII Carriage Return
 
+//UART Ranges come out in meters
+#define INCHES2METERS 0.0254
 
 //*****************************************************************************
 

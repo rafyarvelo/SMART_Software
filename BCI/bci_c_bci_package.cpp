@@ -16,18 +16,18 @@ C_BCI_Package::C_BCI_Package()
     debugLog->BCI_Log() << "Instantiating BCI Package..." << endl;
 
     //Repetitive Visual Stimulus API
-    pRVS              = C_RVS::Instance();
-    pFlasherIO        = C_Flasher_IO::Instance();
+    pRVS = C_RVS::Instance();
 
     //Device Input/Output
     pEEG_IO           = createEEG_IO(DEFAULT_EEG_TYPE);
     pBRS_IO           = createBRS_IO(DEFAULT_BRS_TYPE);
     pPCC_IO           = createPCC_IO(DEFAULT_PCC_TYPE);
+    pFlasherIO        = createFlasher_IO(DEFAULT_FLASHER_TYPE);
 
     //Signal Processing, Judgement Algorithm, and Telemetry Management
     pSignalProcessing = C_SignalProcessing ::Instance();
     pJA               = C_JudgmentAlgorithm::Instance();
-    pTelemetryManager = C_TelemetryManager ::Instance(this, pEEG_IO, pBRS_IO, pRVS, pJA);
+    pTelemetryManager = C_TelemetryManager ::Instance(this, pEEG_IO, pBRS_IO, pRVS, pPCC_IO, pJA);
 
     //Connection Status of Peripherals
     eegConnectionStatus      = NOT_CONNECTED;
@@ -107,12 +107,6 @@ C_EEG_IO* C_BCI_Package::createEEG_IO(eegTypeEnum type)
             ptr = C_EEG_IO_NAUTILUS::Instance();
         break;
 
-        #ifdef EMOTIV
-        case EEG_TYPE_EMOTIV:
-            ptr = C_EEG_IO_EMOTIV::Instance();
-        break;
-        #endif
-
         default:
             ptr = C_EEG_IO_DEBUG::Instance();
         break;
@@ -154,6 +148,24 @@ C_PCC_IO* C_BCI_Package::createPCC_IO(pccTypeEnum type)
 
     return ptr;
 }
+
+C_Flasher_IO* C_BCI_Package::createFlasher_IO(flasherTypeEnum type)
+{
+    C_Flasher_IO* ptr = 0;
+
+    switch (type)
+    {
+        case FLASHER_TYPE_ATMEL:
+            ptr = C_Flasher_IO_GPIO::Instance();
+        break;
+        default:
+            ptr = C_Flasher_IO_Debug::Instance();
+        break;
+    }
+
+    return ptr;
+}
+
 
 bool C_BCI_Package::checkConnections()
 {
@@ -210,7 +222,7 @@ void C_BCI_Package::Run()
 
     //Configure Repetitive Visual Stimulus and send to Flasher
     pRVS->Generate();
-    pFlasherIO->SendRVS(pRVS);
+    pFlasherIO->SendRVS();
 
     //Record our TM to an output file
     pTelemetryManager->RecordTMToFile(TM_DATA_OUTPUTFILE_BIN);
@@ -302,6 +314,7 @@ void C_BCI_Package::startThreads()
     #endif
 
     pBRS_IO->begin();
+    pFlasherIO->begin();        
 }
 
 //This is the entire routine of the BCI_Processing State

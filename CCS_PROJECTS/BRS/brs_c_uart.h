@@ -26,21 +26,16 @@ typedef enum UART_ID
 
 	CONSOLE_UART = UART0_BASE, //Console I/0 UART
 	GPS_UART     = UART1_BASE, //GPS Sensor UART
+	USR_UART     = UART2_BASE,  //Ultrasonic Range Finder - Back
 
-	//Hack For Now
-#ifndef BRS_DEBUG
-	BCI_UART     = UART2_BASE, //BCI Comm UART
-#else
 	BCI_UART     = UART0_BASE, //BCI Comm UART
-#endif
 
 	BT_UART      = UART3_BASE, //Bluetooth UART
-	USF_UART     = UART5_BASE, //Ultrasonic Range Finder - Front
-	USR_UART     = UART6_BASE  //Ultrasonic Range Finder - Back
+	USF_UART     = UART5_BASE  //Ultrasonic Range Finder - Front
 } UART_ID;
 
 //Default BAUD_RATE for all the boards
-#define BAUD_RATE      9600
+#define BAUD_RATE 9600
 
 //*****************************************************************************
 //
@@ -68,7 +63,7 @@ uint16_t UARTReceive(UART_ID uartID, volatile uint8_t *pui8Buffer, uint32_t ui32
 // Retrieve a string from the UART until a delimeter is found, return bytes actually read
 //
 //*****************************************************************************
-uint16_t UARTReceiveUntil(UART_ID uartID, volatile uint8_t *pui8Buffer, char delim);
+uint16_t UARTReceiveUntil(UART_ID uartID, char *pui8Buffer, char delim, uint32_t maxSize);
 
 //*****************************************************************************
 //
@@ -76,7 +71,16 @@ uint16_t UARTReceiveUntil(UART_ID uartID, volatile uint8_t *pui8Buffer, char del
 // Return the number of words read
 //
 //*****************************************************************************
-uint16_t UARTReadDelimetedLine(UART_ID uartID, volatile uint8_t** pui8DoubleBuffer, char delim);
+uint16_t UARTReadDelimetedLine(UART_ID uartID, char** pui8DoubleBuffer, char delim);
+
+//*****************************************************************************
+//
+// Retrieve a pointer to a substring inside a delimeted string, return NULL
+// if offset is invalid or delim not found. offset is the WORD INDEX of the
+// desired delimeted word
+//
+//*****************************************************************************
+char* extractDelimetedString(char* delimetedString, uint32_t size, uint32_t offset, char delim, uint32_t* wordSize);
 
 //*****************************************************************************
 //
@@ -94,37 +98,31 @@ uint32_t ASCII2UINT(const uint8_t* pui8buffer, uint32_t length);
 
 //*****************************************************************************
 //
-// Convert ASCII word to Number, read until count or '\0' is seen
+// Convert ASCII word to Number, read until count or '\0' is seen, return status
 //
 //*****************************************************************************
-float ASCII2FLOAT(const uint8_t* pui8buffer, uint32_t length);
+uint8_t ASCII2FLOAT(const uint8_t* pui8buffer, uint32_t length, float* pFloat);
 
 //*****************************************************************************
 //
 // Read Incoming BCI Message from UART
 //
 //*****************************************************************************
-
-//*****************************************************************************
-//
-// Read Incoming BCI Message from UART
-//
-//*****************************************************************************
-void ReadBCI2BRSMsg(TM_Frame_t* pFrame);
+uint8_t ReadBCI2BRSMsg(TM_Frame_t* pFrame);
 
 //*****************************************************************************
 //
 // Read Incoming GPS Data, return TRUE if data is available
 //
 //*****************************************************************************
-int ReadGPSData(GPS_Data_t* pData);
+uint8_t ReadGPSData(GPS_Data_t* pData);
 
 //*****************************************************************************
 //
 // Read Range Finder data
 //
 //*****************************************************************************
-void ReadUSData(US_Data_t* pData);
+uint8_t ReadUSData(US_Data_t* pData);
 
 //*****************************************************************************
 //
@@ -132,27 +130,6 @@ void ReadUSData(US_Data_t* pData);
 //
 //*****************************************************************************
 void SendBRSFrame(BRS_Frame_t* pFrame);
-
-//*****************************************************************************
-//
-// Check for a Bluetooth Frame in the UART
-//
-//*****************************************************************************
-int BluetoothFrameAvailable();
-
-//*****************************************************************************
-//
-// Check if the
-//
-//*****************************************************************************
-int TMFrameRequested();
-
-//*****************************************************************************
-//
-// Retrieve a Bluetooth Frame from the UART
-//
-//*****************************************************************************
-void ReadBluetoothFrame(BluetoothFrame_t* pFrame);
 
 //*****************************************************************************
 //

@@ -54,6 +54,12 @@ typedef enum
     PCC_TYPE_DEBUG
 } pccTypeEnum;
 
+typedef enum
+{
+    FLASHER_TYPE_ATMEL=0,
+    FLASHER_TYPE_DEBUG
+} flasherTypeEnum;
+
 //EEG Type (only select one)
 //Supported Options:
 //EEG_TYPE_DEBUG
@@ -64,23 +70,26 @@ typedef enum
 //#define TACTICAL
 #define DEBUG_ONLY
 
-//Allow Prints to Console
-#define VERBOSE 
-
 //The Actual Configuration for a real setup
 #ifdef TACTICAL
-    #define USE_EEG_DATA //Start the EEG Thread
+    #define DEFAULT_EEG_TYPE     EEG_TYPE_EMOTIV
+    #define DEFAULT_BRS_TYPE     BRS_TYPE_TIVA
+    #define DEFAULT_PCC_TYPE     PCC_TYPE_MSP
+    #define DEFAULT_FLASHER_TYPE FLASHER_TYPE_ATMEL
+    #define USE_EEG_DATA          //Start the EEG Thread
     #define ENABLE_EMERGENCY_STOP //Allow E-Stop signal from Range Finder Data
-    #define DEFAULT_EEG_TYPE EEG_TYPE_DEBUG//EEG_TYPE_EMOTIV
-    #define DEFAULT_BRS_TYPE BRS_TYPE_TIVA
-    #define DEFAULT_PCC_TYPE PCC_TYPE_MSP
 
 //Debug Configuration for testing
 #else
-    #define DEFAULT_EEG_TYPE EEG_TYPE_DEBUG
-    #define DEFAULT_BRS_TYPE BRS_TYPE_TIVA
-    #define BRS_DEBUG                        //For BRS Code on CCS
-    #define DEFAULT_PCC_TYPE PCC_TYPE_MSP
+    #define DEFAULT_EEG_TYPE     EEG_TYPE_DEBUG
+    #define DEFAULT_BRS_TYPE     BRS_TYPE_TIVA
+    #define DEFAULT_PCC_TYPE     PCC_TYPE_MSP
+    #define DEFAULT_FLASHER_TYPE FLASHER_TYPE_ATMEL
+    #define ENABLE_EMERGENCY_STOP //Allow E-Stop signal from Range Finder Data
+
+    //Allow Prints to Console
+    #define VERBOSE
+
 #endif
 
 //==========================================================

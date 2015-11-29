@@ -1,6 +1,9 @@
 #ifndef BCI_C_SIGNAL_PROCESSING_H
 #define BCI_C_SIGNAL_PROCESSING_H
 
+#include <atomic>
+#include <thread>
+
 #include <QThread>
 #include "../smart_config.h"
 #include "../smart_debug_log.h"
@@ -29,6 +32,8 @@ public:
     C_SignalProcessing();
    ~C_SignalProcessing();	
 
+   void recvLoop();
+
 signals:
     void eegDataProcessed(resultsBufferType* pProcessingResults);
 
@@ -36,50 +41,13 @@ public slots:
     void processFrame(EEG_Frame_t& frame);
 	
 private:
-    void resetData();
-
-    //Top Level Calculation Call, called when MIN_FRAMES_NEEDED is Reached
-    void performCalculations();
-
-    //Average out the Summed Data
-    void calculateAverages();
-
-    //Calculate the Final Scores after Processing is complete
-    void calculateFinalScores();
-
-    //Calculate the Result after all the data has been processed
-    void calculateResult();
-
-private:
     SMART_DEBUG_LOG*   debugLog;
     QThread            mThread;
 
-    //Store all Processing Results in a Circular Buffer FIFO
-    resultsBufferType processingResults;
+    resultsBufferType  mResultsBuf;
 
-    //Only the latest Result
-    ProcessingResult_t mCurrentProcessingResult;
-
-    //Electrode Contact Values for Processing
-    uint32_t normalizedData[MAX_EEG_ELECTRODES];
-
-    //Average Contact Quality
-    uint16_t averageCQ[MAX_EEG_ELECTRODES];
-
-    //Keep Track of Sums to Calculate the Averages
-    uint64t voltageSums[MAX_EEG_ELECTRODES];
-    uint64t qualitySums[MAX_EEG_ELECTRODES];
-
-    //Final Scores from Data Processing
-    ProcessingScore_t finalScores[NUM_PCC_DIRECTIONS];
-    Confidence_Type   finalConfidences[NUM_PCC_DIRECTIONS];
-
-    //Count of how many frames we've processed
-    uint64t framesProcessed;
-
-    bool averagesCalculated;
-    bool scoresCalculated;
-    bool resultReady;
+    std::thread        mRecvThread;
+    std::atomic_bool   mIsAlive;
 };
 
 #endif // BCI_C_SIGNAL_PROCESSING_H

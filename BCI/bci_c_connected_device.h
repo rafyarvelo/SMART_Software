@@ -6,6 +6,8 @@
 class C_ConnectedDevice
 {
 public:
+    C_ConnectedDevice() { connectionStatus = NOT_CONNECTED; }
+
     virtual ConnectionStatusType connect() = 0;
     ConnectionStatusType GetConnectionStatus() {return connectionStatus;}
 

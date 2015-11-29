@@ -11,7 +11,7 @@
 
 
 //##############SMART Data Types##############
-#define EMERGENCY_STOP_DISTANCE   1     //Meters
+#define EMERGENCY_STOP_DISTANCE   0.8   //Meters
 #define MAX_RANGE_TO_OBJECT       6     //Meters
 #define MAX_TM_FRAMES             25    //Only store the latest 25 Frames
 #define COMMAND_TIMEOUT           20000 //Wait 20 seconds before killing the System
@@ -21,12 +21,12 @@
 #define	LED_LEFT_FREQ_DEFAULT     40    //Hertz
 
 //====================EEG Types====================
-typedef enum Emotiv_Electrodes
+enum Emotiv_Electrodes
 {
     F3=0, FC6, P7, T8 , F7,
     F8  , T7 , P8, AF4, F4,
     AF3 , O2 , O1, FC5, NUM_EMOTIV_ELECTRODES
-} Emotiv_Electrodes;
+};
 
 #if DEFAULT_EEG_TYPE == EEG_TYPE_EMOTIV
     #define MAX_EEG_ELECTRODES  NUM_EMOTIV_ELECTRODES
@@ -73,20 +73,21 @@ typedef struct MsgIdType { uint8_t id[MSG_ID_SIZE]; } MsgIdType;
 //*****************************************************************************
 
 //Use to see how sure we are that the command is correct
-typedef enum Confidence_Type
+enum Confidence_Type
 {
     UNSURE=0,
     MODERATE,
     LIKELY,
     ABSOLUTE,
     NUM_CONFIDENCE_TYPES
-}Confidence_Type;
+};
 
 //The Final Result of our EEG Processing
 typedef struct ProcessingResult_t
 {
     PCC_Command_Type command;
-    Confidence_Type  confidence;
+    char             pad_0[3];
+    unsigned int     confidence;
 
 #ifdef __cplusplus
     ProcessingResult_t()
@@ -118,6 +119,7 @@ typedef struct EEG_Frame_t
 
     //Percentage of Full Battery Charge
     uint8_t batteryPercentage;
+    char    pad_0[3]; //To be 4 byte aligned
 
 #ifdef __cplusplus
     EEG_Frame_t()
@@ -176,6 +178,8 @@ typedef struct SensorData_t
 typedef struct BluetoothFrame_t
 {
 	PCC_Command_Type remoteCommand;
+    char             pad_0[3];
+
 #ifdef __cplusplus
     BluetoothFrame_t()
     {
@@ -188,7 +192,9 @@ typedef struct BluetoothFrame_t
 typedef struct BRS_Frame_t
 {
 	MsgIdType        MsgId; //Message Sent from BRS to BCI
+    char             pad_0[3];
     PCC_Command_Type remoteCommand;
+    char             pad_1[3];
 	SensorData_t     sensorData;
 #ifdef __cplusplus
     BRS_Frame_t()
@@ -201,24 +207,25 @@ typedef struct BRS_Frame_t
 //===============================================
 
 //==================Flasher Types==================
-typedef enum
+enum LED_Group_ID
 {
     LED_FORWARD=0,
     LED_BACKWARD,
     LED_RIGHT,
     LED_LEFT,
     NUM_LED_GROUPS
-} LED_Group_ID;
+};
 
 typedef struct LED_Group_t
 {
-	LED_Group_ID id;
+	unsigned int id;
 	uint16_t     frequency;
+    char         pad_0[2]; //To Be 4 byte aligned
 } LED_Group_t;
 
 //=================================================
 
-typedef enum BCIState
+enum BCIState
 {
     BCI_OFF=0,
     /*
@@ -250,16 +257,41 @@ typedef enum BCIState
      * 1) Send the Command
      * 2) Revert to BCI_STANDBY
      */
-}BCIState;
+};
+
+//Need a small messsage to send through the UART
+typedef struct BCI2BRS_MSG
+{
+	unsigned int timeStamp;
+	unsigned int bciState;
+	unsigned char lastCommand;
+	unsigned int  lastConfidence;
+	unsigned char eegCmd;
+	unsigned int  eegConfidence;
+
+#ifdef __cplusplus
+	BCI2BRS_MSG()
+	{
+		timeStamp      = 0;
+		bciState       = BCI_OFF;
+		lastCommand    = PCC_CMD_NONE;
+		lastConfidence = UNSURE;
+		eegCmd         = PCC_CMD_NONE;
+		eegConfidence  = UNSURE;
+	}
+#endif
+} BCI2BRS_MSG;
 
 //Full Telemetry Frame
 typedef struct TM_Frame_t
 {
     MsgIdType            MsgId; //Message Sent From BCI -> BRS -> MD
-    int                  timeStamp;
-    BCIState             bciState;
+    char                 pad_0[3];
+    unsigned int         timeStamp;
+    unsigned int         bciState;
     PCC_Command_Type     lastCommand;
-    Confidence_Type      lastConfidence;
+    char                 pad_1[3];
+    unsigned int         lastConfidence;
     ProcessingResult_t   processingResult;
     BRS_Frame_t          brsFrame;
     LED_Group_t          ledForward;
@@ -308,7 +340,7 @@ typedef struct TM_Frame_t
 TM_Frame_t*         createTMFrame();
 EEG_Frame_t*        createEEGFrame();
 BRS_Frame_t*        createBRSFrame();
-LED_Group_t*        createLEDGroup(LED_Group_ID id);
+LED_Group_t*        createLEDGroup(unsigned int id);
 BluetoothFrame_t*   createBluetoothFrame();
 ProcessingResult_t* createProcessingResult();
 

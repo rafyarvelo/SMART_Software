@@ -32,6 +32,7 @@ void C_PCC_IO_Serial::SendCommand(PCC_Command_Type cmd)
         if (mSerialPortPtr->sendToSerialPort(cmd))
         {
             toPrint = QString("Sending PCC Command: ") + QString(cmd);
+            prevCommand = cmd;
         }
         else
         {
