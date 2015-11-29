@@ -43,31 +43,31 @@ void protobuf_AssignDesc_seniordesign_2eproto() {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ProcessingResults, confidence_),
   };
   ProcessingResults_reflection_ =
-    ::google::protobuf::internal::GeneratedMessageReflection::NewGeneratedMessageReflection(
+    new ::google::protobuf::internal::GeneratedMessageReflection(
       ProcessingResults_descriptor_,
       ProcessingResults::default_instance_,
       ProcessingResults_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ProcessingResults, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ProcessingResults, _unknown_fields_),
       -1,
-      -1,
-      -1,
-      sizeof(ProcessingResults),
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ProcessingResults, _internal_metadata_),
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ProcessingResults, _is_default_instance_));
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(ProcessingResults));
   ProcessingAck_descriptor_ = file->message_type(1);
   static const int ProcessingAck_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ProcessingAck, timestamp_),
   };
   ProcessingAck_reflection_ =
-    ::google::protobuf::internal::GeneratedMessageReflection::NewGeneratedMessageReflection(
+    new ::google::protobuf::internal::GeneratedMessageReflection(
       ProcessingAck_descriptor_,
       ProcessingAck::default_instance_,
       ProcessingAck_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ProcessingAck, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ProcessingAck, _unknown_fields_),
       -1,
-      -1,
-      -1,
-      sizeof(ProcessingAck),
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ProcessingAck, _internal_metadata_),
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ProcessingAck, _is_default_instance_));
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(ProcessingAck));
   Direction_descriptor_ = file->enum_type(0);
 }
 
@@ -82,9 +82,9 @@ inline void protobuf_AssignDescriptorsOnce() {
 void protobuf_RegisterTypes(const ::std::string&) {
   protobuf_AssignDescriptorsOnce();
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
-      ProcessingResults_descriptor_, &ProcessingResults::default_instance());
+    ProcessingResults_descriptor_, &ProcessingResults::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
-      ProcessingAck_descriptor_, &ProcessingAck::default_instance());
+    ProcessingAck_descriptor_, &ProcessingAck::default_instance());
 }
 
 }  // namespace
@@ -104,11 +104,11 @@ void protobuf_AddDesc_seniordesign_2eproto() {
 
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
     "\n\022seniordesign.proto\022\014seniordesign\"S\n\021Pr"
-    "ocessingResults\022*\n\tdirection\030\001 \001(\0162\027.sen"
-    "iordesign.Direction\022\022\n\nconfidence\030\002 \001(\001\""
-    "\"\n\rProcessingAck\022\021\n\ttimestamp\030\001 \001(\004*H\n\tD"
+    "ocessingResults\022*\n\tdirection\030\001 \002(\0162\027.sen"
+    "iordesign.Direction\022\022\n\nconfidence\030\002 \002(\001\""
+    "\"\n\rProcessingAck\022\021\n\ttimestamp\030\001 \002(\004*H\n\tD"
     "irection\022\013\n\007NEUTRAL\020\000\022\013\n\007FORWARD\020\001\022\014\n\010BA"
-    "CKWARD\020\002\022\010\n\004LEFT\020\003\022\t\n\005RIGHT\020\004b\006proto3", 237);
+    "CKWARD\020\002\022\010\n\004LEFT\020\003\022\t\n\005RIGHT\020\004", 229);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "seniordesign.proto", &protobuf_RegisterTypes);
   ProcessingResults::default_instance_ = new ProcessingResults();
@@ -142,16 +142,6 @@ bool Direction_IsValid(int value) {
 }
 
 
-namespace {
-
-static void MergeFromFail(int line) GOOGLE_ATTRIBUTE_COLD;
-static void MergeFromFail(int line) {
-  GOOGLE_CHECK(false) << __FILE__ << ":" << line;
-}
-
-}  // namespace
-
-
 // ===================================================================
 
 #ifndef _MSC_VER
@@ -160,28 +150,26 @@ const int ProcessingResults::kConfidenceFieldNumber;
 #endif  // !_MSC_VER
 
 ProcessingResults::ProcessingResults()
-  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
+  : ::google::protobuf::Message() {
   SharedCtor();
   // @@protoc_insertion_point(constructor:seniordesign.ProcessingResults)
 }
 
 void ProcessingResults::InitAsDefaultInstance() {
-  _is_default_instance_ = true;
 }
 
 ProcessingResults::ProcessingResults(const ProcessingResults& from)
-  : ::google::protobuf::Message(),
-    _internal_metadata_(NULL) {
+  : ::google::protobuf::Message() {
   SharedCtor();
   MergeFrom(from);
   // @@protoc_insertion_point(copy_constructor:seniordesign.ProcessingResults)
 }
 
 void ProcessingResults::SharedCtor() {
-    _is_default_instance_ = false;
   _cached_size_ = 0;
   direction_ = 0;
   confidence_ = 0;
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
 ProcessingResults::~ProcessingResults() {
@@ -211,28 +199,28 @@ const ProcessingResults& ProcessingResults::default_instance() {
 
 ProcessingResults* ProcessingResults::default_instance_ = NULL;
 
-ProcessingResults* ProcessingResults::New(::google::protobuf::Arena* arena) const {
-  ProcessingResults* n = new ProcessingResults;
-  if (arena != NULL) {
-    arena->Own(n);
-  }
-  return n;
+ProcessingResults* ProcessingResults::New() const {
+  return new ProcessingResults;
 }
 
 void ProcessingResults::Clear() {
-#define ZR_HELPER_(f) reinterpret_cast<char*>(\
-  &reinterpret_cast<ProcessingResults*>(16)->f)
+#define OFFSET_OF_FIELD_(f) (reinterpret_cast<char*>(      \
+  &reinterpret_cast<ProcessingResults*>(16)->f) - \
+   reinterpret_cast<char*>(16))
 
-#define ZR_(first, last) do {\
-  ::memset(&first, 0,\
-           ZR_HELPER_(last) - ZR_HELPER_(first) + sizeof(last));\
-} while (0)
+#define ZR_(first, last) do {                              \
+    size_t f = OFFSET_OF_FIELD_(first);                    \
+    size_t n = OFFSET_OF_FIELD_(last) - f + sizeof(last);  \
+    ::memset(&first, 0, n);                                \
+  } while (0)
 
   ZR_(confidence_, direction_);
 
-#undef ZR_HELPER_
+#undef OFFSET_OF_FIELD_
 #undef ZR_
 
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
 }
 
 bool ProcessingResults::MergePartialFromCodedStream(
@@ -245,14 +233,18 @@ bool ProcessingResults::MergePartialFromCodedStream(
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // optional .seniordesign.Direction direction = 1;
+      // required .seniordesign.Direction direction = 1;
       case 1: {
         if (tag == 8) {
           int value;
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
                  input, &value)));
-          set_direction(static_cast< ::seniordesign::Direction >(value));
+          if (::seniordesign::Direction_IsValid(value)) {
+            set_direction(static_cast< ::seniordesign::Direction >(value));
+          } else {
+            mutable_unknown_fields()->AddVarint(1, value);
+          }
         } else {
           goto handle_unusual;
         }
@@ -260,14 +252,14 @@ bool ProcessingResults::MergePartialFromCodedStream(
         break;
       }
 
-      // optional double confidence = 2;
+      // required double confidence = 2;
       case 2: {
         if (tag == 17) {
          parse_confidence:
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    double, ::google::protobuf::internal::WireFormatLite::TYPE_DOUBLE>(
                  input, &confidence_)));
-
+          set_has_confidence();
         } else {
           goto handle_unusual;
         }
@@ -282,7 +274,8 @@ bool ProcessingResults::MergePartialFromCodedStream(
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
           goto success;
         }
-        DO_(::google::protobuf::internal::WireFormatLite::SkipField(input, tag));
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
         break;
       }
     }
@@ -299,34 +292,42 @@ failure:
 void ProcessingResults::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
   // @@protoc_insertion_point(serialize_start:seniordesign.ProcessingResults)
-  // optional .seniordesign.Direction direction = 1;
-  if (this->direction() != 0) {
+  // required .seniordesign.Direction direction = 1;
+  if (has_direction()) {
     ::google::protobuf::internal::WireFormatLite::WriteEnum(
       1, this->direction(), output);
   }
 
-  // optional double confidence = 2;
-  if (this->confidence() != 0) {
+  // required double confidence = 2;
+  if (has_confidence()) {
     ::google::protobuf::internal::WireFormatLite::WriteDouble(2, this->confidence(), output);
   }
 
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
   // @@protoc_insertion_point(serialize_end:seniordesign.ProcessingResults)
 }
 
 ::google::protobuf::uint8* ProcessingResults::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
   // @@protoc_insertion_point(serialize_to_array_start:seniordesign.ProcessingResults)
-  // optional .seniordesign.Direction direction = 1;
-  if (this->direction() != 0) {
+  // required .seniordesign.Direction direction = 1;
+  if (has_direction()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
       1, this->direction(), target);
   }
 
-  // optional double confidence = 2;
-  if (this->confidence() != 0) {
+  // required double confidence = 2;
+  if (has_confidence()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteDoubleToArray(2, this->confidence(), target);
   }
 
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
   // @@protoc_insertion_point(serialize_to_array_end:seniordesign.ProcessingResults)
   return target;
 }
@@ -334,17 +335,24 @@ void ProcessingResults::SerializeWithCachedSizes(
 int ProcessingResults::ByteSize() const {
   int total_size = 0;
 
-  // optional .seniordesign.Direction direction = 1;
-  if (this->direction() != 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::EnumSize(this->direction());
-  }
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    // required .seniordesign.Direction direction = 1;
+    if (has_direction()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::EnumSize(this->direction());
+    }
 
-  // optional double confidence = 2;
-  if (this->confidence() != 0) {
-    total_size += 1 + 8;
-  }
+    // required double confidence = 2;
+    if (has_confidence()) {
+      total_size += 1 + 8;
+    }
 
+  }
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
   _cached_size_ = total_size;
   GOOGLE_SAFE_CONCURRENT_WRITES_END();
@@ -352,10 +360,10 @@ int ProcessingResults::ByteSize() const {
 }
 
 void ProcessingResults::MergeFrom(const ::google::protobuf::Message& from) {
-  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
-  const ProcessingResults* source = 
-      ::google::protobuf::internal::DynamicCastToGenerated<const ProcessingResults>(
-          &from);
+  GOOGLE_CHECK_NE(&from, this);
+  const ProcessingResults* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const ProcessingResults*>(
+      &from);
   if (source == NULL) {
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
@@ -364,13 +372,16 @@ void ProcessingResults::MergeFrom(const ::google::protobuf::Message& from) {
 }
 
 void ProcessingResults::MergeFrom(const ProcessingResults& from) {
-  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
-  if (from.direction() != 0) {
-    set_direction(from.direction());
+  GOOGLE_CHECK_NE(&from, this);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from.has_direction()) {
+      set_direction(from.direction());
+    }
+    if (from.has_confidence()) {
+      set_confidence(from.confidence());
+    }
   }
-  if (from.confidence() != 0) {
-    set_confidence(from.confidence());
-  }
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
 
 void ProcessingResults::CopyFrom(const ::google::protobuf::Message& from) {
@@ -386,19 +397,19 @@ void ProcessingResults::CopyFrom(const ProcessingResults& from) {
 }
 
 bool ProcessingResults::IsInitialized() const {
+  if ((_has_bits_[0] & 0x00000003) != 0x00000003) return false;
 
   return true;
 }
 
 void ProcessingResults::Swap(ProcessingResults* other) {
-  if (other == this) return;
-  InternalSwap(other);
-}
-void ProcessingResults::InternalSwap(ProcessingResults* other) {
-  std::swap(direction_, other->direction_);
-  std::swap(confidence_, other->confidence_);
-  _internal_metadata_.Swap(&other->_internal_metadata_);
-  std::swap(_cached_size_, other->_cached_size_);
+  if (other != this) {
+    std::swap(direction_, other->direction_);
+    std::swap(confidence_, other->confidence_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
 }
 
 ::google::protobuf::Metadata ProcessingResults::GetMetadata() const {
@@ -409,38 +420,6 @@ void ProcessingResults::InternalSwap(ProcessingResults* other) {
   return metadata;
 }
 
-#if PROTOBUF_INLINE_NOT_IN_HEADERS
-// ProcessingResults
-
-// optional .seniordesign.Direction direction = 1;
-void ProcessingResults::clear_direction() {
-  direction_ = 0;
-}
- ::seniordesign::Direction ProcessingResults::direction() const {
-  // @@protoc_insertion_point(field_get:seniordesign.ProcessingResults.direction)
-  return static_cast< ::seniordesign::Direction >(direction_);
-}
- void ProcessingResults::set_direction(::seniordesign::Direction value) {
-  
-  direction_ = value;
-  // @@protoc_insertion_point(field_set:seniordesign.ProcessingResults.direction)
-}
-
-// optional double confidence = 2;
-void ProcessingResults::clear_confidence() {
-  confidence_ = 0;
-}
- double ProcessingResults::confidence() const {
-  // @@protoc_insertion_point(field_get:seniordesign.ProcessingResults.confidence)
-  return confidence_;
-}
- void ProcessingResults::set_confidence(double value) {
-  
-  confidence_ = value;
-  // @@protoc_insertion_point(field_set:seniordesign.ProcessingResults.confidence)
-}
-
-#endif  // PROTOBUF_INLINE_NOT_IN_HEADERS
 
 // ===================================================================
 
@@ -449,27 +428,25 @@ const int ProcessingAck::kTimestampFieldNumber;
 #endif  // !_MSC_VER
 
 ProcessingAck::ProcessingAck()
-  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
+  : ::google::protobuf::Message() {
   SharedCtor();
   // @@protoc_insertion_point(constructor:seniordesign.ProcessingAck)
 }
 
 void ProcessingAck::InitAsDefaultInstance() {
-  _is_default_instance_ = true;
 }
 
 ProcessingAck::ProcessingAck(const ProcessingAck& from)
-  : ::google::protobuf::Message(),
-    _internal_metadata_(NULL) {
+  : ::google::protobuf::Message() {
   SharedCtor();
   MergeFrom(from);
   // @@protoc_insertion_point(copy_constructor:seniordesign.ProcessingAck)
 }
 
 void ProcessingAck::SharedCtor() {
-    _is_default_instance_ = false;
   _cached_size_ = 0;
   timestamp_ = GOOGLE_ULONGLONG(0);
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
 ProcessingAck::~ProcessingAck() {
@@ -499,16 +476,14 @@ const ProcessingAck& ProcessingAck::default_instance() {
 
 ProcessingAck* ProcessingAck::default_instance_ = NULL;
 
-ProcessingAck* ProcessingAck::New(::google::protobuf::Arena* arena) const {
-  ProcessingAck* n = new ProcessingAck;
-  if (arena != NULL) {
-    arena->Own(n);
-  }
-  return n;
+ProcessingAck* ProcessingAck::New() const {
+  return new ProcessingAck;
 }
 
 void ProcessingAck::Clear() {
   timestamp_ = GOOGLE_ULONGLONG(0);
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
 }
 
 bool ProcessingAck::MergePartialFromCodedStream(
@@ -521,13 +496,13 @@ bool ProcessingAck::MergePartialFromCodedStream(
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // optional uint64 timestamp = 1;
+      // required uint64 timestamp = 1;
       case 1: {
         if (tag == 8) {
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::uint64, ::google::protobuf::internal::WireFormatLite::TYPE_UINT64>(
                  input, &timestamp_)));
-
+          set_has_timestamp();
         } else {
           goto handle_unusual;
         }
@@ -542,7 +517,8 @@ bool ProcessingAck::MergePartialFromCodedStream(
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
           goto success;
         }
-        DO_(::google::protobuf::internal::WireFormatLite::SkipField(input, tag));
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
         break;
       }
     }
@@ -559,22 +535,30 @@ failure:
 void ProcessingAck::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
   // @@protoc_insertion_point(serialize_start:seniordesign.ProcessingAck)
-  // optional uint64 timestamp = 1;
-  if (this->timestamp() != 0) {
+  // required uint64 timestamp = 1;
+  if (has_timestamp()) {
     ::google::protobuf::internal::WireFormatLite::WriteUInt64(1, this->timestamp(), output);
   }
 
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
   // @@protoc_insertion_point(serialize_end:seniordesign.ProcessingAck)
 }
 
 ::google::protobuf::uint8* ProcessingAck::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
   // @@protoc_insertion_point(serialize_to_array_start:seniordesign.ProcessingAck)
-  // optional uint64 timestamp = 1;
-  if (this->timestamp() != 0) {
+  // required uint64 timestamp = 1;
+  if (has_timestamp()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteUInt64ToArray(1, this->timestamp(), target);
   }
 
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
   // @@protoc_insertion_point(serialize_to_array_end:seniordesign.ProcessingAck)
   return target;
 }
@@ -582,13 +566,20 @@ void ProcessingAck::SerializeWithCachedSizes(
 int ProcessingAck::ByteSize() const {
   int total_size = 0;
 
-  // optional uint64 timestamp = 1;
-  if (this->timestamp() != 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::UInt64Size(
-        this->timestamp());
-  }
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    // required uint64 timestamp = 1;
+    if (has_timestamp()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::UInt64Size(
+          this->timestamp());
+    }
 
+  }
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
   _cached_size_ = total_size;
   GOOGLE_SAFE_CONCURRENT_WRITES_END();
@@ -596,10 +587,10 @@ int ProcessingAck::ByteSize() const {
 }
 
 void ProcessingAck::MergeFrom(const ::google::protobuf::Message& from) {
-  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
-  const ProcessingAck* source = 
-      ::google::protobuf::internal::DynamicCastToGenerated<const ProcessingAck>(
-          &from);
+  GOOGLE_CHECK_NE(&from, this);
+  const ProcessingAck* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const ProcessingAck*>(
+      &from);
   if (source == NULL) {
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
@@ -608,10 +599,13 @@ void ProcessingAck::MergeFrom(const ::google::protobuf::Message& from) {
 }
 
 void ProcessingAck::MergeFrom(const ProcessingAck& from) {
-  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
-  if (from.timestamp() != 0) {
-    set_timestamp(from.timestamp());
+  GOOGLE_CHECK_NE(&from, this);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from.has_timestamp()) {
+      set_timestamp(from.timestamp());
+    }
   }
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
 
 void ProcessingAck::CopyFrom(const ::google::protobuf::Message& from) {
@@ -627,18 +621,18 @@ void ProcessingAck::CopyFrom(const ProcessingAck& from) {
 }
 
 bool ProcessingAck::IsInitialized() const {
+  if ((_has_bits_[0] & 0x00000001) != 0x00000001) return false;
 
   return true;
 }
 
 void ProcessingAck::Swap(ProcessingAck* other) {
-  if (other == this) return;
-  InternalSwap(other);
-}
-void ProcessingAck::InternalSwap(ProcessingAck* other) {
-  std::swap(timestamp_, other->timestamp_);
-  _internal_metadata_.Swap(&other->_internal_metadata_);
-  std::swap(_cached_size_, other->_cached_size_);
+  if (other != this) {
+    std::swap(timestamp_, other->timestamp_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
 }
 
 ::google::protobuf::Metadata ProcessingAck::GetMetadata() const {
@@ -649,24 +643,6 @@ void ProcessingAck::InternalSwap(ProcessingAck* other) {
   return metadata;
 }
 
-#if PROTOBUF_INLINE_NOT_IN_HEADERS
-// ProcessingAck
-
-// optional uint64 timestamp = 1;
-void ProcessingAck::clear_timestamp() {
-  timestamp_ = GOOGLE_ULONGLONG(0);
-}
- ::google::protobuf::uint64 ProcessingAck::timestamp() const {
-  // @@protoc_insertion_point(field_get:seniordesign.ProcessingAck.timestamp)
-  return timestamp_;
-}
- void ProcessingAck::set_timestamp(::google::protobuf::uint64 value) {
-  
-  timestamp_ = value;
-  // @@protoc_insertion_point(field_set:seniordesign.ProcessingAck.timestamp)
-}
-
-#endif  // PROTOBUF_INLINE_NOT_IN_HEADERS
 
 // @@protoc_insertion_point(namespace_scope)
 
