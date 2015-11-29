@@ -117,7 +117,7 @@ TM_Frame_t* createTMFrame()
 	return ptr;
 }
 
-LED_Group_t* createLEDGroup(LED_Group_ID id)
+LED_Group_t* createLEDGroup(unsigned int id)
 {
     size_t       dataSize = 0;
 	LED_Group_t* ptr = NULL;

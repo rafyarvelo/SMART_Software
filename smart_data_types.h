@@ -11,7 +11,7 @@
 
 
 //##############SMART Data Types##############
-#define EMERGENCY_STOP_DISTANCE   1     //Meters
+#define EMERGENCY_STOP_DISTANCE   0.8   //Meters
 #define MAX_RANGE_TO_OBJECT       6     //Meters
 #define MAX_TM_FRAMES             25    //Only store the latest 25 Frames
 #define COMMAND_TIMEOUT           20000 //Wait 20 seconds before killing the System
