@@ -2,6 +2,7 @@
 #define BCI_C_SIGNAL_PROCESSING_H
 
 #include <atomic>
+#include <thread>
 
 #include <QThread>
 #include "../smart_config.h"

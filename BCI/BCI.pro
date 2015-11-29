@@ -1,3 +1,5 @@
+QMAKE_CC = gcc-4.8
+QMAKE_CXX = g++-4.8
 
 #Added Library from https://github.com/qextserialport/qextserialport
 CONFIG += extserialport
@@ -9,6 +11,9 @@ INCLUDEPATH += ../CCS_PROJECTS
 unix{
 INCLUDEPATH += ../../emokit/include/emokit
 }
+
+#C++11 Support 
+QMAKE_CXXFLAGS += -std=c++11
 
 HEADERS += \
     bci_c_bci_package.h \
@@ -71,10 +76,6 @@ SOURCES += \
     bci_c_flasher_io_debug.cpp \
     bci_c_flasher_io_gpio.cpp \
     seniordesign.pb.cc
-
-    unix{
-    SOURCES += bci_c_eeg_io_emotiv.cpp
-    }
 
 #Crap Needed for Qextserialport on windows
 win32{
