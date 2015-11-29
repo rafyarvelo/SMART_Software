@@ -41,11 +41,8 @@ HEADERS += \
     bci_c_framegenerator.h \
     ../smart_data_types.h \
     bci_c_flasher_io_debug.h \
-    bci_c_flasher_io_gpio.h
-
-    unix{
-    HEADERS += bci_c_eeg_io_emotiv.h
-    }
+    bci_c_flasher_io_gpio.h \
+    seniordesign.pb.h
 
 
 SOURCES += \
@@ -72,52 +69,12 @@ SOURCES += \
     ../smart_data_types.c \
     bci_c_pcc_io.cpp \
     bci_c_flasher_io_debug.cpp \
-    bci_c_flasher_io_gpio.cpp
+    bci_c_flasher_io_gpio.cpp \
+    seniordesign.pb.cc
 
     unix{
     SOURCES += bci_c_eeg_io_emotiv.cpp
     }
-
-#Crap Needed for Emokit libraries
-unix{
-    win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../emokit/lib/release/ -lemokit
-    else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../emokit/lib/debug/ -lemokit
-    else:symbian: LIBS += -lemokit
-    else:unix: LIBS += -L$$PWD/../../emokit/lib/ -lemokit
-
-    INCLUDEPATH += $$PWD/../../emokit/include
-    DEPENDPATH += $$PWD/../../emokit/include
-
-    win32:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../emokit/lib/release/emokit.lib
-    else:win32:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../emokit/lib/debug/emokit.lib
-    else:unix:!symbian: PRE_TARGETDEPS += $$PWD/../../emokit/lib/libemokit.a
-
-    win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../../../usr/lib/release/ -lmcrypt
-    else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../../../usr/lib/debug/ -lmcrypt
-    else:unix: LIBS += -L$$PWD/../../../../../usr/lib/ -lmcrypt
-
-    INCLUDEPATH += $$PWD/../../../../../usr/include
-    DEPENDPATH += $$PWD/../../../../../usr/include
-
-    win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../../../../usr/lib/release/libmcrypt.a
-    else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../../../../usr/lib/debug/libmcrypt.a
-    else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../../../../usr/lib/release/mcrypt.lib
-    else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../../../../usr/lib/debug/mcrypt.lib
-    else:unix: PRE_TARGETDEPS += $$PWD/../../../../../usr/lib/libmcrypt.a
-
-    win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../../../usr/local/lib/release/ -lhidapi-hidraw
-    else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../../../usr/local/lib/debug/ -lhidapi-hidraw
-    else:unix: LIBS += -L$$PWD/../../../../../usr/local/lib/ -lhidapi-hidraw
-
-    INCLUDEPATH += $$PWD/../../../../../usr/local/include
-    DEPENDPATH += $$PWD/../../../../../usr/local/include
-
-    win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../../../../usr/local/lib/release/libhidapi-hidraw.a
-    else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../../../../usr/local/lib/debug/libhidapi-hidraw.a
-    else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../../../../usr/local/lib/release/hidapi-hidraw.lib
-    else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../../../../usr/local/lib/debug/hidapi-hidraw.lib
-    else:unix: PRE_TARGETDEPS += $$PWD/../../../../../usr/local/lib/libhidapi-hidraw.a
-}
 
 #Crap Needed for Qextserialport on windows
 win32{
@@ -125,3 +82,6 @@ win32{
  INCLUDEPATH += $$PWD/../../qextserialport/src/
  DEPENDPATH += $$PWD/../../qextserialport/src/
 }
+
+#Crap Needed for communications with signal processing daemon
+LIBS += -lzmq -lprotobuf
