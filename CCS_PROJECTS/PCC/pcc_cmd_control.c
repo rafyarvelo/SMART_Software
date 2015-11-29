@@ -7,8 +7,8 @@ void initCmdControl()
 	configureServos();
 
 	//Initialize LEDS OFF
-	setLED(TIVA_RED_LED, OFF);
-	setLED(TIVA_GREEN_LED, OFF);
+	setLED(RED_LED, OFF);
+	setLED(GREEN_LED, OFF);
 }
 
 //This Sets up the Timers and PWM for the Servos
@@ -112,7 +112,7 @@ void Right()
 	println("Sending Logic Right...");
 
 	sendServoCmd(SERVO_Y, SERVO_CENTER);
-	sendServoCmd(SERVO_X, SERVO_FORWARD);
+	sendServoCmd(SERVO_X, SERVO_BACKWARD);
 }
 
 //Container Function call for Left Movement
@@ -121,7 +121,7 @@ void Left()
 	println("Sending Logic Left...");
 
 	sendServoCmd(SERVO_Y, SERVO_CENTER);
-	sendServoCmd(SERVO_X, SERVO_BACKWARD);
+	sendServoCmd(SERVO_X, SERVO_FORWARD);
 }
 
 //Container Function call for Stop Command
@@ -203,7 +203,8 @@ PCC_Command_Type processCommand(PCC_Command_Type currentCmd, PCC_Command_Type la
 		break;
 
 		case PCC_TEST: //Debug the UART by blinking the LEDs
-			blinkLEDs(5);
+			println("UART TEST!");
+			//blinkLEDs(5);
 		break;
 
 		case PCC_OFF:
