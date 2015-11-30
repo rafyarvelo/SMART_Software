@@ -106,9 +106,10 @@ void protobuf_AddDesc_seniordesign_2eproto() {
     "\n\022seniordesign.proto\022\014seniordesign\"S\n\021Pr"
     "ocessingResults\022*\n\tdirection\030\001 \002(\0162\027.sen"
     "iordesign.Direction\022\022\n\nconfidence\030\002 \002(\001\""
-    "\"\n\rProcessingAck\022\021\n\ttimestamp\030\001 \002(\004*H\n\tD"
-    "irection\022\013\n\007NEUTRAL\020\000\022\013\n\007FORWARD\020\001\022\014\n\010BA"
-    "CKWARD\020\002\022\010\n\004LEFT\020\003\022\t\n\005RIGHT\020\004", 229);
+    "\"\n\rProcessingAck\022\021\n\ttimestamp\030\001 \002(\004*W\n\tD"
+    "irection\022\016\n\nSD_NEUTRAL\020\000\022\016\n\nSD_FORWARD\020\001"
+    "\022\017\n\013SD_BACKWARD\020\002\022\013\n\007SD_LEFT\020\003\022\014\n\010SD_RIG"
+    "HT\020\004", 244);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "seniordesign.proto", &protobuf_RegisterTypes);
   ProcessingResults::default_instance_ = new ProcessingResults();
