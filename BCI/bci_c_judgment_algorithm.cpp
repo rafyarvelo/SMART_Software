@@ -8,6 +8,7 @@ C_JudgmentAlgorithm::C_JudgmentAlgorithm()
     prevCommand      = PCC_CMD_NONE;
     finalCommand     = PCC_CMD_NONE;
     cmdConfidence    = UNSURE;
+    prevCmdSource    = CMD_SRC_NONE;
 
     //Initialize Members
     memset(&mCurrentTMFrame, 0, sizeof(TM_Frame_t));
@@ -46,11 +47,14 @@ PCC_Command_Type C_JudgmentAlgorithm::GetFinalCommand()
 //To be effective, make sure the RVS and TM are set before calling this
 void C_JudgmentAlgorithm::computeCommand()
 {
+    std::cout << "=================\n\n\n\n LAST CMD SOURCE = " << (unsigned int) prevCmdSource << "\n\n\n\n\n\n================= "<< std::endl;
+
     //Check for Emergency Stop
     #ifdef ENABLE_EMERGENCY_STOP
     if (!SafeToProceed())
     {
         cmdConfidence = ABSOLUTE;
+        prevCmdSource = CMD_SRC_SENSOR;
         finalizeCommand(PCC_STOP);
         return;
     }
@@ -61,12 +65,30 @@ void C_JudgmentAlgorithm::computeCommand()
     {
         //Update Final Command with Remote Command
         cmdConfidence = ABSOLUTE;
+        prevCmdSource = CMD_SRC_REMOTE;
         finalizeCommand(mCurrentTMFrame.brsFrame.remoteCommand);
         return;
     }
-
+    
     //Process EEG Data
-    ParseEEGData();
+    switch (prevCmdSource)
+    {
+        case CMD_SRC_NONE:
+        case CMD_SRC_SENSOR:
+        case CMD_SRC_SP:
+            ParseEEGData();
+            break;
+        case CMD_SRC_REMOTE:
+            if (prevCommand == PCC_STOP)
+            {
+                ParseEEGData();
+            }
+            else
+            {
+                //Ignore EEG Command, Remote Override is still running
+            }
+            break;
+    }
 }
 
 
@@ -77,12 +99,38 @@ bool C_JudgmentAlgorithm::SafeToProceed()
     bool safeToProceed  = true;
 
     //Request an Emergency Stop if We're Getting too close to an Object
-    if (prevCommand == PCC_FORWARD  && rangeData.rangeFront <= EMERGENCY_STOP_DISTANCE ||
-        prevCommand == PCC_BACKWARD && rangeData.rangeBack  <= EMERGENCY_STOP_DISTANCE)
+    if (rangeData.rangeFront <= EMERGENCY_STOP_DISTANCE)
     {
-        debugLog->println(BCI_LOG, "Emergency Stop Requested",true);
-        emit RequestEmergencyStop();
-        safeToProceed = false;
+        switch (prevCommand)
+        {
+            case PCC_RIGHT:
+            case PCC_LEFT:
+            case PCC_BACKWARD:
+            case PCC_STOP:
+                safeToProceed  = true;
+                break;
+            case PCC_FORWARD:
+                safeToProceed = false;
+                prevCmdSource = CMD_SRC_SENSOR;
+                return safeToProceed;
+        }
+    }
+    
+    if (rangeData.rangeBack <= EMERGENCY_STOP_DISTANCE)
+    {
+        switch (prevCommand)
+        {
+            case PCC_RIGHT:
+            case PCC_LEFT:
+            case PCC_FORWARD:
+            case PCC_STOP:
+                safeToProceed  = true;
+                break;
+            case PCC_BACKWARD:
+                safeToProceed = false;
+                prevCmdSource = CMD_SRC_SENSOR;
+                return safeToProceed;
+        }
     }
 
     return safeToProceed;
@@ -96,6 +144,7 @@ void C_JudgmentAlgorithm::ParseEEGData()
     if (mCurrentProcessingResult.command != PCC_CMD_NONE)
     {
         cmdConfidence = mCurrentProcessingResult.confidence;
+        prevCmdSource = CMD_SRC_SP;
         finalizeCommand(mCurrentProcessingResult.command);
     }
 }

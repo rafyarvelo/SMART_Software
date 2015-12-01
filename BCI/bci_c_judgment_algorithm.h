@@ -11,6 +11,14 @@
 //Forward Declaration of Telemetry Manager Class
 class C_TelemetryManager;
 
+enum CommandSource
+{
+    CMD_SRC_NONE   = 0,
+    CMD_SRC_SENSOR = 1, //Range Finder Command
+    CMD_SRC_SP     = 2, //Signal Processing Source
+    CMD_SRC_REMOTE = 3  //Remote Source
+};
+
 class C_JudgmentAlgorithm : public QObject, public C_Singleton<C_JudgmentAlgorithm>
 {
     Q_OBJECT
@@ -52,6 +60,7 @@ private:
 
     PCC_Command_Type    finalCommand;
     PCC_Command_Type    prevCommand;
+    unsigned char       prevCmdSource;
     unsigned int        cmdConfidence;
 
     bool commandFinalized; //Just in case user forgets to call computeCommand()
